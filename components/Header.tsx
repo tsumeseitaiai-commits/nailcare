@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -34,20 +35,14 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 2a7 7 0 0 1 7 7c0 3.5-2.5 6.5-4 8l-3 3-3-3c-1.5-1.5-4-4.5-4-8a7 7 0 0 1 7-7z" />
-              <circle cx="12" cy="9" r="2" fill="currentColor" stroke="none" />
-            </svg>
+          <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg">
+            <Image
+              src="/images/optimized/logo.webp"
+              alt="Nail Seitai AI"
+              fill
+              className="object-cover"
+              sizes="32px"
+            />
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-base font-bold text-foreground sm:text-lg">

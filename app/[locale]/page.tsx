@@ -77,33 +77,27 @@ export default function HomePage() {
                 <div className="mt-14 grid grid-cols-3 gap-6 border-t border-border pt-8">
                   <div>
                     <p className="text-2xl font-bold text-foreground">98%</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      診断精度
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">診断精度</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">5K+</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      分析件数
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">分析件数</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-foreground">24h</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      AIサポート
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">AIサポート</p>
                   </div>
                 </div>
               </div>
 
-              {/* Hero image with floating cards */}
+              {/* Hero image */}
               <div className="relative mx-auto w-full max-w-lg">
                 <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 blur-3xl" />
                 <div className="relative">
                   <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-border">
                     <Image
-                      src="/nail-image-1.jpg"
-                      alt="Nail Seitai"
+                      src="/images/optimized/hero01.webp"
+                      alt="爪整体 AI診断"
                       fill
                       className="object-cover"
                       priority
@@ -120,9 +114,7 @@ export default function HomePage() {
                       <div className="h-1.5 w-20 overflow-hidden rounded-full bg-muted">
                         <div className="h-full w-[92%] rounded-full bg-success" />
                       </div>
-                      <span className="text-sm font-bold text-foreground">
-                        92
-                      </span>
+                      <span className="text-sm font-bold text-foreground">92</span>
                     </div>
                     <p className="mt-1 text-[10px] font-semibold text-success">
                       健康状態: 良好
@@ -170,28 +162,39 @@ export default function HomePage() {
             </div>
 
             <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Health */}
-              <div className="group rounded-xl border border-border bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-200 group-hover:bg-primary group-hover:text-white">
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
+              {/* Health — healthnail.webp */}
+              <div className="group overflow-hidden rounded-xl border border-border bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                <div className="relative h-44 overflow-hidden">
+                  <Image
+                    src="/images/optimized/healthnail.webp"
+                    alt={t("about.health.title")}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
                 </div>
-                <h3 className="text-lg font-bold text-foreground">
-                  {t("about.health.title")}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {t("about.health.description")}
-                </p>
+                <div className="p-8">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-200 group-hover:bg-primary group-hover:text-white">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground">
+                    {t("about.health.title")}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {t("about.health.description")}
+                  </p>
+                </div>
               </div>
 
               {/* Merit */}
@@ -245,7 +248,53 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 3. AI Diagnosis Features ===== */}
+        {/* ===== 3. Data Science Section (NEW) ===== */}
+        <section className="relative overflow-hidden py-20 sm:py-28">
+          {/* datascience.webp as subtle background */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/optimized/datascience.webp"
+              alt=""
+              fill
+              className="object-cover opacity-5"
+              aria-hidden="true"
+            />
+          </div>
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-white via-primary/3 to-white" />
+
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
+              Big Data
+            </p>
+            <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
+              ビッグデータで進化するAI診断
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
+              あなたの診断データが、次の誰かの健康をサポートします。
+              会話型診断で収集される生活習慣データとAI分析の組み合わせにより、
+              診断精度は日々向上しています。
+            </p>
+
+            {/* Stats row */}
+            <div className="mx-auto mt-12 grid max-w-2xl grid-cols-3 gap-8">
+              <div className="rounded-xl border border-border bg-white/80 p-6 backdrop-blur-sm shadow-sm">
+                <p className="text-3xl font-bold text-primary">10K+</p>
+                <p className="mt-1 text-xs text-muted-foreground">蓄積データ数</p>
+              </div>
+              <div className="rounded-xl border border-border bg-white/80 p-6 backdrop-blur-sm shadow-sm">
+                <p className="text-3xl font-bold text-accent">AI</p>
+                <p className="mt-1 text-xs text-muted-foreground">Gemini 1.5 Pro</p>
+              </div>
+              <div className="rounded-xl border border-border bg-white/80 p-6 backdrop-blur-sm shadow-sm">
+                <p className="text-3xl font-bold text-success">7</p>
+                <p className="mt-1 text-xs text-muted-foreground">問診項目</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 4. AI Diagnosis Features ===== */}
         <section className="bg-muted py-24 sm:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
@@ -258,14 +307,14 @@ export default function HomePage() {
               <div className="mx-auto mt-4 h-px w-16 bg-gradient-to-r from-transparent via-border to-transparent" />
             </div>
 
-            <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-              {/* Image */}
+            <div className="mt-16 grid items-start gap-12 lg:grid-cols-2 lg:gap-20">
+              {/* mobile.webp */}
               <div className="relative mx-auto w-full max-w-md">
                 <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/8 to-accent/8 blur-2xl" />
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
                   <Image
-                    src="/nail-image-2.jpg"
-                    alt="AI Nail Diagnosis"
+                    src="/images/optimized/mobile.webp"
+                    alt="AI Nail Diagnosis Mobile App"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -273,14 +322,23 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Steps */}
-              <div className="space-y-10">
+              {/* Steps with anal01/02/03.webp */}
+              <div className="space-y-8">
                 {/* Step 1 */}
                 <div className="flex gap-5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-sm">
                     1
                   </div>
-                  <div>
+                  <div className="flex-1">
+                    <div className="relative mb-3 h-40 overflow-hidden rounded-xl">
+                      <Image
+                        src="/images/optimized/anal01.webp"
+                        alt={t("aiFeature.step1.title")}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    </div>
                     <h3 className="text-base font-bold text-foreground">
                       {t("aiFeature.step1.title")}
                     </h3>
@@ -295,7 +353,16 @@ export default function HomePage() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white shadow-sm">
                     2
                   </div>
-                  <div>
+                  <div className="flex-1">
+                    <div className="relative mb-3 h-40 overflow-hidden rounded-xl">
+                      <Image
+                        src="/images/optimized/anal02.webp"
+                        alt={t("aiFeature.step2.title")}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    </div>
                     <h3 className="text-base font-bold text-foreground">
                       {t("aiFeature.step2.title")}
                     </h3>
@@ -310,7 +377,16 @@ export default function HomePage() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success text-sm font-bold text-white shadow-sm">
                     3
                   </div>
-                  <div>
+                  <div className="flex-1">
+                    <div className="relative mb-3 h-40 overflow-hidden rounded-xl">
+                      <Image
+                        src="/images/optimized/anal03.webp"
+                        alt={t("aiFeature.step3.title")}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    </div>
                     <h3 className="text-base font-bold text-foreground">
                       {t("aiFeature.step3.title")}
                     </h3>
@@ -324,9 +400,21 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 4. Testimonials ===== */}
-        <section className="py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* ===== 5. Testimonials ===== */}
+        <section className="relative overflow-hidden py-24 sm:py-32">
+          {/* voice.webp as subtle background */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/optimized/voice.webp"
+              alt=""
+              fill
+              className="object-cover opacity-5"
+              aria-hidden="true"
+            />
+          </div>
+          <div className="absolute inset-0 z-[1] bg-white/90" />
+
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
                 Testimonials
@@ -343,7 +431,6 @@ export default function HomePage() {
                   key={i}
                   className="rounded-xl border border-border bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-md"
                 >
-                  {/* Stars */}
                   <div className="flex gap-0.5 text-warning">
                     {[...Array(5)].map((_, j) => (
                       <svg
@@ -357,11 +444,9 @@ export default function HomePage() {
                       </svg>
                     ))}
                   </div>
-
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                     &ldquo;{t(`testimonials.items.${i}.comment`)}&rdquo;
                   </p>
-
                   <div className="mt-6 flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                       {t(`testimonials.items.${i}.name`).charAt(0)}
@@ -381,9 +466,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 5. CTA Section ===== */}
+        {/* ===== 6. CTA Section ===== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent py-24 text-white sm:py-32">
-          {/* Dot grid overlay */}
           <div
             className="absolute inset-0 opacity-[0.07]"
             style={{
@@ -429,11 +513,12 @@ export default function HomePage() {
                 </div>
               </div>
 
+              {/* sportnail.webp */}
               <div className="relative mx-auto w-full max-w-md">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/20">
                   <Image
-                    src="/nail-image-3.jpg"
-                    alt="AI Diagnosis CTA"
+                    src="/images/optimized/sportnail.webp"
+                    alt="Nail Care for Sports Performance"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
