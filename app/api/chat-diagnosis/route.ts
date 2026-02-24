@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const { messages, image, sessionId } = await req.json();
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-1.5-flash',
     });
 
     // 会話履歴を構築

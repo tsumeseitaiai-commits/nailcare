@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const MODEL_VERSION = 'gemini-1.5-pro';
+const MODEL_VERSION = 'gemini-1.5-flash';
 
 export async function POST(req: NextRequest) {
   try {
