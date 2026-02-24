@@ -45,6 +45,18 @@
         }
       ]
     },
+    "merit": {
+      "badge": "Benefits of Nail Seitai",
+      "title": "The Impact of Healthy Nails",
+      "card1": {
+        "title": "Benefits of Nail Seitai",
+        "desc": "By correcting nail shape and growth direction, nail seitai prevents ingrown nails and other issues, improving the overall balance of the foot and significantly enhancing daily comfort."
+      },
+      "card2": {
+        "title": "Sports Performance Enhancement",
+        "desc": "Proper nail care is directly linked to athletic performance. You can expect improved grip strength, better running stability, and the ability to compete without pain."
+      }
+    },
     "conditions": {
       "badge": "Detectable Conditions",
       "title": "Detectable Nail Conditions",

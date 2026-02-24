@@ -215,6 +215,19 @@ export default function AIDiagnosisPage() {
           {/* ===== Step 1: Upload ===== */}
           {step === 'upload' && (
             <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
+              {/* Hero image */}
+              <div className="mb-6 flex justify-center">
+                <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-primary/20 shadow-md">
+                  <Image
+                    src="/images/optimized/nailanaly.jpg"
+                    alt="AI爪診断"
+                    fill
+                    className="object-cover"
+                    sizes="112px"
+                    priority
+                  />
+                </div>
+              </div>
               <h2 className="mb-2 text-xl font-bold text-foreground">爪の写真をアップロード</h2>
               <p className="mb-6 text-sm text-muted-foreground">
                 診断したい爪の写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。

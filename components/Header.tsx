@@ -43,7 +43,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2.5">
           <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg">
             <Image
-              src="/images/optimized/logo.webp"
+              src="/images/optimized/nailicon.jpg"
               alt="Nail Seitai AI"
               fill
               className="object-cover"

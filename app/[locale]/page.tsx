@@ -107,7 +107,7 @@ export default function HomePage() {
                 <div className="relative">
                   <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/20">
                     <Image
-                      src="/images/optimized/hero01.webp"
+                      src="/images/optimized/nailhero.jpg"
                       alt="AI爪診断"
                       fill
                       className="object-cover"
@@ -178,7 +178,55 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 3. Disease Conditions ===== */}
+        {/* ===== 3. Merit Cards ===== */}
+        <section className="py-20 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("merit.badge")}
+              </p>
+              <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
+                {t("merit.title")}
+              </h2>
+            </div>
+
+            <div className="mt-14 grid gap-6 sm:grid-cols-2">
+              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src="/images/optimized/merit.jpg"
+                    alt={t("merit.card1.title")}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-foreground">{t("merit.card1.title")}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card1.desc")}</p>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src="/images/optimized/sportsfoot.jpg"
+                    alt={t("merit.card2.title")}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-foreground">{t("merit.card2.title")}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card2.desc")}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 4. Disease Conditions ===== */}
         <section className="bg-muted py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="text-center">
@@ -215,7 +263,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 4. AI Diagnosis Process ===== */}
+        {/* ===== 5. AI Diagnosis Process ===== */}
         <section className="py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
@@ -234,8 +282,8 @@ export default function HomePage() {
                 <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/8 to-accent/8 blur-2xl" />
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
                   <Image
-                    src="/images/optimized/mobile.webp"
-                    alt="AI Nail Diagnosis"
+                    src="/images/optimized/nailsmartp.jpg"
+                    alt="スマートフォンでAI爪診断"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -247,7 +295,7 @@ export default function HomePage() {
               <div className="space-y-8">
                 {([
                   { key: "step1", color: "bg-primary", img: "/images/optimized/anal01.webp" },
-                  { key: "step2", color: "bg-accent", img: "/images/optimized/anal02.webp" },
+                  { key: "step2", color: "bg-accent", img: "/images/optimized/nailanaly.jpg" },
                   { key: "step3", color: "bg-emerald-500", img: "/images/optimized/anal03.webp" },
                 ] as const).map(({ key, color, img }, i) => (
                   <div key={key} className="flex gap-5">
@@ -268,7 +316,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 5. Square-off Cut Guide ===== */}
+        {/* ===== 6. Square-off Cut Guide ===== */}
         <section className="bg-gradient-to-br from-primary/5 via-white to-accent/5 py-20 sm:py-28">
           <div className="mx-auto max-w-5xl px-4 sm:px-6">
             <div className="text-center">
@@ -315,7 +363,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 6. Data Collection ===== */}
+        {/* ===== 7. Data Collection ===== */}
         <section className="relative overflow-hidden bg-muted py-20 sm:py-28">
           <div className="absolute inset-0 z-0">
             <Image src="/images/optimized/mobile.webp" alt="" fill className="object-cover opacity-5" aria-hidden="true" />
@@ -366,7 +414,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 7. Testimonials ===== */}
+        {/* ===== 8. Testimonials ===== */}
         <section className="relative overflow-hidden py-20 sm:py-28">
           <div className="absolute inset-0 z-0">
             <Image src="/images/optimized/voice.webp" alt="" fill className="object-cover opacity-5" aria-hidden="true" />
@@ -410,7 +458,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 8. CTA Section ===== */}
+        {/* ===== 9. CTA Section ===== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent py-24 text-white sm:py-32">
           <div
             className="absolute inset-0 opacity-[0.07]"
@@ -452,7 +500,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 9. Medical Disclaimer ===== */}
+        {/* ===== 10. Medical Disclaimer ===== */}
         <section className="border-t border-amber-200 bg-amber-50 py-8">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             <div className="flex items-start gap-4">

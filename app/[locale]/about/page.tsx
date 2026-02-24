@@ -15,9 +15,19 @@ export default function AboutPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Subtle fixed background */}
+      <div className="fixed inset-0 z-0" aria-hidden="true">
+        <Image
+          src="/images/optimized/back.webp"
+          alt=""
+          fill
+          className="object-cover opacity-[0.03]"
+          sizes="100vw"
+        />
+      </div>
       <Header />
 
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
 
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light py-20 text-white">

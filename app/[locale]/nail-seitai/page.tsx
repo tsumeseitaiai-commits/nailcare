@@ -112,23 +112,41 @@ export default function NailSeitaiPage() {
         {/* What is Nail Seitai */}
         <section className="bg-muted py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="mb-12 text-center">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">About</p>
-              <h2 className="text-3xl font-bold text-foreground">{t("what.sectionTitle")}</h2>
-              <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">{t("what.description")}</p>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {features.map((feature, i) => (
-                <div key={i} className="rounded-xl border border-border bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                    <svg className="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="mb-2 text-base font-bold text-foreground">{feature.title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+              {/* Merit image */}
+              <div className="relative mx-auto w-full max-w-lg">
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/8 to-accent/8 blur-2xl" />
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
+                  <Image
+                    src="/images/optimized/merit.jpg"
+                    alt="爪整体のメリット"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
-              ))}
+              </div>
+              {/* Content */}
+              <div>
+                <div className="mb-8">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">About</p>
+                  <h2 className="text-3xl font-bold text-foreground">{t("what.sectionTitle")}</h2>
+                  <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("what.description")}</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {features.map((feature, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+                        <svg className="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="mb-1 text-sm font-bold text-foreground">{feature.title}</h3>
+                      <p className="text-xs leading-relaxed text-muted-foreground">{feature.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -168,8 +186,17 @@ export default function NailSeitaiPage() {
         </section>
 
         {/* Sports */}
-        <section className="bg-muted py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <section className="relative overflow-hidden bg-muted py-20">
+          <div className="absolute inset-0 z-0" aria-hidden="true">
+            <Image
+              src="/images/optimized/sportsfoot.jpg"
+              alt=""
+              fill
+              className="object-cover opacity-[0.07]"
+              sizes="100vw"
+            />
+          </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mb-12 text-center">
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">Sports</p>
               <h2 className="text-3xl font-bold text-foreground">{t("sports.sectionTitle")}</h2>
