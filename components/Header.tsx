@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
   const t = useTranslations("nav");
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -17,11 +18,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
   const navLinks = [
     { href: "/" as const, label: t("home") },
-    { href: "/" as const, label: t("about") },
-    { href: "/" as const, label: t("aiDiagnosis") },
-    { href: "/" as const, label: t("contact") },
+    { href: "/about" as const, label: t("about") },
+    { href: "/nail-seitai" as const, label: t("nailSeitai") },
+    { href: "/contact" as const, label: t("contact") },
   ];
 
   return (
@@ -58,7 +64,7 @@ export default function Header() {
         <nav className="hidden items-center gap-0.5 md:flex">
           {navLinks.map((link) => (
             <Link
-              key={link.label}
+              key={link.href}
               href={link.href}
               className="rounded-lg px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
@@ -72,7 +78,7 @@ export default function Header() {
 
           {/* CTA Button — desktop */}
           <Link
-            href="/"
+            href="/ai-diagnosis"
             className="hidden items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md md:inline-flex"
           >
             {t("aiDiagnosis")}
@@ -112,7 +118,7 @@ export default function Header() {
           <div className="flex flex-col gap-1 pt-2">
             {navLinks.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -121,7 +127,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="/"
+              href="/ai-diagnosis"
               onClick={() => setMenuOpen(false)}
               className="mt-2 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white"
             >

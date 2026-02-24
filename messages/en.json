@@ -5,7 +5,8 @@
   },
   "nav": {
     "home": "Home",
-    "about": "What is Nail Seitai?",
+    "about": "Nail Care",
+    "nailSeitai": "Nail Seitai",
     "aiDiagnosis": "AI Diagnosis",
     "contact": "Contact"
   },
@@ -71,11 +72,210 @@
       "button": "Start Free Diagnosis"
     }
   },
+  "about": {
+    "title": "About Nail Care",
+    "subtitle": "Your nails are the barometer of your overall health",
+    "hero": {
+      "badge": "Nail Health",
+      "title": "How Nail Care Transforms Your Health",
+      "description": "Nails are a mirror reflecting the health of your fingertips, often called the second heart. Proper care supports your whole body's health."
+    },
+    "importance": {
+      "sectionTitle": "How Nail Health Affects Your Whole Body",
+      "items": [
+        {
+          "title": "Cardiovascular Impact",
+          "description": "Nail color and shape reflect blood circulation. Bluish nails may indicate oxygen deficiency; yellow nails may signal liver issues."
+        },
+        {
+          "title": "Nutritional Indicator",
+          "description": "Vertical lines, horizontal ridges, and brittleness are signs of nutritional deficiency — particularly B12, iron, and zinc."
+        },
+        {
+          "title": "Stress & Fatigue Barometer",
+          "description": "Intense stress and overwork can slow nail growth and cause deformation. Nail condition reveals mental and physical exhaustion."
+        },
+        {
+          "title": "Thyroid & Hormonal Function",
+          "description": "Thyroid conditions and hormonal imbalances affect nail texture and growth patterns. Regular checks are important."
+        }
+      ]
+    },
+    "history": {
+      "sectionTitle": "History of Nail Seitai",
+      "description": "The history of nail care dates back to ancient civilizations. Ancient Egyptians used nail color to indicate social status, while Chinese traditional medicine used nail condition for diagnosis. In Japan, it evolved uniquely as 'Nail Seitai,' and today it is established as a scientifically grounded care method.",
+      "timeline": [
+        { "year": "3000 BC", "event": "Nail care begins in ancient Egypt" },
+        { "year": "Han Dynasty (206 BC–)", "event": "Nail diagnosis incorporated into Chinese traditional medicine" },
+        { "year": "Edo Period", "event": "Japan's unique nail care culture develops" },
+        { "year": "Late 20th Century", "event": "Sports medicine and nail seitai begin to merge" },
+        { "year": "Present", "event": "AI-powered scientific nail diagnosis achieved" }
+      ]
+    },
+    "science": {
+      "sectionTitle": "Scientific Evidence",
+      "description": "Modern research has reported numerous correlations between nail condition and overall health.",
+      "stats": [
+        { "value": "87%", "label": "of diseases show symptoms in the nails (research survey)" },
+        { "value": "3mm", "label": "nails grow approx. 3mm per month, recording health history" },
+        { "value": "7", "label": "health indicators analyzed by AI" }
+      ]
+    },
+    "cta": {
+      "title": "Would you like to diagnose your nails?",
+      "description": "Check your nail health right now with AI.",
+      "button": "Start AI Diagnosis"
+    }
+  },
+  "nailSeitai": {
+    "title": "About Nail Seitai",
+    "subtitle": "Body improvement starting from your nails",
+    "hero": {
+      "badge": "Nail Seitai",
+      "title": "Maximize Your Performance with Nail Seitai",
+      "description": "Nail Seitai is a specialized technique that scientifically optimizes nail shape, angle, and length to improve physical function and sports performance."
+    },
+    "what": {
+      "sectionTitle": "What is Nail Seitai?",
+      "description": "Nail Seitai is a professional practice that adjusts nail shape and growth direction to maximize fingertip function and improve overall performance. Unlike cosmetic nail care, its primary purpose is physical function improvement.",
+      "features": [
+        {
+          "title": "Nail Shape Optimization",
+          "description": "We propose and adjust the optimal nail shape and length based on your sport or profession."
+        },
+        {
+          "title": "Ingrown & Deformed Nail Correction",
+          "description": "We safely correct ingrown and deformed nails that cause pain and discomfort."
+        },
+        {
+          "title": "Improved Circulation",
+          "description": "Nail bed massage and nail correction promote blood circulation, sharpening fingertip sensitivity."
+        },
+        {
+          "title": "Preventive Care",
+          "description": "Regular maintenance prevents nail problems before they occur, maintaining long-term health."
+        }
+      ]
+    },
+    "sports": {
+      "sectionTitle": "Connection to Sports Performance",
+      "description": "For athletes, nail condition is a crucial factor that directly affects performance.",
+      "items": [
+        {
+          "sport": "Running",
+          "benefit": "Optimizing nail length and shape improves push-off power and ground contact feel."
+        },
+        {
+          "sport": "Ball Sports",
+          "benefit": "Fingertip sensation for controlling balls improves, enhancing grip and precision."
+        },
+        {
+          "sport": "Martial Arts",
+          "benefit": "Prevent nail injuries during grappling while maximizing grip strength and fingertip power."
+        },
+        {
+          "sport": "Swimming",
+          "benefit": "Shaping nails to minimize resistance when pulling water increases propulsion."
+        }
+      ]
+    },
+    "treatment": {
+      "sectionTitle": "Treatment Process",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Counseling & Diagnosis",
+          "description": "We listen to your current nail condition, lifestyle, and goals. Detailed diagnosis is performed with AI and visual examination."
+        },
+        {
+          "step": "02",
+          "title": "Cleaning & Preparation",
+          "description": "The nails and surrounding skin are thoroughly cleaned and prepared with specialized care products."
+        },
+        {
+          "step": "03",
+          "title": "Shape Adjustment & Correction",
+          "description": "Nail shape is adjusted to meet your goals. Correction tools are used as needed."
+        },
+        {
+          "step": "04",
+          "title": "Finishing & After-Care Guidance",
+          "description": "We explain home care methods after the treatment and the recommended interval for the next maintenance."
+        }
+      ]
+    },
+    "cases": {
+      "sectionTitle": "Before & After Cases",
+      "items": [
+        {
+          "name": "Client A (Marathon Runner, 40s)",
+          "before": "Nails turned black and eventually fell off after every 10km run",
+          "after": "Zero nail problems after 3 nail seitai sessions. Personal best improved by 3 minutes"
+        },
+        {
+          "name": "Client B (Basketball Player, 20s)",
+          "before": "Ingrown nail caused pain, affecting jumping and landing",
+          "after": "Completely resolved after 2 months of correction treatment. Play quality improved"
+        },
+        {
+          "name": "Client C (Desk Worker, 30s female)",
+          "before": "Recurring cracked nails causing difficulty with typing",
+          "after": "Nail strength improved with dietary guidance and regular care. Work efficiency increased"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Would you like to experience Nail Seitai?",
+      "description": "First, check your current nail condition with AI diagnosis.",
+      "button": "Start AI Diagnosis"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Feel free to ask us anything",
+    "hero": {
+      "badge": "Contact",
+      "title": "Contact Us",
+      "description": "Feel free to ask us anything. We usually reply within 1–2 business days."
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "John Smith",
+      "email": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Question about AI Diagnosis",
+      "message": "Message",
+      "messagePlaceholder": "Please enter your inquiry here...",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Your message has been sent. We will reply shortly.",
+      "error": "Failed to send. Please contact us directly by email."
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "info@tsume-seitai.com",
+      "hours": "Weekdays 9:00–18:00 JST",
+      "hoursLabel": "Business Hours",
+      "emailLabel": "Email Address",
+      "responseLabel": "Response Time",
+      "responseTime": "Within 1–2 business days"
+    }
+  },
   "footer": {
     "copyright": "Nail Seitai AI Diagnosis",
     "email": "info@tsume-seitai.com",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "services": "Services",
+    "information": "Information",
+    "support": "Support",
+    "contactLabel": "Contact",
+    "top": "Home",
+    "aiDiagnosis": "AI Diagnosis",
+    "aboutNail": "Nail Care",
+    "nailSeitai": "Nail Seitai",
+    "contactUs": "Contact"
   },
   "languageSwitcher": {
     "label": "Select language"
@@ -84,6 +284,40 @@
     "title": "AI Nail Diagnosis",
     "uploadTitle": "Upload Nail Photo",
     "chatTitle": "Consultation",
-    "resultTitle": "Diagnosis Result"
+    "resultTitle": "Diagnosis Result",
+    "upload": {
+      "title": "Upload a Photo of Your Nails",
+      "dragDrop": "Drag & drop image here",
+      "or": "or",
+      "selectFile": "Select File",
+      "description": "Select a photo of the nails you want diagnosed. A clear image taken in a bright place is ideal.",
+      "fileTypes": "JPEG, PNG, WebP (max 5MB)",
+      "disclaimer": "This service is not a medical diagnosis. Please consult a healthcare provider if you have concerning symptoms."
+    },
+    "chat": {
+      "inputPlaceholder": "Type a message...",
+      "send": "Send",
+      "aiLabel": "AI Consultation",
+      "aiAssistant": "Nail Seitai AI Assistant"
+    },
+    "result": {
+      "title": "Diagnosis Result",
+      "healthScore": "Health Score",
+      "good": "In good condition",
+      "fair": "Room for improvement",
+      "poor": "Caution: We recommend reviewing your lifestyle habits",
+      "issues": "Detected Issues",
+      "recommendations": "Improvement Advice",
+      "analysis": "Detailed Analysis",
+      "tryAgain": "Diagnose Again"
+    }
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found",
+    "back": "Back to Home"
   }
 }
