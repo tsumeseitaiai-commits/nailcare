@@ -79,5 +79,11 @@
   },
   "languageSwitcher": {
     "label": "Select language"
+  },
+  "aiDiagnosis": {
+    "title": "AI Nail Diagnosis",
+    "uploadTitle": "Upload Nail Photo",
+    "chatTitle": "Consultation",
+    "resultTitle": "Diagnosis Result"
   }
 }

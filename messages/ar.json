@@ -79,5 +79,11 @@
   },
   "languageSwitcher": {
     "label": "اختر اللغة"
+  },
+  "aiDiagnosis": {
+    "title": "تشخيص الأظافر بالذكاء الاصطناعي",
+    "uploadTitle": "رفع صورة الأظافر",
+    "chatTitle": "الاستشارة",
+    "resultTitle": "نتيجة التشخيص"
   }
 }

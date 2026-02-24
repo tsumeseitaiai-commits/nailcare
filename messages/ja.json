@@ -79,5 +79,11 @@
   },
   "languageSwitcher": {
     "label": "言語を選択"
+  },
+  "aiDiagnosis": {
+    "title": "AI爪診断",
+    "uploadTitle": "爪の写真をアップロード",
+    "chatTitle": "問診中",
+    "resultTitle": "診断結果"
   }
 }
