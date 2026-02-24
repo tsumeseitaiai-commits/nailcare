@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "title": "Nail Seitai AI Diagnosis | Check Your Nail Health with AI",
+    "description": "Check your nail health with Nail Seitai and AI diagnosis. Nail care information available in Japanese, English, and Arabic."
+  },
+  "nav": {
+    "home": "Home",
+    "about": "What is Nail Seitai?",
+    "aiDiagnosis": "AI Diagnosis",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "Support Health with Nail Seitai",
+      "subtitle": "Check nail condition with AI diagnosis",
+      "cta": "Start AI Diagnosis"
+    },
+    "about": {
+      "sectionTitle": "What is Nail Seitai?",
+      "health": {
+        "title": "Importance of Healthy Nails",
+        "description": "Nails are called the 'barometer of health,' reflecting your body's condition. Noticing changes in color, shape, and thickness leads to early health management."
+      },
+      "merit": {
+        "title": "Benefits of Nail Seitai",
+        "description": "By adjusting the shape and growth direction of nails, it improves blood circulation in fingertips and balances the entire body. Effective for preventing ingrown and deformed nails."
+      },
+      "sports": {
+        "title": "Sports Performance Enhancement",
+        "description": "Proper nail care directly affects an athlete's grip and stability. Optimize your performance with nail seitai tailored to your sport."
+      }
+    },
+    "aiFeature": {
+      "sectionTitle": "AI Diagnosis Features",
+      "step1": {
+        "title": "Simple 3 Steps",
+        "description": "Just take a photo of your nails and upload it. No registration required — start your diagnosis instantly."
+      },
+      "step2": {
+        "title": "Instant Results",
+        "description": "Cutting-edge AI analyzes your nail condition instantly. Get a health score and an easy-to-understand report."
+      },
+      "step3": {
+        "title": "Improvement Advice",
+        "description": "Receive specific improvement advice based on your results. From daily care tips to guidance on consulting specialists."
+      }
+    },
+    "testimonials": {
+      "sectionTitle": "What Our Clients Say",
+      "items": [
+        {
+          "name": "Misaki T.",
+          "role": "Office Worker, 30s",
+          "comment": "I was worried about my nail condition, but the AI diagnosis gave me specific advice and peace of mind. I check monthly now."
+        },
+        {
+          "name": "Kenta S.",
+          "role": "Marathon Runner",
+          "comment": "Thanks to nail seitai, my nail problems during running have drastically decreased. I feel my performance has improved too."
+        },
+        {
+          "name": "Akari Y.",
+          "role": "Nail Technician",
+          "comment": "I use the AI diagnosis for client consultations. Having objective data makes explanations much easier."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Try AI Diagnosis Now",
+      "description": "Simply upload a photo of your nails, and our AI will analyze your nail health.",
+      "button": "Start Free Diagnosis"
+    }
+  },
+  "footer": {
+    "copyright": "Nail Seitai AI Diagnosis",
+    "email": "info@tsume-seitai.com",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "languageSwitcher": {
+    "label": "Select language"
+  }
+}
