@@ -96,11 +96,45 @@ export default function AIDiagnosisPage() {
   const handleStartDiagnosis = () => {
     if (!image || !userConsent) return;
     setStep('chat');
-    setMessages([{
-      role: 'assistant',
-      content: t('chat.initialMessage'),
-      timestamp: new Date().toISOString(),
-    }]);
+    // 初期メッセージは設定せず、APIから最初の質問を取得する
+    setMessages([]);
+    fetchInitialMessage();
+  };
+
+  const fetchInitialMessage = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/chat-diagnosis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: '診断を開始してください' }],
+          image,
+          sessionId: 'session-' + Date.now(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setMessages([{
+        role: 'assistant',
+        content: data.response,
+        timestamp: new Date().toISOString(),
+      }]);
+    } catch (error) {
+      console.error('fetchInitialMessage error:', error);
+      setMessages([{
+        role: 'assistant',
+        content: t('chat.error'),
+        timestamp: new Date().toISOString(),
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSendMessage = async () => {
