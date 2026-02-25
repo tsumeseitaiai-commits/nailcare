@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'; // Edge回避
+
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
@@ -45,10 +47,10 @@ ${JSON.stringify(messages)}
 
     const diagnosis = JSON.parse(jsonMatch[0]);
 
-    // --- Supabase保存（非同期・失敗してもレスポンスはブロックしない）---
-    saveToSupabase({ image, messages, diagnosis, locale }).catch((err) =>
-      console.error('Supabase save error:', err)
-    );
+    // --- Supabase保存（awaitして確実に完了させる）---
+    console.log('[API] Supabase保存を開始します...');
+    await saveToSupabase({ image, messages, diagnosis, locale });
+    console.log('[API] Supabase保存が完了しました');
 
     return NextResponse.json(diagnosis);
   } catch (error) {
@@ -76,45 +78,37 @@ async function saveToSupabase({
   };
   locale: string;
 }) {
-  console.log('[Supabase] saveToSupabase 開始', { locale, health_score: diagnosis.health_score });
+  console.log('[Supabase] saveToSupabase 開始');
 
   try {
-    // 1. 画像をStorageにアップロード
     const buffer = Buffer.from(image, 'base64');
     const timestamp = Date.now();
     const year = new Date().getFullYear();
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const imagePath = `cases/${year}/${month}/${timestamp}-nail.jpg`;
 
-    console.log(`[Supabase] 1. 画像アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
+    console.log(`[Supabase] アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
+    console.time('[Supabase] upload time');
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('nail-images')
       .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
 
-    console.log('[Supabase] 1-A. アップロード完了チェック');
-    console.log('[Supabase] 1-B. uploadData:', uploadData);
-    console.log('[Supabase] 1-C. uploadError:', uploadError);
+    console.timeEnd('[Supabase] upload time');
+    console.log('[Supabase] uploadData:', uploadData);
+    console.log('[Supabase] uploadError:', uploadError);
 
     if (uploadError) {
-      console.error('[Supabase] 1. 画像アップロード失敗:');
-      console.error('  - message:', uploadError.message);
-      console.error('  - full:', uploadError);
+      throw uploadError;
     }
 
-    let imageUrl = '';
-    if (!uploadError && uploadData) {
-      const { data: urlData } = supabase.storage
-        .from('nail-images')
-        .getPublicUrl(imagePath);
-      imageUrl = urlData.publicUrl;
-      console.log(`[Supabase] 1. 画像アップロード成功: ${imageUrl}`);
-    } else {
-      console.warn('[Supabase] 1. 画像なしで処理続行');
-    }
+    const { data: urlData } = supabase.storage
+      .from('nail-images')
+      .getPublicUrl(imagePath);
+    const imageUrl = urlData.publicUrl;
+    console.log(`[Supabase] 画像アップロード成功: ${imageUrl}`);
 
-    // 2. 健康データ（一時スキップ）
-    console.log('[Supabase] 2. 健康データ抽出スキップ（開発中）');
+    // 健康データ（一時スキップ）
     const healthData = {
       sleep_hours: 0,
       stress_level: '不明',
@@ -122,18 +116,13 @@ async function saveToSupabase({
       messages_count: messages.length,
     };
 
-    // 3. nail_cases テーブルに保存
-    console.log('[Supabase] 3. nail_cases 保存開始', {
-      health_score: diagnosis.health_score,
-      detected_issues_count: diagnosis.detected_issues.length,
-      model_version: MODEL_VERSION,
-      image_url: imageUrl || '(なし)',
-    });
+    // nail_cases テーブルに保存
+    console.log('[Supabase] nail_cases 保存開始');
 
     const { data: savedCase, error: insertError } = await supabase
       .from('nail_cases')
       .insert({
-        image_url: imageUrl || null,
+        image_url: imageUrl,
         image_path: imagePath,
         nail_condition: {},
         health_data: healthData,
@@ -149,21 +138,21 @@ async function saveToSupabase({
       .single();
 
     if (insertError) {
-      console.error('[Supabase] 3. nail_cases 保存失敗:');
+      console.error('[Supabase] nail_cases 保存失敗:');
       console.error('  - message:', insertError.message);
       console.error('  - code:', insertError.code);
       console.error('  - details:', insertError.details);
       console.error('  - hint:', insertError.hint);
-      return;
+      throw insertError;
     }
 
-    console.log(`[Supabase] 3. nail_cases 保存成功: id=${savedCase.id}`);
+    console.log(`[Supabase] nail_cases 保存成功: id=${savedCase.id}`);
     console.log('[Supabase] saveToSupabase 完了');
 
   } catch (error: unknown) {
     const err = error as { message?: string; stack?: string };
-    console.error('[Supabase] saveToSupabase エラー:');
-    console.error('  - message:', err?.message);
-    console.error('  - stack:', err?.stack);
+    console.error('[Supabase] エラー発生:', err?.message);
+    console.error('[Supabase] stack:', err?.stack);
+    throw error; // 外側の catch に伝播
   }
 }
