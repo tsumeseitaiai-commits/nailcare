@@ -3,6 +3,7 @@ export const runtime = 'nodejs'; // Edge回避
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const MODEL_VERSION = 'gemini-2.5-flash';
@@ -135,7 +136,7 @@ async function saveToSupabase({
 
     console.log('[Supabase] INSERT payload:', JSON.stringify(insertData, null, 2));
 
-    const { data: savedCase, error: insertError } = await supabase
+    const { data: savedCase, error: insertError } = await supabaseAdmin
       .from('nail_cases')
       .insert(insertData)
       .select()
@@ -152,7 +153,7 @@ async function saveToSupabase({
 
     console.log(`[Supabase] nail_cases 保存成功: id=${savedCase.id}`);
 
-    const { error: logError } = await supabase
+    const { error: logError } = await supabaseAdmin
       .from('conversation_logs')
       .insert({
         session_id: `session-${timestamp}`,
