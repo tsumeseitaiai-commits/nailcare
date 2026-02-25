@@ -88,26 +88,18 @@ async function saveToSupabase({
 
     console.log(`[Supabase] 1. 画像アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
 
-    // タイムアウト付きアップロード（8秒）
-    const uploadPromise = supabase.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('nail-images')
       .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
 
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Upload timeout after 8 seconds')), 8000)
-    );
-
-    const { data: uploadData, error: uploadError } = await Promise.race([
-      uploadPromise,
-      timeoutPromise,
-    ]);
+    console.log('[Supabase] 1-A. アップロード完了チェック');
+    console.log('[Supabase] 1-B. uploadData:', uploadData);
+    console.log('[Supabase] 1-C. uploadError:', uploadError);
 
     if (uploadError) {
       console.error('[Supabase] 1. 画像アップロード失敗:');
       console.error('  - message:', uploadError.message);
-      console.error('  - statusCode:', (uploadError as unknown as Record<string, unknown>).statusCode);
-      console.error('  - error:', (uploadError as unknown as Record<string, unknown>).error);
-      console.error('  - full:', JSON.stringify(uploadError, null, 2));
+      console.error('  - full:', uploadError);
     }
 
     let imageUrl = '';
