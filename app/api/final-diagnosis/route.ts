@@ -78,12 +78,16 @@ async function saveToSupabase({
   locale: string;
   model: ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
 }) {
+  console.log('[Supabase] saveToSupabase 開始', { locale, health_score: diagnosis.health_score });
+
   // 1. 画像をStorageにアップロード
   const buffer = Buffer.from(image, 'base64');
   const timestamp = Date.now();
   const year = new Date().getFullYear();
   const month = String(new Date().getMonth() + 1).padStart(2, '0');
   const imagePath = `cases/${year}/${month}/${timestamp}-nail.jpg`;
+
+  console.log(`[Supabase] 1. 画像アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
 
   const { error: uploadError } = await supabase.storage
     .from('nail-images')
@@ -95,11 +99,14 @@ async function saveToSupabase({
       .from('nail-images')
       .getPublicUrl(imagePath);
     imageUrl = urlData.publicUrl;
+    console.log(`[Supabase] 1. 画像アップロード成功: ${imageUrl}`);
   } else {
-    console.warn('Image upload skipped:', uploadError.message);
+    console.warn('[Supabase] 1. 画像アップロード失敗:', uploadError.message, uploadError);
   }
 
   // 2. 会話から健康データを抽出
+  console.log(`[Supabase] 2. 健康データ抽出開始 (会話メッセージ数: ${messages.length})`);
+
   const EXTRACTION_PROMPT = `以下の会話から健康データをJSON形式で抽出してください（JSONのみ、説明文なし）:
 ${JSON.stringify(messages)}
 
@@ -110,7 +117,8 @@ ${JSON.stringify(messages)}
   "stress_level": "低" | "中" | "高",
   "diet_balance": "良好" | "やや偏り" | "偏り",
   "exercise_frequency": string,
-  "hydration": "十分" | "やや不足" | "不足"
+  "hydration": "十分" | "やや不足" | "不足",
+  "body_complaints": string[]
 }`;
 
   let healthData: Record<string, unknown> = {};
@@ -120,12 +128,22 @@ ${JSON.stringify(messages)}
     const healthJsonMatch = extractedText.match(/\{[\s\S]*\}/);
     if (healthJsonMatch) {
       healthData = JSON.parse(healthJsonMatch[0]);
+      console.log('[Supabase] 2. 健康データ抽出成功:', healthData);
+    } else {
+      console.warn('[Supabase] 2. 健康データ: JSONが見つかりませんでした。raw:', extractedText.slice(0, 200));
     }
   } catch (err) {
-    console.warn('Health data extraction failed:', err);
+    console.warn('[Supabase] 2. 健康データ抽出失敗:', err);
   }
 
   // 3. nail_cases テーブルに保存
+  console.log('[Supabase] 3. nail_cases 保存開始', {
+    health_score: diagnosis.health_score,
+    detected_issues_count: diagnosis.detected_issues.length,
+    model_version: MODEL_VERSION,
+    image_url: imageUrl || '(なし)',
+  });
+
   const { data: savedCase, error: insertError } = await supabase
     .from('nail_cases')
     .insert({
@@ -145,11 +163,15 @@ ${JSON.stringify(messages)}
     .single();
 
   if (insertError) {
-    console.warn('nail_cases insert failed:', insertError.message);
+    console.warn('[Supabase] 3. nail_cases 保存失敗:', insertError.message, insertError);
     return;
   }
 
+  console.log(`[Supabase] 3. nail_cases 保存成功: id=${savedCase.id}`);
+
   // 4. conversation_logs テーブルに保存
+  console.log(`[Supabase] 4. conversation_logs 保存開始: session-${timestamp}`);
+
   const { error: logError } = await supabase
     .from('conversation_logs')
     .insert({
@@ -160,6 +182,10 @@ ${JSON.stringify(messages)}
     });
 
   if (logError) {
-    console.warn('conversation_logs insert failed:', logError.message);
+    console.warn('[Supabase] 4. conversation_logs 保存失敗:', logError.message, logError);
+  } else {
+    console.log('[Supabase] 4. conversation_logs 保存成功');
   }
+
+  console.log('[Supabase] saveToSupabase 完了');
 }
