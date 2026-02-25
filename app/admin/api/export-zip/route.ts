@@ -119,7 +119,9 @@ export async function GET(req: NextRequest) {
     compressionOptions: { level: 6 },
   });
 
-  return new NextResponse(zipBuffer, {
+  const zipUint8 = new Uint8Array(zipBuffer);
+
+  return new NextResponse(zipUint8, {
     headers: {
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="nail_export_${ts}.zip"`,
