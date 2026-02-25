@@ -2,7 +2,6 @@ export const runtime = 'nodejs'; // Edge回避
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -91,7 +90,7 @@ async function saveToSupabase({
     console.log(`[Supabase] アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
     console.time('[Supabase] upload time');
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await getSupabaseAdmin().storage
       .from('nail-images')
       .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
 
@@ -103,7 +102,7 @@ async function saveToSupabase({
       throw uploadError;
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = getSupabaseAdmin().storage
       .from('nail-images')
       .getPublicUrl(imagePath);
     const imageUrl = urlData.publicUrl;
