@@ -56,6 +56,7 @@ export default function AIDiagnosisPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isFinalDiagnosisCalled = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,7 +187,8 @@ export default function AIDiagnosisPage() {
         data.response.includes('これから診断')
       );
 
-      if (data.isComplete) {
+      if (data.isComplete && !isFinalDiagnosisCalled.current) {
+        isFinalDiagnosisCalled.current = true;
         console.log('✅ 診断完了を検出！最終診断APIを呼び出します...');
         setTimeout(() => {
           handleFinalDiagnosis(finalMessages);
@@ -249,6 +251,7 @@ export default function AIDiagnosisPage() {
   };
 
   const handleReset = () => {
+    isFinalDiagnosisCalled.current = false;
     setStep('upload');
     setImage(null);
     setImagePreview(null);
