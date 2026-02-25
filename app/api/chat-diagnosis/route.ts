@@ -89,7 +89,11 @@ export async function POST(req: NextRequest) {
 
     // 診断完了チェック
     const isComplete =
-      response.includes('診断を開始します') || response.includes('診断結果');
+      response.includes('診断を開始します') ||
+      response.includes('診断を開始させていただきます') ||
+      response.includes('これから診断') ||
+      response.includes('総合的に見て') ||
+      response.includes('診断結果');
 
     return NextResponse.json({
       response,

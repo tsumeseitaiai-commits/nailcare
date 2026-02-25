@@ -164,8 +164,8 @@ export default function AIDiagnosisPage() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'API error');
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       const aiMessage: Message = {
@@ -178,21 +178,55 @@ export default function AIDiagnosisPage() {
       setMessages(finalMessages);
 
       if (data.isComplete) {
-        setIsLoading(true);
-        const diagnosisResponse = await fetch('/api/final-diagnosis', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: finalMessages, image }),
-        });
-
-        const diagnosisData = await diagnosisResponse.json();
-        if (diagnosisResponse.ok) {
-          setDiagnosisResult(diagnosisData);
-          setStep('result');
-        }
+        console.log('診断完了を検出。最終診断を開始します...');
+        setTimeout(() => {
+          handleFinalDiagnosis(finalMessages);
+        }, 1000);
       }
     } catch (error) {
       console.error('Error:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: t('chat.error'),
+        timestamp: new Date().toISOString(),
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFinalDiagnosis = async (chatMessages?: Message[]) => {
+    const messagesToSend = chatMessages || messages;
+
+    console.log('=== Final Diagnosis Start ===');
+    console.log('Messages count:', messagesToSend.length);
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/final-diagnosis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: messagesToSend,
+          image,
+          locale: 'ja',
+        }),
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Failed to get diagnosis');
+      }
+
+      const data = await response.json();
+      console.log('Diagnosis received');
+
+      setDiagnosisResult(data);
+      setStep('result');
+    } catch (error) {
+      console.error('=== Final Diagnosis Error ===', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: t('chat.error'),
