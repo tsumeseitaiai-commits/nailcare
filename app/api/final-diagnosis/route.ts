@@ -119,21 +119,25 @@ async function saveToSupabase({
     // nail_cases テーブルに保存
     console.log('[Supabase] nail_cases 保存開始');
 
+    const insertData = {
+      image_url: imageUrl || null,
+      image_path: imagePath,
+      nail_condition: {},
+      health_data: healthData || {},
+      ai_diagnosis: diagnosis.analysis,
+      health_score: diagnosis.health_score,
+      detected_issues: diagnosis.detected_issues,
+      recommendations: diagnosis.recommendations,
+      model_version: MODEL_VERSION,
+      user_consent: true,
+      locale,
+    };
+
+    console.log('[Supabase] INSERT payload:', JSON.stringify(insertData, null, 2));
+
     const { data: savedCase, error: insertError } = await supabase
-      .from('nail_cases')
-      .insert({
-        image_url: imageUrl,
-        image_path: imagePath,
-        nail_condition: {},
-        health_data: healthData,
-        ai_diagnosis: diagnosis.analysis,
-        health_score: diagnosis.health_score,
-        detected_issues: diagnosis.detected_issues,
-        recommendations: diagnosis.recommendations,
-        model_version: MODEL_VERSION,
-        user_consent: true,
-        locale,
-      })
+      .from('public.nail_cases')
+      .insert(insertData)
       .select()
       .single();
 
@@ -147,6 +151,22 @@ async function saveToSupabase({
     }
 
     console.log(`[Supabase] nail_cases 保存成功: id=${savedCase.id}`);
+
+    const { error: logError } = await supabase
+      .from('public.conversation_logs')
+      .insert({
+        session_id: `session-${timestamp}`,
+        nail_case_id: savedCase.id,
+        messages,
+        extracted_health_data: healthData || {},
+      });
+
+    if (logError) {
+      console.error('[Supabase] conversation_logs 保存失敗:', logError);
+    } else {
+      console.log('[Supabase] conversation_logs 保存成功');
+    }
+
     console.log('[Supabase] saveToSupabase 完了');
 
   } catch (error: unknown) {
