@@ -152,6 +152,8 @@ export default function AIDiagnosisPage() {
     setIsLoading(true);
 
     try {
+      console.log('=== Sending message to chat-diagnosis ===');
+
       const response = await fetch('/api/chat-diagnosis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,6 +165,7 @@ export default function AIDiagnosisPage() {
       });
 
       const data = await response.json();
+      console.log('Chat diagnosis response:', data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -177,11 +180,19 @@ export default function AIDiagnosisPage() {
       const finalMessages = [...updatedMessages, aiMessage];
       setMessages(finalMessages);
 
+      console.log('isComplete flag:', data.isComplete);
+      console.log('AI response contains trigger?',
+        data.response.includes('診断を開始') ||
+        data.response.includes('これから診断')
+      );
+
       if (data.isComplete) {
-        console.log('診断完了を検出。最終診断を開始します...');
+        console.log('✅ 診断完了を検出！最終診断APIを呼び出します...');
         setTimeout(() => {
           handleFinalDiagnosis(finalMessages);
         }, 1000);
+      } else {
+        console.log('❌ まだ診断完了していません');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -458,6 +469,19 @@ export default function AIDiagnosisPage() {
                   <div ref={messagesEndRef} />
                 </div>
               </div>
+
+              {/* Debug: manual trigger button */}
+              {messages.length > 10 && (
+                <div className="border-t border-border px-4 py-3 text-center">
+                  <button
+                    onClick={() => handleFinalDiagnosis(messages)}
+                    disabled={isLoading}
+                    className="rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-50"
+                  >
+                    診断結果を表示する
+                  </button>
+                </div>
+              )}
 
               {/* Input Area */}
               <div className="border-t border-border px-4 py-4">
