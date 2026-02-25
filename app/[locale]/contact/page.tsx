@@ -19,14 +19,14 @@ export default function ContactPage() {
 
   const validate = () => {
     const next: Record<string, string> = {};
-    if (!form.name.trim()) next.name = "必須項目です";
+    if (!form.name.trim()) next.name = t("form.required");
     if (!form.email.trim()) {
-      next.email = "必須項目です";
+      next.email = t("form.required");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      next.email = "有効なメールアドレスを入力してください";
+      next.email = t("form.invalidEmail");
     }
-    if (!form.subject.trim()) next.subject = "必須項目です";
-    if (!form.message.trim()) next.message = "必須項目です";
+    if (!form.subject.trim()) next.subject = t("form.required");
+    if (!form.message.trim()) next.message = t("form.required");
     return next;
   };
 

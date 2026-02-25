@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
@@ -27,17 +28,22 @@ function getRiskLevel(score: number): RiskLevel {
   return 'poor';
 }
 
-function getRiskConfig(level: RiskLevel) {
-  const config = {
-    excellent: { color: '#10B981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', label: '健康', desc: '良好な状態です' },
-    good:      { color: '#F59E0B', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800',   label: '注意', desc: '軽微な改善の余地があります' },
-    fair:      { color: '#F97316', bg: 'bg-orange-50',  border: 'border-orange-200',  text: 'text-orange-800',  label: '要受診検討', desc: '医療機関への受診を検討してください' },
-    poor:      { color: '#EF4444', bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800',     label: '早急に受診', desc: '早急に皮膚科専門医を受診してください' },
+function getRiskStyle(level: RiskLevel) {
+  const styles = {
+    excellent: { color: '#10B981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800' },
+    good:      { color: '#F59E0B', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800'   },
+    fair:      { color: '#F97316', bg: 'bg-orange-50',  border: 'border-orange-200',  text: 'text-orange-800'  },
+    poor:      { color: '#EF4444', bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800'     },
   };
-  return config[level];
+  return styles[level];
 }
 
 export default function AIDiagnosisPage() {
+  const t = useTranslations('aiDiagnosis');
+  const stepLabels = t.raw('steps') as string[];
+  const guideItems = t.raw('upload.guide') as string[];
+  const riskLevels = t.raw('result.riskLevels') as Record<RiskLevel, { label: string; desc: string }>;
+
   const [step, setStep] = useState<'upload' | 'chat' | 'result'>('upload');
   const [image, setImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -57,14 +63,13 @@ export default function AIDiagnosisPage() {
 
   const processFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert('ファイルサイズは5MB以下にしてください');
+      alert(t('upload.fileTypes'));
       return;
     }
     if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください');
+      alert(t('upload.fileTypes'));
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
@@ -72,20 +77,8 @@ export default function AIDiagnosisPage() {
       setImage(base64Data);
       setImagePreview(base64);
     };
-    reader.onerror = () => {
-      alert('画像の読み込みに失敗しました');
-    };
+    reader.onerror = () => alert(t('chat.error'));
     reader.readAsDataURL(file);
-  };
-
-  const handleStartDiagnosis = () => {
-    if (!image || !userConsent) return;
-    setStep('chat');
-    setMessages([{
-      role: 'assistant',
-      content: '爪の写真を受け取りました。より正確な診断のために、いくつか質問させてください。最近の睡眠時間はどのくらいですか？（例：6時間、7〜8時間など）',
-      timestamp: new Date().toISOString(),
-    }]);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +91,16 @@ export default function AIDiagnosisPage() {
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) processFile(file);
+  };
+
+  const handleStartDiagnosis = () => {
+    if (!image || !userConsent) return;
+    setStep('chat');
+    setMessages([{
+      role: 'assistant',
+      content: t('chat.initialMessage'),
+      timestamp: new Date().toISOString(),
+    }]);
   };
 
   const handleSendMessage = async () => {
@@ -158,7 +161,7 @@ export default function AIDiagnosisPage() {
       console.error('Error:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '申し訳ございません。エラーが発生しました。もう一度お試しください。',
+        content: t('chat.error'),
         timestamp: new Date().toISOString(),
       }]);
     } finally {
@@ -187,9 +190,9 @@ export default function AIDiagnosisPage() {
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
               AI Diagnosis
             </p>
-            <h1 className="text-3xl font-bold text-foreground">AI爪診断</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              爪の写真をアップロードして、AIと対話形式で健康状態を確認しましょう
+              {t('subtitle')}
             </p>
           </div>
 
@@ -205,7 +208,7 @@ export default function AIDiagnosisPage() {
                   {['upload', 'chat', 'result'].indexOf(step) > i ? '✓' : i + 1}
                 </div>
                 <span className={`hidden sm:inline ${step === s ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
-                  {s === 'upload' ? '写真アップロード' : s === 'chat' ? '問診' : '診断結果'}
+                  {stepLabels[i]}
                 </span>
                 {i < 2 && <div className="h-px w-8 bg-border" />}
               </div>
@@ -220,7 +223,7 @@ export default function AIDiagnosisPage() {
                 <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-primary/20 shadow-md">
                   <Image
                     src="/images/optimized/nailanaly.jpg"
-                    alt="AI爪診断"
+                    alt="AI Nail Diagnosis"
                     fill
                     className="object-cover"
                     sizes="112px"
@@ -228,21 +231,16 @@ export default function AIDiagnosisPage() {
                   />
                 </div>
               </div>
-              <h2 className="mb-2 text-xl font-bold text-foreground">爪の写真をアップロード</h2>
+              <h2 className="mb-2 text-xl font-bold text-foreground">{t('upload.title')}</h2>
               <p className="mb-6 text-sm text-muted-foreground">
-                診断したい爪の写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。
+                {t('upload.description')}
               </p>
 
               {/* Shooting Guide */}
               <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                <h3 className="mb-2 text-xs font-semibold text-primary uppercase tracking-wider">撮影ガイドライン</h3>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{t('upload.guideTitle')}</h3>
                 <ul className="space-y-1">
-                  {[
-                    '明るい場所（自然光または蛍光灯下）で撮影',
-                    '爪全体が画面に収まるように',
-                    'ピントを爪に合わせて鮮明に',
-                    '複数の爪が対象の場合は全て写す',
-                  ].map((guide, i) => (
+                  {guideItems.map((guide, i) => (
                     <li key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                       {guide}
@@ -258,7 +256,7 @@ export default function AIDiagnosisPage() {
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className={`group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all ${
-                  isDragging ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-border hover:border-primary/40 hover:bg-primary/3'
+                  isDragging ? 'scale-[1.01] border-primary bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-primary/3'
                 }`}
               >
                 <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl transition-colors ${
@@ -269,9 +267,9 @@ export default function AIDiagnosisPage() {
                   </svg>
                 </div>
                 <span className="text-base font-semibold text-foreground">
-                  {isDragging ? 'ここにドロップ' : 'ドラッグ&ドロップ、またはクリックして選択'}
+                  {isDragging ? t('upload.dropHere') : t('upload.dragDrop')}
                 </span>
-                <span className="mt-1 text-sm text-muted-foreground">JPEG, PNG, WebP（最大5MB）</span>
+                <span className="mt-1 text-sm text-muted-foreground">{t('upload.fileTypes')}</span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -284,7 +282,7 @@ export default function AIDiagnosisPage() {
               {/* Image Preview */}
               {imagePreview && (
                 <div className="mt-6">
-                  <p className="mb-2 text-sm text-muted-foreground">アップロード済み:</p>
+                  <p className="mb-2 text-sm text-muted-foreground">{t('upload.uploadedLabel')}</p>
                   <div className="relative mx-auto h-48 w-48 overflow-hidden rounded-lg border border-border">
                     <Image
                       src={imagePreview}
@@ -307,8 +305,7 @@ export default function AIDiagnosisPage() {
                       className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
                     />
                     <span className="text-xs leading-relaxed text-muted-foreground">
-                      診断データを今後のサービス改善に使用することに同意します
-                      <span className="ml-1 font-medium">（個人情報は保存されません。画像は診断後24時間で削除されます）</span>
+                      {t('upload.consent')}
                     </span>
                   </label>
                 </div>
@@ -321,7 +318,7 @@ export default function AIDiagnosisPage() {
                   disabled={!userConsent}
                   className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  診断を開始
+                  {t('upload.startButton')}
                 </button>
               )}
 
@@ -331,7 +328,7 @@ export default function AIDiagnosisPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-xs text-amber-800">
-                  本サービスは医療機器ではなく、確定診断を行うものではありません。気になる症状がある場合は医療機関を受診してください。
+                  {t('upload.disclaimer')}
                 </p>
               </div>
             </div>
@@ -348,10 +345,10 @@ export default function AIDiagnosisPage() {
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-semibold text-foreground">AI問診中</p>
+                  <p className="text-sm font-semibold text-foreground">{t('chat.aiLabel')}</p>
                   <div className="flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <p className="text-xs text-muted-foreground">爪整体AIアシスタント</p>
+                    <p className="text-xs text-muted-foreground">{t('chat.aiAssistant')}</p>
                   </div>
                 </div>
               </div>
@@ -362,7 +359,7 @@ export default function AIDiagnosisPage() {
                   {messages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       {msg.role === 'assistant' && (
-                        <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
+                        <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                           AI
                         </div>
                       )}
@@ -378,14 +375,14 @@ export default function AIDiagnosisPage() {
 
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
+                      <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                         AI
                       </div>
                       <div className="rounded-2xl rounded-tl-sm bg-muted px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce" />
-                          <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce [animation-delay:0.15s]" />
-                          <div className="h-2 w-2 rounded-full bg-muted-foreground animate-bounce [animation-delay:0.3s]" />
+                          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+                          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:0.15s]" />
+                          <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:0.3s]" />
                         </div>
                       </div>
                     </div>
@@ -402,7 +399,7 @@ export default function AIDiagnosisPage() {
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                    placeholder="メッセージを入力..."
+                    placeholder={t('chat.inputPlaceholder')}
                     disabled={isLoading}
                     className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   />
@@ -423,15 +420,15 @@ export default function AIDiagnosisPage() {
           {/* ===== Step 3: Result ===== */}
           {step === 'result' && diagnosisResult && (() => {
             const level = getRiskLevel(diagnosisResult.health_score);
-            const risk = getRiskConfig(level);
+            const style = getRiskStyle(level);
             const circumference = 2 * Math.PI * 44;
             const dashArray = `${(diagnosisResult.health_score / 100) * circumference} ${circumference}`;
 
             return (
               <div className="space-y-6">
                 {/* Score Card */}
-                <div className={`rounded-xl border ${risk.border} ${risk.bg} p-8 text-center shadow-sm`}>
-                  <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">診断結果</p>
+                <div className={`rounded-xl border ${style.border} ${style.bg} p-8 text-center shadow-sm`}>
+                  <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">{t('result.title')}</p>
 
                   {/* Circular Progress */}
                   <div className="relative mx-auto mb-4 flex h-36 w-36 items-center justify-center">
@@ -439,7 +436,7 @@ export default function AIDiagnosisPage() {
                       <circle cx="50" cy="50" r="44" fill="none" stroke="#E2E8F0" strokeWidth="7" />
                       <circle
                         cx="50" cy="50" r="44" fill="none"
-                        stroke={risk.color}
+                        stroke={style.color}
                         strokeWidth="7"
                         strokeLinecap="round"
                         strokeDasharray={dashArray}
@@ -452,10 +449,10 @@ export default function AIDiagnosisPage() {
                     </div>
                   </div>
 
-                  <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 ${risk.border} mb-2`}>
-                    <span className={`text-sm font-bold ${risk.text}`}>{risk.label}</span>
+                  <div className={`mb-2 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 ${style.border}`}>
+                    <span className={`text-sm font-bold ${style.text}`}>{riskLevels[level].label}</span>
                   </div>
-                  <p className={`text-sm font-medium ${risk.text}`}>{risk.desc}</p>
+                  <p className={`text-sm font-medium ${style.text}`}>{riskLevels[level].desc}</p>
 
                   {/* Urgent warning for poor/fair */}
                   {(level === 'poor' || level === 'fair') && (
@@ -463,9 +460,7 @@ export default function AIDiagnosisPage() {
                       <svg className="mt-0.5 h-4 w-4 shrink-0 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                       </svg>
-                      <p className="text-xs text-red-700">
-                        この結果はスクリーニング目的のものです。早急に皮膚科専門医を受診し、確定診断を受けることを強くお勧めします。
-                      </p>
+                      <p className="text-xs text-red-700">{t('result.urgentWarning')}</p>
                     </div>
                   )}
                 </div>
@@ -478,7 +473,7 @@ export default function AIDiagnosisPage() {
                         <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
                     </span>
-                    検出された問題点
+                    {t('result.issues')}
                   </h3>
                   <ul className="space-y-2">
                     {diagnosisResult.detected_issues.map((issue, i) => (
@@ -498,7 +493,7 @@ export default function AIDiagnosisPage() {
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     </span>
-                    改善アドバイス
+                    {t('result.recommendations')}
                   </h3>
                   <ul className="space-y-2">
                     {diagnosisResult.recommendations.map((rec, i) => (
@@ -512,8 +507,8 @@ export default function AIDiagnosisPage() {
 
                 {/* Analysis */}
                 <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-                  <h3 className="mb-3 text-base font-bold text-foreground">詳細分析</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                  <h3 className="mb-3 text-base font-bold text-foreground">{t('result.analysis')}</h3>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
                     {diagnosisResult.analysis}
                   </p>
                 </div>
@@ -524,7 +519,7 @@ export default function AIDiagnosisPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p className="text-xs text-amber-800">
-                    この結果はスクリーニング目的のものであり、医学的確定診断ではありません。気になる症状がある場合は必ず医療機関を受診してください。
+                    {t('result.disclaimer')}
                   </p>
                 </div>
 
@@ -534,7 +529,7 @@ export default function AIDiagnosisPage() {
                     onClick={handleReset}
                     className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
                   >
-                    もう一度診断する
+                    {t('result.tryAgain')}
                   </button>
                 </div>
               </div>

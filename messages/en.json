@@ -332,7 +332,9 @@
       "message": "Message", "messagePlaceholder": "Please enter your inquiry here...",
       "submit": "Send Message", "sending": "Sending...",
       "success": "Your message has been sent. We will reply shortly.",
-      "error": "Failed to send. Please contact us directly by email."
+      "error": "Failed to send. Please contact us directly by email.",
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address"
     },
     "info": {
       "title": "Contact Information",
@@ -365,6 +367,8 @@
     "uploadTitle": "Upload Nail Photo",
     "chatTitle": "Consultation",
     "resultTitle": "Diagnosis Result",
+    "subtitle": "Upload a nail photo and check your nail health through AI conversation",
+    "steps": ["Photo Upload", "Interview", "Diagnosis Results"],
     "upload": {
       "title": "Upload a Photo of Your Nails",
       "dragDrop": "Drag & drop image here",
@@ -376,9 +380,12 @@
       "guideTitle": "Shooting Guidelines",
       "guide": ["Shoot in bright light (natural or fluorescent)", "Entire nail in frame", "Focus sharply on the nail", "If multiple nails, include all"],
       "consent": "I consent to using diagnostic data for future service improvement (no personal information stored; images deleted within 24 hours of diagnosis)",
-      "consentRequired": "Consent required to proceed"
+      "consentRequired": "Consent required to proceed",
+      "dropHere": "Drop here",
+      "uploadedLabel": "Uploaded:",
+      "startButton": "Start Diagnosis"
     },
-    "chat": { "inputPlaceholder": "Type a message...", "send": "Send", "aiLabel": "AI Consultation", "aiAssistant": "Nail Seitai AI Assistant" },
+    "chat": { "inputPlaceholder": "Type a message...", "send": "Send", "aiLabel": "AI Consultation", "aiAssistant": "Nail Seitai AI Assistant", "error": "We apologize. An error occurred. Please try again.", "initialMessage": "I received your nail photo. To provide a more accurate assessment, I have a few questions. How many hours of sleep have you been getting recently? (e.g., 6 hours, 7–8 hours)" },
     "result": {
       "title": "Diagnosis Result",
       "healthScore": "Health Score",
@@ -392,7 +399,8 @@
       "recommendations": "Improvement Advice",
       "analysis": "Detailed Analysis",
       "tryAgain": "Diagnose Again",
-      "disclaimer": "This result is for screening purposes only and is not a medical diagnosis."
+      "disclaimer": "This result is for screening purposes only and is not a medical diagnosis.",
+      "urgentWarning": "This result is for screening purposes. We strongly recommend visiting a dermatologist urgently for a definitive diagnosis."
     }
   },
   "loading": { "message": "Loading..." },
