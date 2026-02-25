@@ -36,11 +36,16 @@ export async function POST(req: NextRequest) {
       model: 'gemini-1.5-flash',
     });
 
-    // 会話履歴を構築
-    const chatHistory = messages.slice(0, -1).map((msg: { role: string; content: string }) => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    }));
+    // 会話履歴を構築（Gemini は history が 'user' ロール始まりであることを要求するため、
+    // クライアント側で追加した初期アシスタント挨拶を除外し最初のユーザー発言から開始する）
+    const priorMessages = messages.slice(0, -1) as { role: string; content: string }[];
+    const firstUserIdx = priorMessages.findIndex((m) => m.role === 'user');
+    const chatHistory = (firstUserIdx >= 0 ? priorMessages.slice(firstUserIdx) : []).map(
+      (msg) => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      })
+    );
 
     const chat = model.startChat({
       history: chatHistory,
@@ -50,13 +55,14 @@ export async function POST(req: NextRequest) {
     });
 
     // 最新メッセージを送信
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage = messages[messages.length - 1] as { role: string; content: string };
     const parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = [
       { text: SYSTEM_PROMPT + '\n\n' + lastMessage.content },
     ];
 
-    // 初回で画像がある場合
-    if (image && messages.length === 1) {
+    // ユーザーの最初のメッセージ送信時に画像を添付
+    const userMessageCount = (messages as { role: string }[]).filter((m) => m.role === 'user').length;
+    if (image && userMessageCount === 1) {
       parts.push({
         inlineData: {
           mimeType: 'image/jpeg',
