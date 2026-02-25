@@ -319,7 +319,91 @@
         { "name": "Client C (Desk Worker, 30s female)", "before": "Recurring cracked nails causing difficulty with typing", "after": "Nail strength improved with dietary guidance and regular care. Work efficiency increased" }
       ]
     },
-    "cta": { "title": "Experience Nail Seitai?", "description": "First, check your current nail condition with AI diagnosis.", "button": "Start AI Diagnosis" }
+    "cta": { "title": "Experience Nail Seitai?", "description": "First, check your current nail condition with AI diagnosis.", "button": "Start AI Diagnosis" },
+    "merit": {
+      "sectionTitle": "3 Reasons to Choose Nail Seitai",
+      "badge": "Why Choose Us",
+      "items": [
+        {
+          "title": "Full-Body Connection",
+          "desc": "Toenails are deeply connected to skeletal alignment and posture. Nail Seitai addresses root causes to restore whole-body balance.",
+          "image": "/images/optimized/merit.jpg"
+        },
+        {
+          "title": "Sports Performance Enhancement",
+          "desc": "Optimizing nail shape for your sport improves grip strength, push-off power, and balance. Powerful support for athletes of all levels.",
+          "image": "/images/optimized/sportsfoot.jpg"
+        },
+        {
+          "title": "Proven Track Record",
+          "desc": "An extensive portfolio of successful treatments. See real before-and-after photos to witness the transformation firsthand.",
+          "image": "/images/爪整体/01a80761bd5c70e483d3dd888f287522.jpg"
+        }
+      ]
+    },
+    "judo": {
+      "sectionTitle": "Finger Strength in Martial Arts & Nail Seitai",
+      "badge": "Sports Science",
+      "description": "In judo and jiu-jitsu, 'finger force'—the ability to grip and control—is distinct from overall grip strength. Nail Seitai scientifically supports this by optimizing fingertip sensation and function.",
+      "evidenceTitle": "Scientific Evidence",
+      "evidence": "Research shows that competitive judo performance correlates more strongly with fingertip sensory precision than with overall grip strength. Ingrown nails and nail deformities impair nerve conduction at the fingertip, disrupting fine motor control. Nail Seitai improves circulation and nerve function around the nail, enhancing tactile sensitivity and the ability to sense an opponent's movements.",
+      "items": [
+        {
+          "title": "Finger Force vs. Grip Strength",
+          "desc": "Grip strength measures overall hand force, while finger force refers to the precise 'hook, pull, push' action of individual fingers. The effectiveness of judo's gripping techniques depends directly on finger force."
+        },
+        {
+          "title": "Nail Condition & Nerve Conduction",
+          "desc": "The nail bed contains abundant Merkel cells (tactile receptors). Chronic pressure from ingrown nails inhibits these receptors, reducing fingertip sensory precision."
+        },
+        {
+          "title": "Immediate Effects of Nail Seitai",
+          "desc": "Blood circulation around the nail improves immediately after treatment, and fingertip sensation becomes sharper. Many athletes notice a change in their grip feel on the same day."
+        }
+      ]
+    },
+    "flow": {
+      "sectionTitle": "Treatment Process",
+      "badge": "Treatment Flow",
+      "steps": [
+        { "number": "01", "title": "Consultation", "desc": "We carefully listen to your nail condition, concerns, and lifestyle including sports and occupation." },
+        { "number": "02", "title": "Nail Assessment", "desc": "We examine nail shape, color, and thickness in detail using specialized tools to identify issues." },
+        { "number": "03", "title": "Treatment Plan", "desc": "We propose and explain the optimal treatment plan tailored to your goals and nail condition." },
+        { "number": "04", "title": "Nail Seitai Treatment", "desc": "We carefully perform nail shaping, correction, and care. There is minimal pain during treatment." },
+        { "number": "05", "title": "Aftercare Guidance", "desc": "We explain self-care methods and the recommended schedule for the next session to maintain results." }
+      ]
+    },
+    "gallery": {
+      "sectionTitle": "Before & After Gallery",
+      "badge": "Before & After",
+      "description": "See our real treatment cases. A record of clients who have restored beautiful, healthy nails with care tailored to their condition."
+    },
+    "faq": {
+      "sectionTitle": "Frequently Asked Questions",
+      "badge": "FAQ",
+      "items": [
+        {
+          "question": "Is Nail Seitai painful?",
+          "answer": "There is virtually no pain. Correction involves attaching a flexible wire to the nail, and most clients find relief from pain immediately. If inflammation or infection is present, we recommend medical treatment first."
+        },
+        {
+          "question": "How many sessions are needed?",
+          "answer": "It depends on severity. Mild cases typically require 1–3 sessions, moderate cases 3–6 sessions. Lasting improvement also involves self-care and correcting walking habits alongside treatment."
+        },
+        {
+          "question": "Can I receive treatment if I play sports?",
+          "answer": "Absolutely—we especially recommend it for athletes. Treatment is available anytime except just before a match or training. We also optimize nail shape for specific sports."
+        },
+        {
+          "question": "Can I play sports right after treatment?",
+          "answer": "In most cases, yes. However, after wire correction, intense contact sports may dislodge the wire. Please consult your practitioner."
+        },
+        {
+          "question": "Can I cut my nails at home?",
+          "answer": "Yes, correct nail trimming is important self-care. We will instruct you on the proper technique (square-off cutting) during your visit. Deep cutting is strictly avoided."
+        }
+      ]
+    }
   },
   "contact": {
     "title": "Contact",
