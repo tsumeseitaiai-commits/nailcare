@@ -46,8 +46,7 @@ export default function AIDiagnosisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [consentGiven, setConsentGiven] = useState(false);
-  const [consentError, setConsentError] = useState(false);
+  const [userConsent, setUserConsent] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -66,25 +65,27 @@ export default function AIDiagnosisPage() {
       return;
     }
 
-    if (!consentGiven) {
-      setConsentError(true);
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
       const base64Data = base64.split(',')[1];
       setImage(base64Data);
       setImagePreview(base64);
-      setStep('chat');
-      setMessages([{
-        role: 'assistant',
-        content: '爪の写真を受け取りました。より正確な診断のために、いくつか質問させてください。最近の睡眠時間はどのくらいですか？（例：6時間、7〜8時間など）',
-        timestamp: new Date().toISOString(),
-      }]);
+    };
+    reader.onerror = () => {
+      alert('画像の読み込みに失敗しました');
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleStartDiagnosis = () => {
+    if (!image || !userConsent) return;
+    setStep('chat');
+    setMessages([{
+      role: 'assistant',
+      content: '爪の写真を受け取りました。より正確な診断のために、いくつか質問させてください。最近の睡眠時間はどのくらいですか？（例：6時間、7〜8時間など）',
+      timestamp: new Date().toISOString(),
+    }]);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,8 +173,7 @@ export default function AIDiagnosisPage() {
     setMessages([]);
     setDiagnosisResult(null);
     setUserInput('');
-    setConsentGiven(false);
-    setConsentError(false);
+    setUserConsent(false);
   };
 
   return (
@@ -281,27 +281,49 @@ export default function AIDiagnosisPage() {
                 />
               </div>
 
-              {/* Consent Checkbox */}
-              <div className={`mt-5 rounded-xl border p-4 ${consentError ? 'border-red-300 bg-red-50' : 'border-border bg-muted/50'}`}>
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={consentGiven}
-                    onChange={(e) => {
-                      setConsentGiven(e.target.checked);
-                      if (e.target.checked) setConsentError(false);
-                    }}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
-                  />
-                  <span className={`text-xs leading-relaxed ${consentError ? 'text-red-700' : 'text-muted-foreground'}`}>
-                    診断データを今後のサービス改善に使用することに同意します
-                    <span className="ml-1 font-medium">（個人情報は保存されません。画像は診断後24時間で削除されます）</span>
-                  </span>
-                </label>
-                {consentError && (
-                  <p className="mt-2 text-xs font-semibold text-red-600">続行するには同意が必要です</p>
-                )}
-              </div>
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="mt-6">
+                  <p className="mb-2 text-sm text-muted-foreground">アップロード済み:</p>
+                  <div className="relative mx-auto h-48 w-48 overflow-hidden rounded-lg border border-border">
+                    <Image
+                      src={imagePreview}
+                      alt="Uploaded nail"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Consent Checkbox — shown after image is uploaded */}
+              {imagePreview && (
+                <div className="mt-5 rounded-xl border border-border bg-muted/50 p-4">
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={userConsent}
+                      onChange={(e) => setUserConsent(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+                    />
+                    <span className="text-xs leading-relaxed text-muted-foreground">
+                      診断データを今後のサービス改善に使用することに同意します
+                      <span className="ml-1 font-medium">（個人情報は保存されません。画像は診断後24時間で削除されます）</span>
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              {/* Start Button — shown after image is uploaded */}
+              {imagePreview && (
+                <button
+                  onClick={handleStartDiagnosis}
+                  disabled={!userConsent}
+                  className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  診断を開始
+                </button>
+              )}
 
               {/* Disclaimer */}
               <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
