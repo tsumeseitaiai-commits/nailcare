@@ -53,8 +53,8 @@ export default function AboutPage() {
                   />
                 </div>
                 <div className="glass absolute -bottom-4 -right-4 rounded-xl p-4 shadow-lg">
-                  <p className="text-2xl font-bold text-primary">87%</p>
-                  <p className="text-xs text-muted-foreground">の疾患が爪に現れる</p>
+                  <p className="text-sm font-bold text-primary">{t("hero.floatLabel")}</p>
+                  <p className="text-xs text-muted-foreground">{t("hero.floatSub")}</p>
                 </div>
               </div>
             </div>

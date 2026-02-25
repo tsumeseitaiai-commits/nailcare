@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Nail Seitai AI | Medical-Evidence-Based Nail Disease Screening",
-    "description": "AI trained on 49,567 clinical images screens for onychomycosis, ingrown nails, melanonychia and more. Non-invasive nail health analysis at the level of a dermatology specialist."
+    "description": "Combining AI image analysis with conversational health screening to suggest personalized nail care advice. For concerning symptoms, we recommend consulting a dermatologist."
   },
   "nav": {
     "home": "Home",
@@ -18,30 +18,30 @@
       "cta": "Start AI Diagnosis",
       "secondary": "Learn More",
       "stats": {
-        "accuracy": { "value": "99.25%", "label": "Validation accuracy (Hybrid Capsule CNN)" },
-        "images": { "value": "49,567", "label": "Clinical image database" },
-        "support": { "value": "24h", "label": "AI support" }
+        "accuracy": { "value": "AI Analysis", "label": "Image-based nail assessment" },
+        "images": { "value": "Interview", "label": "Lifestyle habit screening" },
+        "support": { "value": "Advice", "label": "Personalized care suggestions" }
       }
     },
     "evidence": {
       "badge": "Scientific Evidence",
       "title": "AI Diagnosis Backed by Scientific Evidence",
-      "subtitle": "Our system is grounded in clinical data from Asan Medical Center and other institutions, and in cutting-edge deep learning research.",
+      "subtitle": "Our service is built referencing publicly available academic nail disease image datasets and clinical guidelines from dermatological associations.",
       "items": [
         {
-          "value": "49,567",
-          "label": "Clinical image database",
-          "detail": "Collected from multiple institutions including Asan Medical Center, Korea. Uses the Figshare dataset (Han et al.) released under CC BY 4.0 license."
+          "value": "AI Analysis",
+          "label": "Nail Condition Assessment",
+          "detail": "AI built referencing publicly available academic nail disease image datasets analyzes uploaded nail photos."
         },
         {
-          "value": "6 Classes",
-          "label": "Major detectable disease classes",
-          "detail": "Onychomycosis, nail dystrophy, onycholysis, melanonychia, normal, and others (incl. ingrown nail, paronychia) classified with high accuracy."
+          "value": "Interview",
+          "label": "Comprehensive Lifestyle Evaluation",
+          "detail": "Sleep, diet, exercise, stress and other lifestyle factors related to nail health are assessed through conversational screening."
         },
         {
-          "value": "99.25%",
-          "label": "Validation accuracy (Hybrid Capsule CNN)",
-          "detail": "Achieved by Hybrid Capsule CNN with high spatial robustness. Precision 97.35%, recall 96.79% (PMC paper, 2024)."
+          "value": "Advice",
+          "label": "Self-Care Recommendations",
+          "detail": "We clearly explain square-off cutting techniques and guidance on when to see a doctor based on your nail condition."
         }
       ]
     },
@@ -60,7 +60,7 @@
     "conditions": {
       "badge": "Detectable Conditions",
       "title": "Detectable Nail Conditions",
-      "subtitle": "AI screens for the following 6 major nail conditions. Early detection is key for all of them.",
+      "subtitle": "Use this tool to self-check for the following nail conditions. For any concerning symptoms, we recommend consulting a dermatologist.",
       "items": [
         {
           "name": "Ingrown / Pincer Nail",
@@ -121,9 +121,9 @@
     "aiFeature": {
       "badge": "How It Works",
       "sectionTitle": "3 Steps of AI Diagnosis",
-      "step1": { "title": "Photo Upload", "description": "Take a clear photo of your nails in good lighting and upload it. An AI quality filter checks image clarity and prompts retaking if needed." },
-      "step2": { "title": "Multi-Stage AI Analysis", "description": "A segmentation model precisely extracts the nail region, then Hybrid Capsule CNN calculates probability scores for 6 disease classes, integrated with interview data for a comprehensive assessment." },
-      "step3": { "title": "Results & Care Advice", "description": "Risk is stratified into 4 levels. Urgent referral for suspected melanonychia; square-off cut guidance provided immediately for over-trimming." }
+      "step1": { "title": "Photo Upload", "description": "Take a photo of your nails and upload it. Please photograph in good lighting with your entire nail visible." },
+      "step2": { "title": "AI Image Analysis", "description": "AI analyzes the uploaded nail image and combines it with lifestyle data gathered through conversation for a comprehensive nail condition assessment." },
+      "step3": { "title": "Care Advice", "description": "We suggest care methods tailored to your nail condition, including square-off cutting techniques and guidance on when to see a doctor." }
     },
     "squareOff": {
       "badge": "Prevention Guide",
@@ -152,13 +152,13 @@
       "warning": "If the nail is already embedded with inflammation or granulation, do not attempt self-treatment. Visit a dermatologist or foot care clinic immediately."
     },
     "dataCollection": {
-      "badge": "Big Data",
-      "title": "Your Diagnostic Data Saves the Next Person",
-      "desc": "Accumulating nail images and interview data continuously improves AI diagnostic accuracy. It also contributes to discovering new medical insights, such as correlations between ingrown nails, gait posture, and foot deformity.",
+      "badge": "Data Collection",
+      "title": "Your Data Helps Improve Our Service",
+      "desc": "Accumulating nail images and interview data helps improve the quality of AI analysis. All data is properly managed and used without linking to personal information.",
       "items": [
-        { "value": "49,567→∞", "label": "Continuously expanding training data" },
-        { "value": "Semi-supervised", "label": "High accuracy from small data" },
-        { "value": "CC BY 4.0", "label": "Open academic data foundation" }
+        { "value": "Analysis", "label": "AI nail condition assessment" },
+        { "value": "Integration", "label": "Combined lifestyle evaluation" },
+        { "value": "Improvement", "label": "Ongoing quality enhancement" }
       ],
       "privacy": "Diagnostic data is not linked to personal information. Images are deleted within 24 hours of diagnosis."
     },
@@ -179,7 +179,7 @@
       "title": "Important Medical Notice",
       "text": "This service is not a medical device under Japanese pharmaceutical law and does not provide definitive diagnoses. It is provided as a screening tool to help recommend appropriate timing for medical consultation.",
       "urgent": "If you notice melanonychia (black vertical lines) or rapid discoloration, please visit a dermatologist (skin malignancy specialist) urgently. Early detection of malignant melanoma is critical for prognosis.",
-      "source": "Reference: Japanese Dermatological Association 'Dermatology Q&A' / PMC 2024 papers"
+      "source": "Reference: Japanese Dermatological Association 'Dermatology Q&A'"
     }
   },
   "about": {
@@ -187,8 +187,10 @@
     "subtitle": "Your nails are the barometer of your overall health",
     "hero": {
       "badge": "Nail Health Science",
-      "title": "Nails as Biomarkers of Systemic Disease",
-      "description": "Changes in nail morphology, color, and structure reflect early signs of diseases ranging from diabetes and anemia to cardiovascular disease and malignant tumors."
+      "title": "Reading Health Clues from Nail Changes",
+      "description": "Changes in nail morphology, color, and structure can reflect your lifestyle habits and overall health. Regular nail self-checks are the first step in health management.",
+      "floatLabel": "Nail Self-Check",
+      "floatSub": "Health Support Tool"
     },
     "anatomy": {
       "sectionTitle": "Nail Anatomy",
@@ -236,8 +238,8 @@
         { "year": "3000 BC", "event": "Nail care begins in ancient Egypt" },
         { "year": "Han Dynasty (206 BC–)", "event": "Nail diagnosis incorporated into Chinese traditional medicine" },
         { "year": "Edo Period", "event": "Japan's unique nail care culture develops" },
-        { "year": "2018", "event": "Han et al. publish deep learning paper using 49,567 clinical images" },
-        { "year": "2024", "event": "Hybrid Capsule CNN + Stable Diffusion achieves >99% diagnostic accuracy" }
+        { "year": "2018–", "event": "AI-based nail disease analysis research advances globally" },
+        { "year": "2024–", "event": "AI services combining nail care and lifestyle assessment become mainstream" }
       ]
     },
     "science": {
@@ -257,11 +259,11 @@
     "hero": {
       "badge": "Nail Seitai Science",
       "title": "Maximize Your Performance with Nail Seitai",
-      "description": "As research from Tokyo Medical and Dental University's foot care clinic shows, ingrown nails are a systemic problem closely related to foot skeletal structure and gait. A scientific approach addresses the root cause."
+      "description": "Ingrown nails are a systemic problem closely related to foot skeletal structure and gait. Understanding the causes and taking a scientific approach helps address the root issue."
     },
     "biomechanics": {
       "sectionTitle": "Biomechanical Mechanism of Ingrown Nails",
-      "subtitle": "Based on clinical research from Tokyo Medical and Dental University Dermatology Foot Care Clinic",
+      "subtitle": "Key causes of ingrown nails identified through clinical research",
       "description": "Nails serve to push down the ground-reaction force applied to the toe pad during walking. When this upward pressure is insufficient — such as in floating toes (where toes don't contact the ground) — the nail's natural tendency to curl prevails, advancing the ingrown nail.",
       "factors": [
         { "title": "Foot Skeletal Deformity", "desc": "Hallux valgus, flat foot, and other structural deformities promote lateral curvature of the nail plate. Bone hypertrophy at the distal phalanx base is one cause of pincer nail.", "icon": "bone" },
