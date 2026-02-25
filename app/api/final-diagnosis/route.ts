@@ -136,7 +136,7 @@ async function saveToSupabase({
     console.log('[Supabase] INSERT payload:', JSON.stringify(insertData, null, 2));
 
     const { data: savedCase, error: insertError } = await supabase
-      .from('public.nail_cases')
+      .from('nail_cases')
       .insert(insertData)
       .select()
       .single();
@@ -153,7 +153,7 @@ async function saveToSupabase({
     console.log(`[Supabase] nail_cases 保存成功: id=${savedCase.id}`);
 
     const { error: logError } = await supabase
-      .from('public.conversation_logs')
+      .from('conversation_logs')
       .insert({
         session_id: `session-${timestamp}`,
         nail_case_id: savedCase.id,
