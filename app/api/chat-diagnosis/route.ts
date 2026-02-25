@@ -5,38 +5,21 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const SYSTEM_PROMPT = `あなたは爪整体の専門家AIアシスタントです。
 
-【役割】
-ユーザーの爪の写真を分析し、会話を通じて体の状態と生活習慣を問診します。
-
-【会話の流れ（全5問）】
-1. 写真確認の挨拶（1〜2文で簡潔に）
-2. 体の不調・関節の状態を質問
-   - 「肩こり、腰痛、膝・股関節の痛み、冷え性、むくみなど、気になる箇所はありますか？（複数回答可、特になしでもOK）」
-3. 睡眠と疲労感を質問
-   - 「最近の睡眠時間と、日中の疲労感はいかがですか？」
-4. 食事バランスと水分補給を質問
-   - 「食事の偏りや、1日の水分補給量はどのくらいですか？」
-5. 運動習慣と仕事環境を質問
-   - 「週にどのくらい体を動かしますか？また、デスクワークなどで長時間同じ姿勢をとることはありますか？」
-6. 総合診断を提示
+【会話の流れ】
+1. 体の不調な箇所を質問（肩こり、腰痛、冷え性など）
+2. 睡眠状態を質問（時間と質）
+3. 食事バランスを質問
+4. 仕事環境を質問（デスクワーク、立ち仕事など）
+5. 全項目完了後「これで全ての質問が完了しました。診断を開始しますね。」と言う
 
 【重要ルール】
 - 1回に1つだけ質問する
-- 親しみやすく優しい口調
-- 挨拶は簡潔に（長々と説明しない）
+- 簡潔に質問する（長文禁止、1-2文で）
+- 優しい口調で
 - 医学的診断は行わない
-- 深刻な症状は医療機関受診を推奨
-- 日本語で応答
-- 体の不調と爪の状態を関連付けて分析する
-
-【不調と爪の関連性】
-- 肩こり・首こり → 血行不良、爪の成長遅延
-- 腰痛・関節痛 → 足の指の使い方、歩行姿勢と巻き爪の関連
-- 冷え性・むくみ → 末端血流不足、爪の変色・乾燥
-- 疲労感 → 栄養不足、爪の脆弱化
 
 【問診完了の判断】
-上記5問すべて聞き終えたら「診断を開始します」と言ってください。`;
+上記4項目すべて聞き終えたら「これで全ての質問が完了しました。診断を開始しますね。」と必ず言ってください。`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -78,7 +61,8 @@ export async function POST(req: NextRequest) {
     const chat = model.startChat({
       history: chatHistory,
       generationConfig: {
-        maxOutputTokens: 1000,
+        maxOutputTokens: 2000,
+        temperature: 0.7,
       },
     });
 
@@ -99,25 +83,50 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    console.log('Sending message to Gemini...');
     const result = await chat.sendMessage(parts);
+
+    // 応答チェック
+    if (!result || !result.response) {
+      console.error('[Chat] Empty response from Gemini');
+      throw new Error('AIからの応答がありません');
+    }
+
     const response = result.response.text();
+
+    // 空の応答チェック
+    if (!response || response.trim().length === 0) {
+      console.error('[Chat] Empty text in response');
+      throw new Error('AIからの応答が空です');
+    }
+
+    console.log('[Chat] Response length:', response.length);
+    console.log('[Chat] Response preview:', response.substring(0, 100));
 
     // 診断完了チェック
     const isComplete =
       response.includes('診断を開始します') ||
-      response.includes('診断を開始させていただきます') ||
-      response.includes('これから診断') ||
-      response.includes('総合的に見て') ||
-      response.includes('診断結果');
+      response.includes('診断を開始しますね') ||
+      response.includes('全ての質問が完了しました');
+
+    console.log('[Chat] isComplete:', isComplete);
 
     return NextResponse.json({
       response,
       isComplete,
     });
-  } catch (error) {
-    console.error('Chat diagnosis error:', error);
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string; stack?: string };
+    console.error('=== Chat Diagnosis Error ===');
+    console.error('Error name:', err?.name);
+    console.error('Error message:', err?.message);
+    console.error('Error stack:', err?.stack);
+
     return NextResponse.json(
-      { error: 'AI診断中にエラーが発生しました' },
+      {
+        error: 'AI診断中にエラーが発生しました',
+        details: err?.message || 'Unknown error',
+      },
       { status: 500 }
     );
   }
