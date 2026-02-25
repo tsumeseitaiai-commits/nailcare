@@ -89,9 +89,17 @@ async function saveToSupabase({
 
   console.log(`[Supabase] 1. 画像アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
 
-  const { error: uploadError } = await supabase.storage
+  const { data: uploadData, error: uploadError } = await supabase.storage
     .from('nail-images')
     .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
+
+  if (uploadError) {
+    console.error('[Supabase] 1. 画像アップロード失敗:');
+    console.error('  - message:', uploadError.message);
+    console.error('  - name:', uploadError.name);
+    console.error('  - stack:', uploadError.stack);
+    console.error('  - full error:', JSON.stringify(uploadError, null, 2));
+  }
 
   let imageUrl = '';
   if (!uploadError) {
@@ -100,8 +108,9 @@ async function saveToSupabase({
       .getPublicUrl(imagePath);
     imageUrl = urlData.publicUrl;
     console.log(`[Supabase] 1. 画像アップロード成功: ${imageUrl}`);
+    console.log(`[Supabase] 1. uploadData:`, uploadData);
   } else {
-    console.warn('[Supabase] 1. 画像アップロード失敗:', uploadError.message, uploadError);
+    console.warn('[Supabase] 1. 画像なしで処理続行');
   }
 
   // 2. 会話から健康データを抽出
