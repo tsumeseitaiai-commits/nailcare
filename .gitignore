@@ -45,3 +45,4 @@ files/*.txt
 next-env.d.ts
 
 .vercel
+.claude/
