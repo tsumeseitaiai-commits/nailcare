@@ -27,6 +27,7 @@ export default function Header() {
     { href: "/" as const, label: t("home") },
     { href: "/about" as const, label: t("about") },
     { href: "/nail-seitai" as const, label: t("nailSeitai") },
+    { href: "/benefits" as const, label: t("benefits") },
     { href: "/contact" as const, label: t("contact") },
   ];
 

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import HeroCanvas from "@/components/HeroCanvas";
 
 export default function HomePage() {
   const t = useTranslations("home");
@@ -42,17 +43,13 @@ export default function HomePage() {
 
         {/* ===== 1. Hero Section ===== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-primary-light py-24 text-white sm:py-32 lg:py-40">
-          {/* Dot grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.07]"
-            style={{
-              backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
-            }}
-          />
-          {/* Glow orbs */}
-          <div className="absolute -top-40 -end-40 h-[600px] w-[600px] rounded-full bg-accent/20 blur-3xl" />
-          <div className="absolute -bottom-40 -start-40 h-[400px] w-[400px] rounded-full bg-secondary/20 blur-3xl" />
+          {/* データサイエンス背景アニメーション */}
+          <HeroCanvas />
+          {/* Glow orbs（Canvas の上にうっすら重ねる） */}
+          <div className="pointer-events-none absolute -top-40 -end-40 h-[600px] w-[600px] rounded-full bg-accent/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-40 -start-40 h-[400px] w-[400px] rounded-full bg-secondary/10 blur-3xl" />
+          {/* 下部グラデーションフェード */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-primary-dark/40 to-transparent" />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
             {/* Badge */}
@@ -191,37 +188,45 @@ export default function HomePage() {
             </div>
 
             <div className="mt-14 grid gap-6 sm:grid-cols-2">
-              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+              <Link
+                href="/benefits"
+                className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              >
                 <div className="relative h-56 overflow-hidden">
                   <Image
                     src="/images/optimized/merit.jpg"
                     alt={t("merit.card1.title")}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-foreground">{t("merit.card1.title")}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card1.desc")}</p>
+                  <p className="mt-3 text-xs font-semibold text-primary">詳しく見る →</p>
                 </div>
-              </div>
+              </Link>
 
-              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+              <Link
+                href="/benefits"
+                className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              >
                 <div className="relative h-56 overflow-hidden">
                   <Image
                     src="/images/optimized/sportsfoot.jpg"
                     alt={t("merit.card2.title")}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-foreground">{t("merit.card2.title")}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card2.desc")}</p>
+                  <p className="mt-3 text-xs font-semibold text-primary">詳しく見る →</p>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </section>
