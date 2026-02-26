@@ -782,6 +782,215 @@
       "tryAgain": "Diagnose Again",
       "disclaimer": "This result is for screening purposes only and is not a medical diagnosis.",
       "urgentWarning": "This result is for screening purposes. We strongly recommend visiting a dermatologist urgently for a definitive diagnosis."
+    },
+    "quiz": {
+      "uiSteps": [
+        "Image",
+        "Interview",
+        "AI Chat",
+        "Result"
+      ],
+      "progressLabel": "Interview",
+      "startBtn": "Start Interview ({total} Questions) →",
+      "backBtn": "← Back",
+      "nextBtn": "Next →",
+      "finishBtn": "Finish Interview →",
+      "q1": {
+        "title": "What sport do you play?",
+        "placeholder": "Select..."
+      },
+      "q2": {
+        "title": "What is your age and gender?",
+        "ageLabel": "Age",
+        "ageUnit": "years",
+        "genderLabel": "Gender"
+      },
+      "q3": {
+        "title": "What is your body size and dominant foot?",
+        "heightLabel": "Height",
+        "weightLabel": "Weight",
+        "dominantFootLabel": "Dominant Foot"
+      },
+      "q4": {
+        "title": "How long have you played and how often do you train?",
+        "historyLabel": "Years of experience",
+        "historyUnit": "years",
+        "freqLabel": "Training sessions per week"
+      },
+      "q5": {
+        "title": "Any nail concerns?",
+        "sub": "Select all that apply (skip if none)",
+        "colorChange": "Color changes (yellow, white, black, etc.)",
+        "brittle": "Brittle or chipping nails",
+        "pain": "Pain or tenderness",
+        "growthChange": "Change in growth speed"
+      },
+      "q6": {
+        "title": "Tell us about your foot shape",
+        "archLabel": "Foot arch type",
+        "callusLabel": "Location of calluses or corns"
+      },
+      "q7": {
+        "title": "What is your nail care routine?",
+        "styleLabel": "Nail trimming style",
+        "freqLabel": "Trimming frequency",
+        "insoleLabel": "Insole use"
+      },
+      "q8": {
+        "title": "Any nail or foot deformities?",
+        "curvedNailLabel": "Ingrown / curved nails",
+        "halluxLabel": "Hallux valgus (bunion)"
+      },
+      "q9": {
+        "title": "How is your athletic performance?",
+        "toeGripLabel": "Ability to grip the ground with toes",
+        "toeGripLeft": "No sensation",
+        "toeGripRight": "Full sensation",
+        "gripConfLabel": "Confidence in grip / bracing",
+        "gripConfLeft": "No confidence",
+        "gripConfRight": "Very confident",
+        "balanceLabel": "Balance",
+        "balanceLeft": "Unstable",
+        "balanceRight": "Very stable"
+      },
+      "q10": {
+        "title": "Tell us about injuries and current pain",
+        "finalLabel": "Q10 (Final Question)",
+        "ankleSprainLabel": "Ankle sprain history",
+        "painAreasLabel": "Current pain locations (multiple)"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      },
+      "dominantFoot": {
+        "right": "Right foot",
+        "left": "Left foot",
+        "both": "Both"
+      },
+      "practiceFreq": {
+        "1-2": "1-2 times/week",
+        "3-4": "3-4 times/week",
+        "5plus": "5+ times/week",
+        "daily": "Every day"
+      },
+      "archType": {
+        "flat": "Flat foot (no arch)",
+        "normal": "Normal",
+        "high": "High arch",
+        "unknown": "Not sure"
+      },
+      "nailCareStyle": {
+        "deep": "Cut short (deep)",
+        "square": "Square cut",
+        "round": "Round cut",
+        "random": "Irregular / don't care"
+      },
+      "careFreq": {
+        "weekly": "Once a week or more",
+        "biweekly": "Every 2 weeks",
+        "monthly": "Monthly",
+        "rarely": "Rarely"
+      },
+      "insole": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "curvedNail": {
+        "none": "None",
+        "mild": "Slight",
+        "strong": "Severe"
+      },
+      "halluxValgus": {
+        "none": "None",
+        "mild": "Mild",
+        "severe": "Severe"
+      },
+      "ankleSprain": {
+        "none": "None",
+        "once": "Once",
+        "2-3": "2-3 times",
+        "4plus": "4+ times"
+      },
+      "painAreas": {
+        "toes": "Toes",
+        "ankle": "Ankle",
+        "knee": "Knee",
+        "hip": "Hip",
+        "back": "Lower back",
+        "upperBack": "Upper back",
+        "shoulder": "Shoulder",
+        "elbow": "Elbow",
+        "neck": "Neck",
+        "none": "None"
+      },
+      "callusLocs": {
+        "bigToeMound": "Ball of big toe",
+        "littleToeMound": "Ball of little toe",
+        "toeTips": "Toe tips",
+        "heel": "Heel",
+        "none": "None"
+      },
+      "sports": {
+        "soccer": "Soccer",
+        "futsal": "Futsal",
+        "basketball": "Basketball",
+        "volleyball": "Volleyball",
+        "tennis": "Tennis",
+        "badminton": "Badminton",
+        "tableTennis": "Table Tennis",
+        "baseball": "Baseball",
+        "softball": "Softball",
+        "rugby": "Rugby",
+        "americanFootball": "American Football",
+        "handball": "Handball",
+        "hockey": "Hockey",
+        "sprintTrack": "Track & Field (Sprint)",
+        "longDistanceTrack": "Track & Field (Long Distance)",
+        "swimming": "Swimming",
+        "triathlon": "Triathlon",
+        "gymnastics": "Gymnastics",
+        "judo": "Judo",
+        "jujutsu": "Jiu-Jitsu",
+        "kendo": "Kendo",
+        "karate": "Karate",
+        "boxing": "Boxing",
+        "kickboxing": "Kickboxing",
+        "sumo": "Sumo",
+        "skiing": "Skiing",
+        "snowboarding": "Snowboarding",
+        "surfing": "Surfing",
+        "golf": "Golf",
+        "roadCycling": "Road Cycling",
+        "mountainBike": "Mountain Biking",
+        "other": "Other"
+      },
+      "prelim": {
+        "badge": "Interview Score (Preliminary)",
+        "title": "Interview Complete!",
+        "summaryLabel": "Answer Summary",
+        "ageSep": "years ·",
+        "toeGrip": "👣 Toe Grip:",
+        "grip": "💪 Grip:",
+        "balance": "⚖️ Balance:",
+        "ankleSprain": "🩹 Sprain History:",
+        "chatTitle": "Let's discuss further with AI",
+        "chatDesc": "Analysis based on your nail image and interview results.\nFeel free to discuss any athletic concerns.",
+        "chatBtn": "Chat with AI →"
+      },
+      "chatBar": {
+        "specialistLabel": "Sports Specialist ·",
+        "quizScore": "Interview Score:",
+        "viewResult": "View Diagnosis →",
+        "placeholder": "Type anything you're curious about…",
+        "initialMessage": "Please start the free chat"
+      },
+      "scoreBreakdown": {
+        "nail": "💅 Nail Score",
+        "quiz": "📋 Interview Score",
+        "nailDiagnosis": "Nail Diagnosis from Image"
+      }
     }
   },
   "benefits": {

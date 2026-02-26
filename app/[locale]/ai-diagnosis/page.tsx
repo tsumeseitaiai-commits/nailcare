@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
@@ -26,38 +26,28 @@ interface DiagnosisResult {
 }
 
 interface QuizAnswers {
-  // Q1
   sport: string;
-  // Q2
   age: number | '';
   gender: string;
-  // Q3
   height: number | '';
   weight: number | '';
   dominantFoot: string;
-  // Q4
   sportsHistory: number | '';
   practiceFrequency: string;
-  // Q5 爪の自覚症状
   nailColorChange: boolean;
   nailBrittle: boolean;
   nailPain: boolean;
   nailGrowthChange: boolean;
-  // Q6 足の形態
   archType: string;
   callusLocations: string[];
-  // Q7 爪ケア
   nailCareStyle: string;
   nailCareFrequency: string;
   usesInsole: boolean | '';
-  // Q8
   curvedNail: string;
   halluxValgus: string;
-  // Q9
   toeGrip: number;
   gripConfidence: number;
   balance: number;
-  // Q10
   ankleSprain: string;
   currentPainAreas: string[];
 }
@@ -67,19 +57,6 @@ type RiskLevel = 'excellent' | 'good' | 'fair' | 'poor';
 // ============================================================
 // 定数
 // ============================================================
-const SPORTS_LIST = [
-  'サッカー', 'フットサル', 'バスケットボール', 'バレーボール',
-  'テニス', 'バドミントン', '卓球', '野球', 'ソフトボール',
-  'ラグビー', 'アメリカンフットボール', 'ハンドボール', 'ホッケー',
-  '陸上競技（短距離）', '陸上競技（長距離）', '水泳', 'トライアスロン',
-  '体操', '柔道', '柔術', '剣道', '空手', 'ボクシング', 'キックボクシング', '相撲',
-  'スキー', 'スノーボード', 'サーフィン', 'ゴルフ',
-  'サイクリング（ロード）', 'マウンテンバイク', 'その他',
-];
-
-const PAIN_AREAS = ['足指', '足首', '膝', '股関節', '腰', '背中', '肩', '肘', '首', 'なし'];
-const CALLUS_LOCATIONS = ['親指の付け根', '小指の付け根', '足指の先', '踵', 'なし'];
-
 const INITIAL_ANSWERS: QuizAnswers = {
   sport: '', age: '', gender: '',
   height: '', weight: '', dominantFoot: '',
@@ -107,25 +84,26 @@ function getRiskLevel(score: number): RiskLevel {
 
 function getRiskStyle(level: RiskLevel) {
   return {
-    excellent: { color: '#10B981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', label: '非常に良好', desc: '足指・足首の機能は優れています' },
-    good:      { color: '#F59E0B', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800',   label: '良好',     desc: '多少の改善余地がありますが良好です' },
-    fair:      { color: '#F97316', bg: 'bg-orange-50',  border: 'border-orange-200',  text: 'text-orange-800',  label: '要注意',   desc: 'いくつかの問題が見られます' },
-    poor:      { color: '#EF4444', bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800',     label: '要改善',   desc: '早めのケアをおすすめします' },
+    excellent: { color: '#10B981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800' },
+    good:      { color: '#F59E0B', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800' },
+    fair:      { color: '#F97316', bg: 'bg-orange-50',  border: 'border-orange-200',  text: 'text-orange-800' },
+    poor:      { color: '#EF4444', bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800' },
   }[level];
 }
 
+// Uses locale-neutral codes for comparison
 function calcPrelimScore(a: QuizAnswers): number {
   let score = 50;
   score += (a.toeGrip - 5) * 3;
   score += (a.gripConfidence - 5) * 2;
   score += (a.balance - 5) * 2;
-  if (a.ankleSprain === 'なし') score += 5;
-  else if (a.ankleSprain === '1回') score += 0;
-  else if (a.ankleSprain === '2〜3回') score -= 5;
-  else score -= 10;
-  if (a.curvedNail === '強い') score -= 8;
-  else if (a.curvedNail === '少しある') score -= 3;
-  if (a.halluxValgus !== 'なし' && a.halluxValgus !== '') score -= 5;
+  if (a.ankleSprain === 'none') score += 5;
+  else if (a.ankleSprain === 'once') score += 0;
+  else if (a.ankleSprain === '2-3') score -= 5;
+  else if (a.ankleSprain === '4plus') score -= 10;
+  if (a.curvedNail === 'strong') score -= 8;
+  else if (a.curvedNail === 'mild') score -= 3;
+  if (a.halluxValgus !== 'none' && a.halluxValgus !== '') score -= 5;
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
@@ -151,16 +129,16 @@ function SliderInput({ value, onChange, leftLabel, rightLabel }: {
 
 // 選択ボタンコンポーネント
 function ChoiceButtons({ options, value, onChange, cols = 1 }: {
-  options: string[]; value: string; onChange: (v: string) => void; cols?: number;
+  options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; cols?: number;
 }) {
   return (
     <div className={`grid gap-2 ${cols === 2 ? 'grid-cols-2' : cols === 3 ? 'grid-cols-3' : 'grid-cols-1'}`}>
       {options.map(opt => (
-        <button key={opt} onClick={() => onChange(opt)}
+        <button key={opt.value} onClick={() => onChange(opt.value)}
           className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all ${
-            value === opt ? 'border-primary bg-primary/5 text-primary' : 'border-border text-foreground hover:border-primary/40'
+            value === opt.value ? 'border-primary bg-primary/5 text-primary' : 'border-border text-foreground hover:border-primary/40'
           }`}>
-          {opt}
+          {opt.label}
         </button>
       ))}
     </div>
@@ -172,11 +150,59 @@ function ChoiceButtons({ options, value, onChange, cols = 1 }: {
 // ============================================================
 export default function AIDiagnosisPage() {
   const t = useTranslations('aiDiagnosis');
+  const locale = useLocale();
   const guideItems = t.raw('upload.guide') as string[];
   const riskLevels = t.raw('result.riskLevels') as Record<RiskLevel, { label: string; desc: string }>;
 
+  // Quiz translations
+  const qt = t.raw('quiz') as {
+    uiSteps: string[];
+    progressLabel: string;
+    startBtn: string;
+    backBtn: string;
+    nextBtn: string;
+    finishBtn: string;
+    q1: { title: string; placeholder: string };
+    q2: { title: string; ageLabel: string; ageUnit: string; genderLabel: string };
+    q3: { title: string; heightLabel: string; weightLabel: string; dominantFootLabel: string };
+    q4: { title: string; historyLabel: string; historyUnit: string; freqLabel: string };
+    q5: { title: string; sub: string; colorChange: string; brittle: string; pain: string; growthChange: string };
+    q6: { title: string; archLabel: string; callusLabel: string };
+    q7: { title: string; styleLabel: string; freqLabel: string; insoleLabel: string };
+    q8: { title: string; curvedNailLabel: string; halluxLabel: string };
+    q9: { title: string; toeGripLabel: string; toeGripLeft: string; toeGripRight: string; gripConfLabel: string; gripConfLeft: string; gripConfRight: string; balanceLabel: string; balanceLeft: string; balanceRight: string };
+    q10: { title: string; finalLabel: string; ankleSprainLabel: string; painAreasLabel: string };
+    gender: Record<string, string>;
+    dominantFoot: Record<string, string>;
+    practiceFreq: Record<string, string>;
+    archType: Record<string, string>;
+    nailCareStyle: Record<string, string>;
+    careFreq: Record<string, string>;
+    insole: Record<string, string>;
+    curvedNail: Record<string, string>;
+    halluxValgus: Record<string, string>;
+    ankleSprain: Record<string, string>;
+    painAreas: Record<string, string>;
+    callusLocs: Record<string, string>;
+    sports: Record<string, string>;
+    prelim: { badge: string; title: string; summaryLabel: string; ageSep: string; toeGrip: string; grip: string; balance: string; ankleSprain: string; chatTitle: string; chatDesc: string; chatBtn: string };
+    chatBar: { specialistLabel: string; quizScore: string; viewResult: string; placeholder: string; initialMessage: string };
+    scoreBreakdown: { nail: string; quiz: string; nailDiagnosis: string };
+  };
+
+  // Convert translation maps to option arrays
+  const toOpts = (map: Record<string, string>) => Object.entries(map).map(([value, label]) => ({ value, label }));
+  const SPORTS_LIST = toOpts(qt.sports);
+  const PAIN_AREAS = toOpts(qt.painAreas);
+  const CALLUS_LOCATIONS = toOpts(qt.callusLocs);
+
+  // Label lookup helpers
+  const sportLabel = (v: string) => SPORTS_LIST.find(s => s.value === v)?.label ?? v;
+  const ankleSprainLabel = (v: string) => toOpts(qt.ankleSprain).find(o => o.value === v)?.label ?? v;
+  const genderLabel = (v: string) => toOpts(qt.gender).find(o => o.value === v)?.label ?? v;
+
   const [step, setStep] = useState<'upload' | 'quiz' | 'freeChat' | 'result'>('upload');
-  const [quizStep, setQuizStep] = useState(1); // 1〜7
+  const [quizStep, setQuizStep] = useState(1);
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>(INITIAL_ANSWERS);
   const [prelimScore, setPrelimScore] = useState<number | null>(null);
   const [showPrelim, setShowPrelim] = useState(false);
@@ -201,22 +227,22 @@ export default function AIDiagnosisPage() {
     setQuizAnswers(prev => ({ ...prev, [key]: value }));
 
   const togglePainArea = (area: string) => {
-    if (area === 'なし') { set('currentPainAreas', ['なし']); return; }
-    const current = quizAnswers.currentPainAreas.filter(a => a !== 'なし');
+    if (area === 'none') { set('currentPainAreas', ['none']); return; }
+    const current = quizAnswers.currentPainAreas.filter(a => a !== 'none');
     const next = current.includes(area) ? current.filter(a => a !== area) : [...current, area];
     set('currentPainAreas', next);
+  };
+
+  const toggleCallusLocation = (loc: string) => {
+    if (loc === 'none') { set('callusLocations', ['none']); return; }
+    const current = quizAnswers.callusLocations.filter(l => l !== 'none');
+    const next = current.includes(loc) ? current.filter(l => l !== loc) : [...current, loc];
+    set('callusLocations', next);
   };
 
   // ============================================================
   // バリデーション
   // ============================================================
-  const toggleCallusLocation = (loc: string) => {
-    if (loc === 'なし') { set('callusLocations', ['なし']); return; }
-    const current = quizAnswers.callusLocations.filter(l => l !== 'なし');
-    const next = current.includes(loc) ? current.filter(l => l !== loc) : [...current, loc];
-    set('callusLocations', next);
-  };
-
   const canProceed = (): boolean => {
     if (quizStep === 1) return quizAnswers.sport !== '';
     if (quizStep === 2) return quizAnswers.age !== '' && Number(quizAnswers.age) >= 5 && quizAnswers.gender !== '';
@@ -275,7 +301,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: 'フリーチャットを開始してください' }], image, quizAnswers, isInitial: true }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers, isInitial: true, locale }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -293,7 +319,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated, image, quizAnswers }),
+        body: JSON.stringify({ messages: updated, image, quizAnswers, locale }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -315,7 +341,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/final-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgs, image, quizAnswers, locale: 'ja' }),
+        body: JSON.stringify({ messages: msgs, image, quizAnswers, locale }),
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -333,7 +359,7 @@ export default function AIDiagnosisPage() {
     setDiagnosisResult(null); setUserInput(''); setUserConsent(false);
   };
 
-  const uiStepLabels = ['画像', '問診', 'AI相談', '結果'];
+  const uiStepLabels = qt.uiSteps;
   const currentUiStepIndex = ['upload', 'quiz', 'freeChat', 'result'].indexOf(step);
 
   // ============================================================
@@ -428,7 +454,7 @@ export default function AIDiagnosisPage() {
                   disabled={!userConsent}
                   className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  問診を開始する（全{TOTAL_STEPS}問）→
+                  {qt.startBtn.replace('{total}', String(TOTAL_STEPS))}
                 </button>
               )}
               <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
@@ -446,7 +472,7 @@ export default function AIDiagnosisPage() {
               {/* 進捗バー */}
               <div className="mb-6">
                 <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>問診 {quizStep} / {TOTAL_STEPS}</span>
+                  <span>{qt.progressLabel} {quizStep} / {TOTAL_STEPS}</span>
                   <span>{Math.round((quizStep / TOTAL_STEPS) * 100)}%</span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -466,35 +492,35 @@ export default function AIDiagnosisPage() {
               {quizStep === 1 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q1</p>
-                  <h2 className="mb-5 text-xl font-bold">競技名を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q1.title}</h2>
                   <select value={quizAnswers.sport} onChange={e => set('sport', e.target.value)}
                     className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option value="">選択してください</option>
-                    {SPORTS_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+                    <option value="">{qt.q1.placeholder}</option>
+                    {SPORTS_LIST.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                 </div>
               )}
 
-              {/* Q2: 年齢 + 性別（同一画面） */}
+              {/* Q2: 年齢 + 性別 */}
               {quizStep === 2 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q2</p>
-                  <h2 className="mb-5 text-xl font-bold">年齢と性別を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q2.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">年齢</p>
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q2.ageLabel}</p>
                       <div className="flex items-center gap-3">
                         <input type="number" min={5} max={100} value={quizAnswers.age} autoFocus
                           onChange={e => set('age', e.target.value === '' ? '' : Number(e.target.value))}
                           onKeyDown={e => e.key === 'Enter' && canProceed() && handleNext()}
                           placeholder="25"
                           className="w-32 rounded-lg border-2 border-border px-4 py-3 text-center text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                        <span className="text-base text-muted-foreground">歳</span>
+                        <span className="text-base text-muted-foreground">{qt.q2.ageUnit}</span>
                       </div>
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">性別</p>
-                      <ChoiceButtons options={['男性', '女性', 'その他']} value={quizAnswers.gender} onChange={v => set('gender', v)} cols={3} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q2.genderLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.gender)} value={quizAnswers.gender} onChange={v => set('gender', v)} cols={3} />
                     </div>
                   </div>
                 </div>
@@ -504,11 +530,11 @@ export default function AIDiagnosisPage() {
               {quizStep === 3 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q3</p>
-                  <h2 className="mb-5 text-xl font-bold">体格と利き足を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q3.title}</h2>
                   <div className="space-y-5">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="mb-2 text-sm font-semibold text-foreground">身長</p>
+                        <p className="mb-2 text-sm font-semibold text-foreground">{qt.q3.heightLabel}</p>
                         <div className="flex items-center gap-2">
                           <input type="number" min={100} max={250} value={quizAnswers.height}
                             onChange={e => set('height', e.target.value === '' ? '' : Number(e.target.value))}
@@ -518,7 +544,7 @@ export default function AIDiagnosisPage() {
                         </div>
                       </div>
                       <div>
-                        <p className="mb-2 text-sm font-semibold text-foreground">体重</p>
+                        <p className="mb-2 text-sm font-semibold text-foreground">{qt.q3.weightLabel}</p>
                         <div className="flex items-center gap-2">
                           <input type="number" min={20} max={200} value={quizAnswers.weight}
                             onChange={e => set('weight', e.target.value === '' ? '' : Number(e.target.value))}
@@ -534,8 +560,8 @@ export default function AIDiagnosisPage() {
                       </p>
                     )}
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">利き足</p>
-                      <ChoiceButtons options={['右足', '左足', '両方']} value={quizAnswers.dominantFoot} onChange={v => set('dominantFoot', v)} cols={3} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q3.dominantFootLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.dominantFoot)} value={quizAnswers.dominantFoot} onChange={v => set('dominantFoot', v)} cols={3} />
                     </div>
                   </div>
                 </div>
@@ -545,38 +571,38 @@ export default function AIDiagnosisPage() {
               {quizStep === 4 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
-                  <h2 className="mb-5 text-xl font-bold">競技歴と練習頻度を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q4.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">競技歴</p>
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q4.historyLabel}</p>
                       <div className="flex items-center gap-3">
                         <input type="number" min={0} max={50} value={quizAnswers.sportsHistory}
                           onChange={e => set('sportsHistory', e.target.value === '' ? '' : Number(e.target.value))}
                           placeholder="5"
                           className="w-28 rounded-lg border-2 border-border px-4 py-3 text-center text-2xl font-bold focus:border-primary focus:outline-none" />
-                        <span className="text-base text-muted-foreground">年</span>
+                        <span className="text-base text-muted-foreground">{qt.q4.historyUnit}</span>
                       </div>
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">週の練習回数</p>
-                      <ChoiceButtons options={['週1〜2回', '週3〜4回', '週5回以上', '毎日']} value={quizAnswers.practiceFrequency} onChange={v => set('practiceFrequency', v)} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q4.freqLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.practiceFreq)} value={quizAnswers.practiceFrequency} onChange={v => set('practiceFrequency', v)} cols={2} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Q5: 爪の自覚症状（複数選択） */}
+              {/* Q5: 爪の自覚症状 */}
               {quizStep === 5 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q5</p>
-                  <h2 className="mb-2 text-xl font-bold">爪に関して気になる症状は？</h2>
-                  <p className="mb-5 text-sm text-muted-foreground">当てはまるものをすべて選んでください（なければスキップ）</p>
+                  <h2 className="mb-2 text-xl font-bold">{qt.q5.title}</h2>
+                  <p className="mb-5 text-sm text-muted-foreground">{qt.q5.sub}</p>
                   <div className="space-y-3">
                     {([
-                      { key: 'nailColorChange', label: '色の変化がある（黄色・白・黒など）', icon: '🎨' },
-                      { key: 'nailBrittle',     label: '割れやすい・欠けやすい',             icon: '💔' },
-                      { key: 'nailPain',        label: '痛みや圧痛がある',                   icon: '😣' },
-                      { key: 'nailGrowthChange',label: '伸びる速さが変わった気がする',       icon: '📏' },
+                      { key: 'nailColorChange', label: qt.q5.colorChange, icon: '🎨' },
+                      { key: 'nailBrittle',     label: qt.q5.brittle,     icon: '💔' },
+                      { key: 'nailPain',        label: qt.q5.pain,        icon: '😣' },
+                      { key: 'nailGrowthChange',label: qt.q5.growthChange,icon: '📏' },
                     ] as { key: keyof QuizAnswers; label: string; icon: string }[]).map(({ key, label, icon }) => (
                       <button key={key}
                         onClick={() => set(key, !quizAnswers[key] as QuizAnswers[typeof key])}
@@ -594,22 +620,22 @@ export default function AIDiagnosisPage() {
               {quizStep === 6 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q6</p>
-                  <h2 className="mb-5 text-xl font-bold">足の形態を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q6.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">足のアーチタイプ</p>
-                      <ChoiceButtons options={['扁平足（土踏まずがない）', '正常', 'ハイアーチ（高すぎる）', 'わからない']} value={quizAnswers.archType} onChange={v => set('archType', v)} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q6.archLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.archType)} value={quizAnswers.archType} onChange={v => set('archType', v)} cols={2} />
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">タコ・魚の目がある場所</p>
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q6.callusLabel}</p>
                       <div className="grid grid-cols-2 gap-2">
                         {CALLUS_LOCATIONS.map(loc => (
-                          <button key={loc} onClick={() => toggleCallusLocation(loc)}
+                          <button key={loc.value} onClick={() => toggleCallusLocation(loc.value)}
                             className={`rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all ${
-                              quizAnswers.callusLocations.includes(loc)
+                              quizAnswers.callusLocations.includes(loc.value)
                                 ? 'border-primary bg-primary/5 text-primary'
                                 : 'border-border text-foreground hover:border-primary/40'
-                            }`}>{loc}</button>
+                            }`}>{loc.label}</button>
                         ))}
                       </div>
                     </div>
@@ -621,19 +647,23 @@ export default function AIDiagnosisPage() {
               {quizStep === 7 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q7</p>
-                  <h2 className="mb-5 text-xl font-bold">爪のケア習慣を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q7.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">爪の切り方</p>
-                      <ChoiceButtons options={['深爪気味', 'スクエアカット', 'ラウンドカット', 'バラバラ・気にしない']} value={quizAnswers.nailCareStyle} onChange={v => set('nailCareStyle', v)} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q7.styleLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.nailCareStyle)} value={quizAnswers.nailCareStyle} onChange={v => set('nailCareStyle', v)} cols={2} />
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">ケア頻度</p>
-                      <ChoiceButtons options={['週1回以上', '2週間に1回', '月1回', 'ほとんどしない']} value={quizAnswers.nailCareFrequency} onChange={v => set('nailCareFrequency', v)} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q7.freqLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.careFreq)} value={quizAnswers.nailCareFrequency} onChange={v => set('nailCareFrequency', v)} cols={2} />
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">インソール（中敷き）使用</p>
-                      <ChoiceButtons options={['使っている', '使っていない']} value={quizAnswers.usesInsole === '' ? '' : quizAnswers.usesInsole ? '使っている' : '使っていない'} onChange={v => set('usesInsole', v === '使っている')} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q7.insoleLabel}</p>
+                      <ChoiceButtons
+                        options={toOpts(qt.insole)}
+                        value={quizAnswers.usesInsole === '' ? '' : quizAnswers.usesInsole ? 'yes' : 'no'}
+                        onChange={v => set('usesInsole', v === 'yes')}
+                        cols={2} />
                     </div>
                   </div>
                 </div>
@@ -643,63 +673,63 @@ export default function AIDiagnosisPage() {
               {quizStep === 8 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q8</p>
-                  <h2 className="mb-5 text-xl font-bold">爪・足の変形を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q8.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">巻き爪の傾向</p>
-                      <ChoiceButtons options={['なし', '少しある', '強い']} value={quizAnswers.curvedNail} onChange={v => set('curvedNail', v)} cols={3} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q8.curvedNailLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.curvedNail)} value={quizAnswers.curvedNail} onChange={v => set('curvedNail', v)} cols={3} />
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">外反母趾</p>
-                      <ChoiceButtons options={['なし', 'あり（軽度）', 'あり（重度）']} value={quizAnswers.halluxValgus} onChange={v => set('halluxValgus', v)} cols={3} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q8.halluxLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.halluxValgus)} value={quizAnswers.halluxValgus} onChange={v => set('halluxValgus', v)} cols={3} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Q9: 機能スコア（スライダー3つ） */}
+              {/* Q9: 機能スコア */}
               {quizStep === 9 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q9</p>
-                  <h2 className="mb-5 text-xl font-bold">競技中のパフォーマンスを教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q9.title}</h2>
                   <div className="space-y-6">
                     <div>
-                      <p className="mb-3 text-sm font-semibold text-foreground">足指で地面を掴める感覚</p>
-                      <SliderInput value={quizAnswers.toeGrip} onChange={v => set('toeGrip', v)} leftLabel="全く感じない" rightLabel="完全に感じる" />
+                      <p className="mb-3 text-sm font-semibold text-foreground">{qt.q9.toeGripLabel}</p>
+                      <SliderInput value={quizAnswers.toeGrip} onChange={v => set('toeGrip', v)} leftLabel={qt.q9.toeGripLeft} rightLabel={qt.q9.toeGripRight} />
                     </div>
                     <div className="border-t border-border pt-5">
-                      <p className="mb-3 text-sm font-semibold text-foreground">踏ん張り・グリップ力の自信</p>
-                      <SliderInput value={quizAnswers.gripConfidence} onChange={v => set('gripConfidence', v)} leftLabel="全く自信がない" rightLabel="とても自信がある" />
+                      <p className="mb-3 text-sm font-semibold text-foreground">{qt.q9.gripConfLabel}</p>
+                      <SliderInput value={quizAnswers.gripConfidence} onChange={v => set('gripConfidence', v)} leftLabel={qt.q9.gripConfLeft} rightLabel={qt.q9.gripConfRight} />
                     </div>
                     <div className="border-t border-border pt-5">
-                      <p className="mb-3 text-sm font-semibold text-foreground">バランス感覚</p>
-                      <SliderInput value={quizAnswers.balance} onChange={v => set('balance', v)} leftLabel="不安定" rightLabel="とても安定" />
+                      <p className="mb-3 text-sm font-semibold text-foreground">{qt.q9.balanceLabel}</p>
+                      <SliderInput value={quizAnswers.balance} onChange={v => set('balance', v)} leftLabel={qt.q9.balanceLeft} rightLabel={qt.q9.balanceRight} />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Q10: 捻挫歴 + 現在の痛み（最終問） */}
+              {/* Q10: 捻挫歴 + 現在の痛み */}
               {quizStep === 10 && (
                 <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q10（最終問）</p>
-                  <h2 className="mb-5 text-xl font-bold">ケガ歴と現在の痛みを教えてください</h2>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">{qt.q10.finalLabel}</p>
+                  <h2 className="mb-5 text-xl font-bold">{qt.q10.title}</h2>
                   <div className="space-y-5">
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">足首の捻挫歴</p>
-                      <ChoiceButtons options={['なし', '1回', '2〜3回', '4回以上']} value={quizAnswers.ankleSprain} onChange={v => set('ankleSprain', v)} cols={2} />
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q10.ankleSprainLabel}</p>
+                      <ChoiceButtons options={toOpts(qt.ankleSprain)} value={quizAnswers.ankleSprain} onChange={v => set('ankleSprain', v)} cols={2} />
                     </div>
                     <div>
-                      <p className="mb-2 text-sm font-semibold text-foreground">現在、痛みがある部位（複数選択可）</p>
+                      <p className="mb-2 text-sm font-semibold text-foreground">{qt.q10.painAreasLabel}</p>
                       <div className="grid grid-cols-3 gap-2">
                         {PAIN_AREAS.map(area => (
-                          <button key={area} onClick={() => togglePainArea(area)}
+                          <button key={area.value} onClick={() => togglePainArea(area.value)}
                             className={`rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all ${
-                              quizAnswers.currentPainAreas.includes(area)
+                              quizAnswers.currentPainAreas.includes(area.value)
                                 ? 'border-primary bg-primary/5 text-primary'
                                 : 'border-border text-foreground hover:border-primary/40'
                             }`}>
-                            {area}
+                            {area.label}
                           </button>
                         ))}
                       </div>
@@ -712,12 +742,12 @@ export default function AIDiagnosisPage() {
               <div className="mt-8 flex gap-3">
                 {quizStep > 1 && (
                   <button onClick={handleBack} className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted">
-                    ← 戻る
+                    {qt.backBtn}
                   </button>
                 )}
                 <button onClick={handleNext} disabled={!canProceed()}
                   className="flex-1 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50">
-                  {quizStep < TOTAL_STEPS ? '次へ →' : '問診完了 →'}
+                  {quizStep < TOTAL_STEPS ? qt.nextBtn : qt.finishBtn}
                 </button>
               </div>
             </div>
@@ -732,8 +762,8 @@ export default function AIDiagnosisPage() {
             return (
               <div className="space-y-6">
                 <div className={`rounded-xl border ${style.border} ${style.bg} p-8 text-center shadow-sm`}>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">問診スコア（暫定）</p>
-                  <h2 className="mb-6 text-xl font-bold">問診が完了しました！</h2>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">{qt.prelim.badge}</p>
+                  <h2 className="mb-6 text-xl font-bold">{qt.prelim.title}</h2>
                   <div className="relative mx-auto mb-4 flex h-36 w-36 items-center justify-center">
                     <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="44" fill="none" stroke="#E2E8F0" strokeWidth="7" />
@@ -747,30 +777,29 @@ export default function AIDiagnosisPage() {
                     </div>
                   </div>
                   <div className={`mb-2 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 ${style.border}`}>
-                    <span className={`text-sm font-bold ${style.text}`}>{style.label}</span>
+                    <span className={`text-sm font-bold ${style.text}`}>{riskLevels[level].label}</span>
                   </div>
-                  <p className={`text-sm font-medium ${style.text}`}>{style.desc}</p>
+                  <p className={`text-sm font-medium ${style.text}`}>{riskLevels[level].desc}</p>
                   <div className="mt-6 rounded-xl border border-border bg-white/70 p-4 text-left">
-                    <p className="mb-3 text-xs font-semibold text-muted-foreground">回答サマリー</p>
+                    <p className="mb-3 text-xs font-semibold text-muted-foreground">{qt.prelim.summaryLabel}</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-foreground">
-                      <span>🏅 {quizAnswers.sport}</span>
-                      <span>🎂 {quizAnswers.age}歳 · {quizAnswers.gender}</span>
-                      <span>👣 足指感覚: {quizAnswers.toeGrip}/10</span>
-                      <span>💪 グリップ: {quizAnswers.gripConfidence}/10</span>
-                      <span>⚖️ バランス: {quizAnswers.balance}/10</span>
-                      <span>🩹 捻挫歴: {quizAnswers.ankleSprain}</span>
+                      <span>🏅 {sportLabel(quizAnswers.sport)}</span>
+                      <span>🎂 {quizAnswers.age}{qt.prelim.ageSep} {genderLabel(quizAnswers.gender)}</span>
+                      <span>{qt.prelim.toeGrip} {quizAnswers.toeGrip}/10</span>
+                      <span>{qt.prelim.grip} {quizAnswers.gripConfidence}/10</span>
+                      <span>{qt.prelim.balance} {quizAnswers.balance}/10</span>
+                      <span>{qt.prelim.ankleSprain} {ankleSprainLabel(quizAnswers.ankleSprain)}</span>
                     </div>
                   </div>
                 </div>
                 <div className="rounded-xl border border-border bg-white p-6 text-center shadow-sm">
-                  <p className="mb-2 text-base font-bold text-foreground">AIとさらに詳しく話しましょう</p>
-                  <p className="mb-5 text-sm text-muted-foreground">
-                    爪の画像と問診結果をもとに分析します。<br />
-                    競技の悩みや体の変化など、自由に話しかけてください。
+                  <p className="mb-2 text-base font-bold text-foreground">{qt.prelim.chatTitle}</p>
+                  <p className="mb-5 text-sm text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>
+                    {qt.prelim.chatDesc}
                   </p>
                   <button onClick={handleStartFreeChat}
                     className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-primary-dark">
-                    AIと相談する →
+                    {qt.prelim.chatBtn}
                   </button>
                 </div>
               </div>
@@ -790,11 +819,11 @@ export default function AIDiagnosisPage() {
                   <p className="text-sm font-semibold text-foreground">{t('chat.aiAssistant')}</p>
                   <div className="flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    <p className="text-xs text-muted-foreground">スポーツ専門 · {quizAnswers.sport}</p>
+                    <p className="text-xs text-muted-foreground">{qt.chatBar.specialistLabel} {sportLabel(quizAnswers.sport)}</p>
                   </div>
                 </div>
                 <div className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  問診スコア: {prelimScore}/100
+                  {qt.chatBar.quizScore} {prelimScore}/100
                 </div>
               </div>
               <div className="h-[420px] overflow-y-auto px-6 py-4">
@@ -830,7 +859,7 @@ export default function AIDiagnosisPage() {
                 <div className="border-t border-border px-4 py-3 text-center">
                   <button onClick={() => handleFinalDiagnosis(messages)} disabled={isLoading}
                     className="rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-50">
-                    診断結果を見る →
+                    {qt.chatBar.viewResult}
                   </button>
                 </div>
               )}
@@ -838,7 +867,7 @@ export default function AIDiagnosisPage() {
                 <div className="flex gap-2">
                   <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                    placeholder="気になることを自由に入力してください…"
+                    placeholder={qt.chatBar.placeholder}
                     disabled={isLoading}
                     className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50" />
                   <button onClick={handleSendMessage} disabled={isLoading || !userInput.trim()}
@@ -883,12 +912,12 @@ export default function AIDiagnosisPage() {
                   {(diagnosisResult.nail_score !== undefined && diagnosisResult.quiz_score !== undefined) && (
                     <div className="mt-5 grid grid-cols-2 gap-3">
                       <div className="rounded-xl border border-border bg-white/80 p-3 text-center">
-                        <p className="text-xs text-muted-foreground mb-1">💅 爪スコア</p>
+                        <p className="text-xs text-muted-foreground mb-1">{qt.scoreBreakdown.nail}</p>
                         <p className="text-2xl font-bold text-foreground">{diagnosisResult.nail_score}</p>
                         <p className="text-xs text-muted-foreground">× 60%</p>
                       </div>
                       <div className="rounded-xl border border-border bg-white/80 p-3 text-center">
-                        <p className="text-xs text-muted-foreground mb-1">📋 問診スコア</p>
+                        <p className="text-xs text-muted-foreground mb-1">{qt.scoreBreakdown.quiz}</p>
                         <p className="text-2xl font-bold text-foreground">{diagnosisResult.quiz_score}</p>
                         <p className="text-xs text-muted-foreground">× 40%</p>
                       </div>
@@ -904,13 +933,14 @@ export default function AIDiagnosisPage() {
                     </div>
                   )}
                 </div>
+
                 {/* 爪の観察結果 */}
                 {diagnosisResult.nail_findings && diagnosisResult.nail_findings.length > 0 && (
                   <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
                     <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
                       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-pink-100 text-pink-600">
                         💅
-                      </span>画像からの爪診断
+                      </span>{qt.scoreBreakdown.nailDiagnosis}
                     </h3>
                     <ul className="space-y-2">{diagnosisResult.nail_findings.map((f, i) => (
                       <li key={i} className="flex items-start gap-3 text-sm"><span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-pink-400" />{f}</li>

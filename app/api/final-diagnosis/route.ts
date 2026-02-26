@@ -12,79 +12,91 @@ export async function POST(req: NextRequest) {
     const { messages, image, quizAnswers, locale = 'ja' } = await req.json();
 
     const q = quizAnswers as Record<string, unknown> | undefined;
+
+    // Language instruction based on locale
+    const langName = locale === 'ar' ? 'Arabic (العربية)' : locale === 'en' ? 'English' : 'Japanese (日本語)';
+    const langInstruction = `IMPORTANT: All text in nail_findings, detected_issues, recommendations, and analysis fields MUST be written in ${langName}.`;
+
+    // Analysis section headers vary by locale
+    const headers = locale === 'ar'
+      ? { nail: '【حالة الأظافر】', cross: '【المقارنة مع الاستبيان】', perf: '【التأثير على الأداء والنصائح】' }
+      : locale === 'en'
+      ? { nail: '[Nail Condition]', cross: '[Cross-reference with Interview]', perf: '[Performance Impact & Advice]' }
+      : { nail: '【爪の状態】', cross: '【問診との照合】', perf: '【パフォーマンスへの影響とアドバイス】' };
+
     const quizContext = q ? `
-【問診結果】
-- 競技：${q.sport}、年齢：${q.age}歳、性別：${q.gender}
-- 足指グリップ感覚：${q.toeGrip}/10、踏ん張り：${q.gripConfidence}/10、バランス：${q.balance}/10
-- 巻き爪：${q.curvedNail}、外反母趾：${q.halluxValgus}
-- 足首捻挫歴：${q.ankleSprain}
-- 現在の痛み：${Array.isArray(q.currentPainAreas) ? (q.currentPainAreas as string[]).join('・') || 'なし' : 'なし'}
+[Interview Results]
+- Sport: ${q.sport}, Age: ${q.age}, Gender: ${q.gender}
+- Toe grip: ${q.toeGrip}/10, Grip confidence: ${q.gripConfidence}/10, Balance: ${q.balance}/10
+- Curved nail: ${q.curvedNail}, Hallux valgus: ${q.halluxValgus}
+- Ankle sprain history: ${q.ankleSprain}
+- Current pain: ${Array.isArray(q.currentPainAreas) ? (q.currentPainAreas as string[]).join(', ') || 'none' : 'none'}
 ` : '';
 
-    const DIAGNOSIS_PROMPT = `あなたは爪整体の専門家AIです。添付の爪画像と問診データを使って、以下の手順で診断してください。
+    const DIAGNOSIS_PROMPT = `${langInstruction}
+
+You are a nail health specialist AI. Using the attached nail image and interview data, perform a diagnosis following these steps.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 1】爪画像の視覚的評価（nail_score: 0-100）
+[STEP 1] Visual evaluation of nail image (nail_score: 0-100)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-画像だけを見て以下を評価し、nail_scoreを算出すること。
+Evaluate the following from the image only and calculate nail_score.
 
-採点基準（画像のみで判断）:
-- 爪の形状：スクエア〜ラウンドが理想。巻き爪・反り爪・変形があれば減点
-- 爪の厚み：均一で適度な厚みが理想。薄すぎ・厚すぎ・層状剥離は減点
-- 爪の色：ピンク〜淡い肌色が理想。黄変・白濁・黒褐色変化・白い線は減点
-- 爪の表面：滑らかが理想。縦筋・横筋・凸凹・点状陥凹は減点
-- 爪と皮膚の関係：爪床との密着が理想。爪甲剥離・深爪・陥入は減点
-- 爪周囲の皮膚：健康な皮膚が理想。発赤・腫脹・胼胝・皮膚の硬化は減点
+Scoring criteria (image only):
+- Nail shape: square-to-round is ideal; deduct for curved, convex, or deformed nails
+- Nail thickness: uniform moderate thickness is ideal; deduct for too thin/thick or layered peeling
+- Nail color: pink to light skin tone is ideal; deduct for yellowing, white clouding, dark discoloration, white lines
+- Nail surface: smooth is ideal; deduct for vertical/horizontal ridges, bumps, pitting
+- Nail-skin interface: well-attached is ideal; deduct for onycholysis, deep cutting, ingrown nails
+- Periungual skin: healthy skin is ideal; deduct for redness, swelling, calluses, hardening
 
-→ nail_score算出後、nail_findingsに観察した内容を列挙する
+→ After calculating nail_score, list observations in nail_findings
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 2】問診スコア算出（quiz_score: 0-100）
+[STEP 2] Interview score (quiz_score: 0-100)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-問診データと会話ログだけを使って機能的・パフォーマンス状態を評価する。
+Evaluate functional and performance status using only interview data and chat log.
 
 ${quizContext}
-会話ログ:
+Chat log:
 ${JSON.stringify(messages)}
 
-採点基準:
-- グリップ・バランス・足指感覚の高低（各スライダー値）
-- 捻挫歴の回数（多いほど減点）
-- 現在の痛みの部位数・深刻度
-- 会話で出てきた追加の懸念事項
-
-→ quiz_score算出後、quiz_findingsに観察した内容を列挙する
+Scoring criteria:
+- Grip, balance, toe grip levels (slider values)
+- Number of ankle sprains (more = deduct)
+- Number and severity of current pain areas
+- Additional concerns raised in conversation
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【STEP 3】統合診断
+[STEP 3] Integrated diagnosis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-health_score = nail_score × 0.6 + quiz_score × 0.4（小数点以下四捨五入）
+health_score = nail_score × 0.6 + quiz_score × 0.4 (round to nearest integer)
 
-detected_issuesには:
-・画像で確認できた爪の問題（先頭に「[爪]」を付ける）
-・問診と照合して一致・補強できる問題（先頭に「[照合]」を付ける）
-・問診のみから読み取れる機能的問題（先頭に「[問診]」を付ける）
+In detected_issues:
+- Nail problems confirmed in image (prefix with "[Nail]")
+- Problems corroborated by both image and interview (prefix with "[Cross]")
+- Functional problems from interview only (prefix with "[Interview]")
 
-recommendationsには:
-・爪の状態を踏まえた具体的ケア方法
-・問診で判明した機能低下への対策
-・競技パフォーマンス改善のヒント
+In recommendations:
+- Specific nail care based on nail condition
+- Measures for functional deficits found in interview
+- Athletic performance improvement tips
 
-analysisは以下3段構成で記述:
-1. 「【爪の状態】」：画像から見えること（2〜3文）
-2. 「【問診との照合】」：爪の状態と問診結果を結びつけた考察（2〜3文）
-3. 「【パフォーマンスへの影響とアドバイス】」：問診ベースの具体的アドバイス（2〜3文）
+Write analysis in 3 sections:
+1. "${headers.nail}": What the image shows (2-3 sentences)
+2. "${headers.cross}": Connecting nail condition with interview findings (2-3 sentences)
+3. "${headers.perf}": Specific advice based on interview data (2-3 sentences)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-以下のJSON形式のみで返してください（説明文・コードブロック不要）:
+Return ONLY the following JSON (no explanation, no code blocks):
 {
   "nail_score": 0-100,
   "quiz_score": 0-100,
   "health_score": 0-100,
-  "nail_findings": ["爪の観察結果1", "爪の観察結果2", ...],
-  "detected_issues": ["[爪] 問題1", "[照合] 問題2", "[問診] 問題3", ...],
-  "recommendations": ["アドバイス1", "アドバイス2", ...],
-  "analysis": "【爪の状態】...\n\n【問診との照合】...\n\n【パフォーマンスへの影響とアドバイス】..."
+  "nail_findings": ["observation 1", "observation 2", ...],
+  "detected_issues": ["[Nail] issue 1", "[Cross] issue 2", "[Interview] issue 3", ...],
+  "recommendations": ["advice 1", "advice 2", ...],
+  "analysis": "${headers.nail}...\n\n${headers.cross}...\n\n${headers.perf}..."
 }`;
 
     const model = genAI.getGenerativeModel({ model: MODEL_VERSION });

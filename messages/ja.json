@@ -782,6 +782,215 @@
       "tryAgain": "もう一度診断する",
       "disclaimer": "この結果はスクリーニング目的のものであり、医学的確定診断ではありません。",
       "urgentWarning": "この結果はスクリーニング目的のものです。早急に皮膚科専門医を受診し、確定診断を受けることを強くお勧めします。"
+    },
+    "quiz": {
+      "uiSteps": [
+        "画像",
+        "問診",
+        "AI相談",
+        "結果"
+      ],
+      "progressLabel": "問診",
+      "startBtn": "問診を開始する（全{total}問）→",
+      "backBtn": "← 戻る",
+      "nextBtn": "次へ →",
+      "finishBtn": "問診完了 →",
+      "q1": {
+        "title": "競技名を教えてください",
+        "placeholder": "選択してください"
+      },
+      "q2": {
+        "title": "年齢と性別を教えてください",
+        "ageLabel": "年齢",
+        "ageUnit": "歳",
+        "genderLabel": "性別"
+      },
+      "q3": {
+        "title": "体格と利き足を教えてください",
+        "heightLabel": "身長",
+        "weightLabel": "体重",
+        "dominantFootLabel": "利き足"
+      },
+      "q4": {
+        "title": "競技歴と練習頻度を教えてください",
+        "historyLabel": "競技歴",
+        "historyUnit": "年",
+        "freqLabel": "週の練習回数"
+      },
+      "q5": {
+        "title": "爪に関して気になる症状は？",
+        "sub": "当てはまるものをすべて選んでください（なければスキップ）",
+        "colorChange": "色の変化がある（黄色・白・黒など）",
+        "brittle": "割れやすい・欠けやすい",
+        "pain": "痛みや圧痛がある",
+        "growthChange": "伸びる速さが変わった気がする"
+      },
+      "q6": {
+        "title": "足の形態を教えてください",
+        "archLabel": "足のアーチタイプ",
+        "callusLabel": "タコ・魚の目がある場所"
+      },
+      "q7": {
+        "title": "爪のケア習慣を教えてください",
+        "styleLabel": "爪の切り方",
+        "freqLabel": "ケア頻度",
+        "insoleLabel": "インソール（中敷き）使用"
+      },
+      "q8": {
+        "title": "爪・足の変形を教えてください",
+        "curvedNailLabel": "巻き爪の傾向",
+        "halluxLabel": "外反母趾"
+      },
+      "q9": {
+        "title": "競技中のパフォーマンスを教えてください",
+        "toeGripLabel": "足指で地面を掴める感覚",
+        "toeGripLeft": "全く感じない",
+        "toeGripRight": "完全に感じる",
+        "gripConfLabel": "踏ん張り・グリップ力の自信",
+        "gripConfLeft": "全く自信がない",
+        "gripConfRight": "とても自信がある",
+        "balanceLabel": "バランス感覚",
+        "balanceLeft": "不安定",
+        "balanceRight": "とても安定"
+      },
+      "q10": {
+        "title": "ケガ歴と現在の痛みを教えてください",
+        "finalLabel": "Q10（最終問）",
+        "ankleSprainLabel": "足首の捻挫歴",
+        "painAreasLabel": "現在、痛みがある部位（複数選択可）"
+      },
+      "gender": {
+        "male": "男性",
+        "female": "女性",
+        "other": "その他"
+      },
+      "dominantFoot": {
+        "right": "右足",
+        "left": "左足",
+        "both": "両方"
+      },
+      "practiceFreq": {
+        "1-2": "週1〜2回",
+        "3-4": "週3〜4回",
+        "5plus": "週5回以上",
+        "daily": "毎日"
+      },
+      "archType": {
+        "flat": "扁平足（土踏まずがない）",
+        "normal": "正常",
+        "high": "ハイアーチ（高すぎる）",
+        "unknown": "わからない"
+      },
+      "nailCareStyle": {
+        "deep": "深爪気味",
+        "square": "スクエアカット",
+        "round": "ラウンドカット",
+        "random": "バラバラ・気にしない"
+      },
+      "careFreq": {
+        "weekly": "週1回以上",
+        "biweekly": "2週間に1回",
+        "monthly": "月1回",
+        "rarely": "ほとんどしない"
+      },
+      "insole": {
+        "yes": "使っている",
+        "no": "使っていない"
+      },
+      "curvedNail": {
+        "none": "なし",
+        "mild": "少しある",
+        "strong": "強い"
+      },
+      "halluxValgus": {
+        "none": "なし",
+        "mild": "あり（軽度）",
+        "severe": "あり（重度）"
+      },
+      "ankleSprain": {
+        "none": "なし",
+        "once": "1回",
+        "2-3": "2〜3回",
+        "4plus": "4回以上"
+      },
+      "painAreas": {
+        "toes": "足指",
+        "ankle": "足首",
+        "knee": "膝",
+        "hip": "股関節",
+        "back": "腰",
+        "upperBack": "背中",
+        "shoulder": "肩",
+        "elbow": "肘",
+        "neck": "首",
+        "none": "なし"
+      },
+      "callusLocs": {
+        "bigToeMound": "親指の付け根",
+        "littleToeMound": "小指の付け根",
+        "toeTips": "足指の先",
+        "heel": "踵",
+        "none": "なし"
+      },
+      "sports": {
+        "soccer": "サッカー",
+        "futsal": "フットサル",
+        "basketball": "バスケットボール",
+        "volleyball": "バレーボール",
+        "tennis": "テニス",
+        "badminton": "バドミントン",
+        "tableTennis": "卓球",
+        "baseball": "野球",
+        "softball": "ソフトボール",
+        "rugby": "ラグビー",
+        "americanFootball": "アメリカンフットボール",
+        "handball": "ハンドボール",
+        "hockey": "ホッケー",
+        "sprintTrack": "陸上競技（短距離）",
+        "longDistanceTrack": "陸上競技（長距離）",
+        "swimming": "水泳",
+        "triathlon": "トライアスロン",
+        "gymnastics": "体操",
+        "judo": "柔道",
+        "jujutsu": "柔術",
+        "kendo": "剣道",
+        "karate": "空手",
+        "boxing": "ボクシング",
+        "kickboxing": "キックボクシング",
+        "sumo": "相撲",
+        "skiing": "スキー",
+        "snowboarding": "スノーボード",
+        "surfing": "サーフィン",
+        "golf": "ゴルフ",
+        "roadCycling": "サイクリング（ロード）",
+        "mountainBike": "マウンテンバイク",
+        "other": "その他"
+      },
+      "prelim": {
+        "badge": "問診スコア（暫定）",
+        "title": "問診が完了しました！",
+        "summaryLabel": "回答サマリー",
+        "ageSep": "歳 ·",
+        "toeGrip": "👣 足指感覚:",
+        "grip": "💪 グリップ:",
+        "balance": "⚖️ バランス:",
+        "ankleSprain": "🩹 捻挫歴:",
+        "chatTitle": "AIとさらに詳しく話しましょう",
+        "chatDesc": "爪の画像と問診結果をもとに分析します。\n競技の悩みや体の変化など、自由に話しかけてください。",
+        "chatBtn": "AIと相談する →"
+      },
+      "chatBar": {
+        "specialistLabel": "スポーツ専門 ·",
+        "quizScore": "問診スコア:",
+        "viewResult": "診断結果を見る →",
+        "placeholder": "気になることを自由に入力してください…",
+        "initialMessage": "フリーチャットを開始してください"
+      },
+      "scoreBreakdown": {
+        "nail": "💅 爪スコア",
+        "quiz": "📋 問診スコア",
+        "nailDiagnosis": "画像からの爪診断"
+      }
     }
   },
   "benefits": {

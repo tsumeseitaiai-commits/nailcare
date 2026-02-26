@@ -3,88 +3,96 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-function buildSystemPrompt(quizAnswers?: Record<string, unknown>): string {
-  const q = quizAnswers;
+function getLangInstruction(locale: string): string {
+  if (locale === 'ar') return 'IMPORTANT: You must respond in Arabic (العربية) only.';
+  if (locale === 'en') return 'IMPORTANT: You must respond in English only.';
+  return 'IMPORTANT: You must respond in Japanese (日本語) only.';
+}
 
-  // 問診データから「気になる点」を自動抽出
+function buildSystemPrompt(quizAnswers?: Record<string, unknown>, locale = 'ja'): string {
+  const q = quizAnswers;
+  const langInstruction = getLangInstruction(locale);
+
+  // Extract concerns from quiz data
   const concerns: string[] = [];
   if (q) {
     const toeGrip = Number(q.toeGrip);
     const grip = Number(q.gripConfidence);
     const balance = Number(q.balance);
-    if (toeGrip <= 4) concerns.push(`足指で地面を掴む感覚が弱い（${toeGrip}/10）`);
-    if (grip <= 4) concerns.push(`踏ん張り・グリップ力に不安がある（${grip}/10）`);
-    if (balance <= 4) concerns.push(`バランス感覚が不安定（${balance}/10）`);
-    if (q.curvedNail === '強い') concerns.push('巻き爪が強い');
-    if (q.curvedNail === '少しある') concerns.push('巻き爪の傾向がある');
-    if (q.halluxValgus && q.halluxValgus !== 'なし') concerns.push(`外反母趾あり（${q.halluxValgus}）`);
-    if (q.ankleSprain === '2〜3回' || q.ankleSprain === '4回以上') concerns.push(`足首捻挫歴が複数回（${q.ankleSprain}）`);
+    if (toeGrip <= 4) concerns.push(`toe grip weak (${toeGrip}/10)`);
+    if (grip <= 4) concerns.push(`grip confidence low (${grip}/10)`);
+    if (balance <= 4) concerns.push(`balance unstable (${balance}/10)`);
+    if (q.curvedNail === 'strong') concerns.push('severe curved nail');
+    if (q.curvedNail === 'mild') concerns.push('mild curved nail tendency');
+    if (q.halluxValgus && q.halluxValgus !== 'none') concerns.push(`hallux valgus: ${q.halluxValgus}`);
+    if (q.ankleSprain === '2-3' || q.ankleSprain === '4plus') concerns.push(`ankle sprain history: ${q.ankleSprain}`);
     const painAreas = Array.isArray(q.currentPainAreas) ? q.currentPainAreas as string[] : [];
-    if (painAreas.length > 0 && !painAreas.includes('なし')) concerns.push(`現在も痛みあり（${painAreas.join('・')}）`);
+    if (painAreas.length > 0 && !painAreas.includes('none')) concerns.push(`current pain: ${painAreas.join(', ')}`);
   }
 
   const concernText = concerns.length > 0
-    ? `\n【問診から読み取れる気になるポイント（必ず会話で触れること）】\n${concerns.map(c => `- ${c}`).join('\n')}\n`
-    : `\n【問診では特に問題なし。競技パフォーマンスや爪ケアの習慣について自然に聞き出すこと】\n`;
+    ? `\n[Key concerns from interview (must address in conversation)]\n${concerns.map(c => `- ${c}`).join('\n')}\n`
+    : `\n[No major issues in interview. Naturally explore athletic performance and nail care habits.]\n`;
 
   const athleteContext = q
-    ? `【アスリート情報】
-- 競技：${q.sport}${q.position ? ' / ' + q.position : ''}
-- 年齢：${q.age}歳 / 性別：${q.gender}
-- 足指感覚：${q.toeGrip}/10 / グリップ：${q.gripConfidence}/10 / バランス：${q.balance}/10
-- 巻き爪：${q.curvedNail} / 外反母趾：${q.halluxValgus}
-- 捻挫歴：${q.ankleSprain}
-- 現在の痛み：${Array.isArray(q.currentPainAreas) ? (q.currentPainAreas as string[]).join('・') || 'なし' : 'なし'}
+    ? `[Athlete Profile]
+- Sport: ${q.sport}
+- Age: ${q.age} / Gender: ${q.gender}
+- Toe grip: ${q.toeGrip}/10 / Grip confidence: ${q.gripConfidence}/10 / Balance: ${q.balance}/10
+- Curved nail: ${q.curvedNail} / Hallux valgus: ${q.halluxValgus}
+- Ankle sprain history: ${q.ankleSprain}
+- Current pain: ${Array.isArray(q.currentPainAreas) ? (q.currentPainAreas as string[]).join(', ') || 'none' : 'none'}
 ${concernText}`
     : '';
 
-  return `あなたは爪整体の専門家カウンセラーです。${q?.sport || 'スポーツ'}をしているアスリートと1対1で話しています。
+  return `${langInstruction}
+
+You are a nail health specialist counselor. You are having a 1-on-1 conversation with an athlete who plays ${q?.sport || 'sports'}.
 
 ${athleteContext}
-【あなたのキャラクター】
-- 温かく、聞き上手な専門家。押しつけがましくなく、自然に話を引き出す
-- 相手の言葉にちゃんと反応する（「それは辛そうですね」「なるほど、${q?.sport || 'その競技'}ならではですね」など）
-- 専門知識はあるが、難しい用語は使わない
-- 1ターンは2〜4文程度。短くテンポよく
+[Your character]
+- Warm, good listener, not pushy — naturally draw out conversation
+- React to what the user says ("That sounds tough", "I see, that makes sense for ${q?.sport || 'that sport'}", etc.)
+- Expert knowledge but avoid jargon
+- 2-4 sentences per turn — short and conversational
 
-【会話の進め方】
-1. 【最初のメッセージ】問診データと気になるポイントを見て、自分から具体的に触れる。
-   良い例：「問診を見ると、バランス感覚が少し気になりました。試合中に体が流れる感覚はありますか？」
-   良い例：「巻き爪の傾向があるんですね。シューズを脱いだあと、足の指が痛くなることはありますか？」
-   悪い例（禁止）：「他に気になることはありますか？」だけで始める
+[Conversation flow]
+1. [Opening] Look at the interview data and concerns, then proactively bring up something specific.
+   Good: "From your interview, your balance score caught my attention. Do you feel your body shifting during games?"
+   Good: "You have a curved nail tendency. Do your toes hurt after taking off your shoes?"
+   Bad (forbidden): Starting with only "Is there anything you'd like to talk about?"
 
-2. 【深掘りフェーズ（2〜4ターン）】
-   - ユーザーの返答にまずうなずく
-     例：「ああ、なるほど」「それは${q?.sport || 'その競技'}だと特に影響しそうですね」「それは気になりますね」
-   - その話題に関連した質問を1つだけ投げる
-   - 扱うテーマ例：いつ症状が出るか／練習後の変化／シューズの具合／最近の体の変化／爪のケア習慣
+2. [Deep dive (2-4 turns)]
+   - First acknowledge what they say
+   - Then ask exactly one related follow-up question
+   - Topics: when symptoms occur / changes after training / shoe fit / recent body changes / nail care habits
 
-3. 【締めのフェーズ】
-   - 3〜5ターン話したら、または「特にない」「以上」「終わり」「大丈夫」「診断して」などが出たら自然に締める
-   - 締め文に必ず「診断結果を見る」というフレーズを含めること
-   - 例：「ありがとうございます、かなり詳しく聞けました！準備ができたら下の『診断結果を見る』ボタンを押してみてください。」
+3. [Closing phase]
+   - After 3-5 turns, or when user says "nothing else" / "that's all" / "I'm done" / "diagnose me", close naturally
+   - The closing message MUST include the token [DIAGNOSIS_COMPLETE]
+   - Example: "Thank you, I've learned a lot! Whenever you're ready, tap the button below to see your diagnosis results. [DIAGNOSIS_COMPLETE]"
 
-【絶対にやらないこと】
-- 「何かご質問はありますか？」「他に気になることは？」だけの返答（必ず自分から具体的な話題を出す）
-- 箇条書きや番号リストの多用
-- 医学的診断・治療の断言
-- 5文以上の長い説明
+[Never do]
+- Reply with only "Do you have any questions?" or "Anything else?" without raising a specific topic
+- Use bullet lists or numbered lists excessively
+- Assert medical diagnoses or treatments
+- Write more than 5 sentences in one turn
 
-【診断完了フラグ】
-締めの返答には必ず「診断結果を見る」という文字列を含めること。`;
+[Completion flag]
+The closing response MUST contain the token [DIAGNOSIS_COMPLETE].`;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, image, quizAnswers, isInitial } = await req.json();
+    const { messages, image, quizAnswers, isInitial, locale = 'ja' } = await req.json();
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
     });
 
-    const systemPrompt = buildSystemPrompt(quizAnswers);
+    const systemPrompt = buildSystemPrompt(quizAnswers, locale);
 
-    // 会話履歴を構築
+    // Build conversation history
     const priorMessages = messages.slice(0, -1) as { role: string; content: string }[];
     const firstUserIdx = priorMessages.findIndex((m) => m.role === 'user');
 
@@ -97,7 +105,7 @@ export async function POST(req: NextRequest) {
       }));
     } else if (priorMessages.length > 0) {
       chatHistory = [
-        { role: 'user', parts: [{ text: 'フリーチャットを開始してください' }] },
+        { role: 'user', parts: [{ text: 'start' }] },
         ...priorMessages.map((msg) => ({
           role: msg.role === 'user' ? 'user' : 'model',
           parts: [{ text: msg.content }],
@@ -120,7 +128,7 @@ export async function POST(req: NextRequest) {
       { text: systemPrompt + '\n\n' + lastMessage.content },
     ];
 
-    // 最初のメッセージ時に画像を添付
+    // Attach image on initial message
     const userMessageCount = (messages as { role: string }[]).filter((m) => m.role === 'user').length;
     if (image && (isInitial || userMessageCount === 1)) {
       parts.push({
@@ -134,20 +142,17 @@ export async function POST(req: NextRequest) {
     const result = await chat.sendMessage(parts);
 
     if (!result || !result.response) {
-      throw new Error('AIからの応答がありません');
+      throw new Error('No response from AI');
     }
 
     const response = result.response.text();
 
     if (!response || response.trim().length === 0) {
-      throw new Error('AIからの応答が空です');
+      throw new Error('Empty response from AI');
     }
 
-    // 診断完了チェック
-    const isComplete =
-      response.includes('診断結果を見る') ||
-      response.includes('総合診断を行います') ||
-      response.includes('診断を開始します');
+    // Completion check — locale-neutral marker
+    const isComplete = response.includes('[DIAGNOSIS_COMPLETE]');
 
     return NextResponse.json({ response, isComplete });
   } catch (error: unknown) {
@@ -155,7 +160,7 @@ export async function POST(req: NextRequest) {
     console.error('=== Chat Diagnosis Error ===');
     console.error('Error message:', err?.message);
     return NextResponse.json(
-      { error: 'AI診断中にエラーが発生しました', details: err?.message || 'Unknown error' },
+      { error: 'AI diagnosis error', details: err?.message || 'Unknown error' },
       { status: 500 }
     );
   }
