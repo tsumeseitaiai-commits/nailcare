@@ -106,7 +106,7 @@ export default function HomePage() {
                   <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/20">
                     <Image
                       src="/images/optimized/nailhero.jpg"
-                      alt="AI爪診断"
+                      alt={t("hero.title")}
                       fill
                       className="object-cover"
                       priority
@@ -289,7 +289,7 @@ export default function HomePage() {
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
                   <Image
                     src="/images/optimized/nailsmartp.jpg"
-                    alt="スマートフォンでAI爪診断"
+                    alt={t("aiFeature.sectionTitle")}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -556,14 +556,14 @@ export default function HomePage() {
                   {tMedia("issue2.title")}
                 </h3>
                 <p className="text-sm leading-relaxed text-slate-300">
-                  爪整体×柔術・キックボクシングのインタビューほか、実証データ集を収録。
+                  {tMedia("issue2.bannerDesc")}
                 </p>
                 <div>
                   <Link
                     href="/media"
                     className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow transition-all hover:bg-primary-dark hover:-translate-y-0.5"
                   >
-                    雑誌を見る →
+                    {tMedia("issue2.viewMagazine")}
                   </Link>
                 </div>
               </div>

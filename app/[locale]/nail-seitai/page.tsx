@@ -71,7 +71,7 @@ export default function NailSeitaiPage() {
           {/* Background image */}
           <Image
             src="/images/optimized/sportnail.webp"
-            alt="爪整体"
+            alt={t("hero.title")}
             fill
             className="object-cover"
             priority
@@ -119,7 +119,7 @@ export default function NailSeitaiPage() {
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-border">
                   <Image
                     src="/images/optimized/merit.jpg"
-                    alt="爪整体とは"
+                    alt={t("what.sectionTitle")}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -296,7 +296,7 @@ export default function NailSeitaiPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={GALLERY_BASE + filename}
-                    alt="爪整体 施術事例"
+                    alt={t("cases.sectionTitle")}
                     loading="lazy"
                     className="w-full object-cover"
                   />

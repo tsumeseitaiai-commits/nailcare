@@ -21,9 +21,18 @@
       "cta": "Start AI Diagnosis",
       "secondary": "Learn More",
       "stats": {
-        "accuracy": { "value": "AI Analysis", "label": "Image-based nail assessment" },
-        "images": { "value": "Interview", "label": "Lifestyle habit screening" },
-        "support": { "value": "Advice", "label": "Personalized care suggestions" }
+        "accuracy": {
+          "value": "AI Analysis",
+          "label": "Image-based nail assessment"
+        },
+        "images": {
+          "value": "Interview",
+          "label": "Lifestyle habit screening"
+        },
+        "support": {
+          "value": "Advice",
+          "label": "Personalized care suggestions"
+        }
       }
     },
     "evidence": {
@@ -124,16 +133,34 @@
     },
     "about": {
       "sectionTitle": "What is Nail Seitai?",
-      "health": { "title": "Importance of Healthy Nails", "description": "Nails are called the 'barometer of health,' reflecting your body's condition. Noticing changes in color, shape, and thickness leads to early health management." },
-      "merit": { "title": "Benefits of Nail Seitai", "description": "Adjusting nail shape and growth direction improves fingertip circulation and overall body balance. Also effective for preventing ingrown and deformed nails." },
-      "sports": { "title": "Sports Performance Enhancement", "description": "Proper nail care directly affects an athlete's grip and push-off power. Maximize performance with sport-specific nail seitai." }
+      "health": {
+        "title": "Importance of Healthy Nails",
+        "description": "Nails are called the 'barometer of health,' reflecting your body's condition. Noticing changes in color, shape, and thickness leads to early health management."
+      },
+      "merit": {
+        "title": "Benefits of Nail Seitai",
+        "description": "Adjusting nail shape and growth direction improves fingertip circulation and overall body balance. Also effective for preventing ingrown and deformed nails."
+      },
+      "sports": {
+        "title": "Sports Performance Enhancement",
+        "description": "Proper nail care directly affects an athlete's grip and push-off power. Maximize performance with sport-specific nail seitai."
+      }
     },
     "aiFeature": {
       "badge": "How It Works",
       "sectionTitle": "3 Steps of AI Diagnosis",
-      "step1": { "title": "Photo Upload", "description": "Take a photo of your nails and upload it. Please photograph in good lighting with your entire nail visible." },
-      "step2": { "title": "AI Image Analysis", "description": "AI analyzes the uploaded nail image and combines it with lifestyle data gathered through conversation for a comprehensive nail condition assessment." },
-      "step3": { "title": "Care Advice", "description": "We suggest care methods tailored to your nail condition, including square-off cutting techniques and guidance on when to see a doctor." }
+      "step1": {
+        "title": "Photo Upload",
+        "description": "Take a photo of your nails and upload it. Please photograph in good lighting with your entire nail visible."
+      },
+      "step2": {
+        "title": "AI Image Analysis",
+        "description": "AI analyzes the uploaded nail image and combines it with lifestyle data gathered through conversation for a comprehensive nail condition assessment."
+      },
+      "step3": {
+        "title": "Care Advice",
+        "description": "We suggest care methods tailored to your nail condition, including square-off cutting techniques and guidance on when to see a doctor."
+      }
     },
     "squareOff": {
       "badge": "Prevention Guide",
@@ -166,18 +193,39 @@
       "title": "Your Data Helps Improve Our Service",
       "desc": "Accumulating nail images and interview data helps improve the quality of AI analysis. All data is properly managed and used without linking to personal information.",
       "items": [
-        { "value": "Analysis", "label": "AI nail condition assessment" },
-        { "value": "Integration", "label": "Combined lifestyle evaluation" },
-        { "value": "Improvement", "label": "Ongoing quality enhancement" }
+        {
+          "value": "Analysis",
+          "label": "AI nail condition assessment"
+        },
+        {
+          "value": "Integration",
+          "label": "Combined lifestyle evaluation"
+        },
+        {
+          "value": "Improvement",
+          "label": "Ongoing quality enhancement"
+        }
       ],
       "privacy": "Diagnostic data is not linked to personal information. Images are deleted within 24 hours of diagnosis."
     },
     "testimonials": {
       "sectionTitle": "What Our Clients Say",
       "items": [
-        { "name": "Misaki T.", "role": "Office Worker, 30s", "comment": "I was worried about my nail condition, but the AI diagnosis gave me specific advice and peace of mind. I check monthly now." },
-        { "name": "Kenta S.", "role": "Marathon Runner", "comment": "Thanks to nail seitai, my nail problems during running have drastically decreased. I feel my performance has improved too." },
-        { "name": "Akari Y.", "role": "Nail Technician", "comment": "I use the AI diagnosis for client consultations. Having objective data makes explanations much easier." }
+        {
+          "name": "Misaki T.",
+          "role": "Office Worker, 30s",
+          "comment": "I was worried about my nail condition, but the AI diagnosis gave me specific advice and peace of mind. I check monthly now."
+        },
+        {
+          "name": "Kenta S.",
+          "role": "Marathon Runner",
+          "comment": "Thanks to nail seitai, my nail problems during running have drastically decreased. I feel my performance has improved too."
+        },
+        {
+          "name": "Akari Y.",
+          "role": "Nail Technician",
+          "comment": "I use the AI diagnosis for client consultations. Having objective data makes explanations much easier."
+        }
       ]
     },
     "cta": {
@@ -206,20 +254,68 @@
       "sectionTitle": "Nail Anatomy",
       "subtitle": "The nail is composed of 4 major structures",
       "parts": [
-        { "name": "Nail Plate", "eng": "Nail Plate", "desc": "The nail body — a hard semi-transparent plate of stacked keratin protein. A healthy nail is pink, lustrous, and uniformly thick." },
-        { "name": "Nail Bed", "eng": "Nail Bed", "desc": "The skin beneath the nail plate, rich in capillaries — the source of the nail's pink color. Discoloration (blue/yellow/brown) is an important indicator of systemic status." },
-        { "name": "Nail Matrix", "eng": "Nail Matrix", "desc": "Where stem cells producing the nail plate are concentrated. The 'lunula' (white semicircle) at the nail base is the tip of the matrix. Damage here causes nail deformity." },
-        { "name": "Nail Fold", "eng": "Nail Fold", "desc": "Skin folds surrounding the nail base and sides. The cuticle acts as a barrier against bacteria and fungi. In chronic paronychia, the cuticle disappears." }
+        {
+          "name": "Nail Plate",
+          "eng": "Nail Plate",
+          "desc": "The nail body — a hard semi-transparent plate of stacked keratin protein. A healthy nail is pink, lustrous, and uniformly thick."
+        },
+        {
+          "name": "Nail Bed",
+          "eng": "Nail Bed",
+          "desc": "The skin beneath the nail plate, rich in capillaries — the source of the nail's pink color. Discoloration (blue/yellow/brown) is an important indicator of systemic status."
+        },
+        {
+          "name": "Nail Matrix",
+          "eng": "Nail Matrix",
+          "desc": "Where stem cells producing the nail plate are concentrated. The 'lunula' (white semicircle) at the nail base is the tip of the matrix. Damage here causes nail deformity."
+        },
+        {
+          "name": "Nail Fold",
+          "eng": "Nail Fold",
+          "desc": "Skin folds surrounding the nail base and sides. The cuticle acts as a barrier against bacteria and fungi. In chronic paronychia, the cuticle disappears."
+        }
       ]
     },
     "systemic": {
       "sectionTitle": "Nails and Systemic Disease",
       "subtitle": "87% of systemic diseases reportedly show symptoms in the nails (research survey)",
       "items": [
-        { "disease": "Diabetes", "signs": ["Nail thickening and yellowing", "High frequency of onychomycosis", "Reduced nail bed blood flow"], "note": "Peripheral neuropathy delays symptom awareness, making deterioration more likely." },
-        { "disease": "Iron-Deficiency Anemia", "signs": ["Koilonychia (spoon-shaped nails)", "Nail thinning and brittleness", "Increased longitudinal ridges"], "note": "Low hemoglobin makes the nail bed pale. Improves with iron supplementation." },
-        { "disease": "Cardiopulmonary Disease", "signs": ["Clubbing (bulging fingertips)", "Cyanosis (blue-purple nails)", "Nail capillary engorgement"], "note": "Indicator of chronic hypoxia. Also seen in lung cancer and COPD." },
-        { "disease": "Psoriasis", "signs": ["Nail pitting", "Onycholysis", "Oil-drop sign"], "note": "Nail symptoms may precede psoriatic arthritis. Important for early diagnosis." }
+        {
+          "disease": "Diabetes",
+          "signs": [
+            "Nail thickening and yellowing",
+            "High frequency of onychomycosis",
+            "Reduced nail bed blood flow"
+          ],
+          "note": "Peripheral neuropathy delays symptom awareness, making deterioration more likely."
+        },
+        {
+          "disease": "Iron-Deficiency Anemia",
+          "signs": [
+            "Koilonychia (spoon-shaped nails)",
+            "Nail thinning and brittleness",
+            "Increased longitudinal ridges"
+          ],
+          "note": "Low hemoglobin makes the nail bed pale. Improves with iron supplementation."
+        },
+        {
+          "disease": "Cardiopulmonary Disease",
+          "signs": [
+            "Clubbing (bulging fingertips)",
+            "Cyanosis (blue-purple nails)",
+            "Nail capillary engorgement"
+          ],
+          "note": "Indicator of chronic hypoxia. Also seen in lung cancer and COPD."
+        },
+        {
+          "disease": "Psoriasis",
+          "signs": [
+            "Nail pitting",
+            "Onycholysis",
+            "Oil-drop sign"
+          ],
+          "note": "Nail symptoms may precede psoriatic arthritis. Important for early diagnosis."
+        }
       ]
     },
     "skinColor": {
@@ -235,33 +331,73 @@
     "importance": {
       "sectionTitle": "How Nail Health Affects the Whole Body",
       "items": [
-        { "title": "Cardiovascular Impact", "description": "Nail color and shape reflect blood circulation. Bluish nails may indicate oxygen deficiency; yellow nails may signal liver issues." },
-        { "title": "Nutritional Indicator", "description": "Ridges and brittleness signal nutritional deficiency — especially B12, iron, and zinc." },
-        { "title": "Stress & Fatigue Barometer", "description": "Intense stress and overwork can slow nail growth and cause deformation. Nail condition reveals mental and physical exhaustion." },
-        { "title": "Thyroid & Hormonal Function", "description": "Thyroid conditions and hormonal imbalances affect nail texture and growth patterns. Regular monitoring is important." }
+        {
+          "title": "Cardiovascular Impact",
+          "description": "Nail color and shape reflect blood circulation. Bluish nails may indicate oxygen deficiency; yellow nails may signal liver issues."
+        },
+        {
+          "title": "Nutritional Indicator",
+          "description": "Ridges and brittleness signal nutritional deficiency — especially B12, iron, and zinc."
+        },
+        {
+          "title": "Stress & Fatigue Barometer",
+          "description": "Intense stress and overwork can slow nail growth and cause deformation. Nail condition reveals mental and physical exhaustion."
+        },
+        {
+          "title": "Thyroid & Hormonal Function",
+          "description": "Thyroid conditions and hormonal imbalances affect nail texture and growth patterns. Regular monitoring is important."
+        }
       ]
     },
     "history": {
       "sectionTitle": "History of Nail Seitai",
       "description": "Nail care history dates back to ancient civilizations. Ancient Egyptians used nail color to indicate social status; Chinese traditional medicine used nail condition for diagnosis. In Japan, it evolved uniquely as 'Nail Seitai,' now established as a scientifically grounded care method.",
       "timeline": [
-        { "year": "3000 BC", "event": "Nail care begins in ancient Egypt" },
-        { "year": "Han Dynasty (206 BC–)", "event": "Nail diagnosis incorporated into Chinese traditional medicine" },
-        { "year": "Edo Period", "event": "Japan's unique nail care culture develops" },
-        { "year": "2018–", "event": "AI-based nail disease analysis research advances globally" },
-        { "year": "2024–", "event": "AI services combining nail care and lifestyle assessment become mainstream" }
+        {
+          "year": "3000 BC",
+          "event": "Nail care begins in ancient Egypt"
+        },
+        {
+          "year": "Han Dynasty (206 BC–)",
+          "event": "Nail diagnosis incorporated into Chinese traditional medicine"
+        },
+        {
+          "year": "Edo Period",
+          "event": "Japan's unique nail care culture develops"
+        },
+        {
+          "year": "2018–",
+          "event": "AI-based nail disease analysis research advances globally"
+        },
+        {
+          "year": "2024–",
+          "event": "AI services combining nail care and lifestyle assessment become mainstream"
+        }
       ]
     },
     "science": {
       "sectionTitle": "Scientific Evidence",
       "description": "Modern research has reported numerous correlations between nail condition and overall health.",
       "stats": [
-        { "value": "87%", "label": "of diseases show symptoms in the nails (research survey)" },
-        { "value": "3mm", "label": "nails grow approx. 3mm per month, recording health history" },
-        { "value": "7", "label": "health indicators analyzed by AI" }
+        {
+          "value": "87%",
+          "label": "of diseases show symptoms in the nails (research survey)"
+        },
+        {
+          "value": "3mm",
+          "label": "nails grow approx. 3mm per month, recording health history"
+        },
+        {
+          "value": "7",
+          "label": "health indicators analyzed by AI"
+        }
       ]
     },
-    "cta": { "title": "Diagnose Your Nails Now?", "description": "Check your nail health right now with AI.", "button": "Start AI Diagnosis" }
+    "cta": {
+      "title": "Diagnose Your Nails Now?",
+      "description": "Check your nail health right now with AI.",
+      "button": "Start AI Diagnosis"
+    }
   },
   "nailSeitai": {
     "title": "About Nail Seitai",
@@ -276,60 +412,148 @@
       "subtitle": "Key causes of ingrown nails identified through clinical research",
       "description": "Nails serve to push down the ground-reaction force applied to the toe pad during walking. When this upward pressure is insufficient — such as in floating toes (where toes don't contact the ground) — the nail's natural tendency to curl prevails, advancing the ingrown nail.",
       "factors": [
-        { "title": "Foot Skeletal Deformity", "desc": "Hallux valgus, flat foot, and other structural deformities promote lateral curvature of the nail plate. Bone hypertrophy at the distal phalanx base is one cause of pincer nail.", "icon": "bone" },
-        { "title": "Floating Toes & Gait", "desc": "When toes don't contact the ground (floating toes), ground-reaction force isn't transmitted to the nail and the nail's curling tendency can't be suppressed. Learning proper gait is the key to prevention.", "icon": "walk" },
-        { "title": "Over-trimming & Improper Cutting", "desc": "Cutting the nail's lateral edges too short allows soft tissue to rise during walking, and the growing nail drives directly into it. The Japanese Dermatological Association strongly recommends preventive guidance.", "icon": "scissors" },
-        { "title": "Shoe Compression", "desc": "Narrow-toed shoes and high heels compress the nail plate laterally, causing chronic deformity. Choosing appropriate footwear directly contributes to long-term prevention.", "icon": "shoe" }
+        {
+          "title": "Foot Skeletal Deformity",
+          "desc": "Hallux valgus, flat foot, and other structural deformities promote lateral curvature of the nail plate. Bone hypertrophy at the distal phalanx base is one cause of pincer nail.",
+          "icon": "bone"
+        },
+        {
+          "title": "Floating Toes & Gait",
+          "desc": "When toes don't contact the ground (floating toes), ground-reaction force isn't transmitted to the nail and the nail's curling tendency can't be suppressed. Learning proper gait is the key to prevention.",
+          "icon": "walk"
+        },
+        {
+          "title": "Over-trimming & Improper Cutting",
+          "desc": "Cutting the nail's lateral edges too short allows soft tissue to rise during walking, and the growing nail drives directly into it. The Japanese Dermatological Association strongly recommends preventive guidance.",
+          "icon": "scissors"
+        },
+        {
+          "title": "Shoe Compression",
+          "desc": "Narrow-toed shoes and high heels compress the nail plate laterally, causing chronic deformity. Choosing appropriate footwear directly contributes to long-term prevention.",
+          "icon": "shoe"
+        }
       ]
     },
     "what": {
       "sectionTitle": "What is Nail Seitai?",
       "description": "Nail Seitai is a professional practice that adjusts nail shape and growth direction to maximize fingertip function and improve overall performance. Unlike cosmetic nail care, its primary purpose is physical function improvement.",
       "features": [
-        { "title": "Nail Shape Optimization", "description": "We propose and adjust the optimal nail shape and length based on your sport or profession." },
-        { "title": "Ingrown & Deformed Nail Correction", "description": "We safely correct ingrown and deformed nails that cause pain and discomfort." },
-        { "title": "Improved Circulation", "description": "Nail bed massage and nail correction promote blood circulation, sharpening fingertip sensitivity." },
-        { "title": "Preventive Care", "description": "Regular maintenance prevents nail problems before they occur, maintaining long-term health." }
+        {
+          "title": "Nail Shape Optimization",
+          "description": "We propose and adjust the optimal nail shape and length based on your sport or profession."
+        },
+        {
+          "title": "Ingrown & Deformed Nail Correction",
+          "description": "We safely correct ingrown and deformed nails that cause pain and discomfort."
+        },
+        {
+          "title": "Improved Circulation",
+          "description": "Nail bed massage and nail correction promote blood circulation, sharpening fingertip sensitivity."
+        },
+        {
+          "title": "Preventive Care",
+          "description": "Regular maintenance prevents nail problems before they occur, maintaining long-term health."
+        }
       ]
     },
     "treatments": {
       "sectionTitle": "Treatment & Care Methods",
       "subtitle": "A stepwise approach based on severity",
       "items": [
-        { "stage": "Mild", "title": "Square-off Cut + Foot Care", "desc": "Switch to proper nail trimming (square-off) combined with moisturizing care and toe stretching. Most early ingrown nails can be resolved at this stage.", "type": "self" },
-        { "stage": "Moderate", "title": "Superelastic Wire Correction", "desc": "A representative conservative treatment at clinics. A shape-memory alloy wire is attached to the nail tip and uses its restoring force to gradually correct the curvature. Low pain, with rapid pain-relief effect expected.", "type": "clinic" },
-        { "stage": "Severe", "title": "Light-curing Resin Nail Extension", "desc": "Applied when there is insufficient nail for wire correction due to over-trimming. Light-curing or acrylic resin artificially extends and shapes the nail to resolve the embedding. Often combined with wire correction.", "type": "clinic" },
-        { "stage": "Infected", "title": "Urgent Visit to Dermatology or Foot Care Clinic", "desc": "Redness, swelling, heat, or granulation around the nail strongly suggests bacterial secondary infection (soft tissue infection). Self-treatment worsens symptoms — seek specialist care immediately.", "type": "urgent" }
+        {
+          "stage": "Mild",
+          "title": "Square-off Cut + Foot Care",
+          "desc": "Switch to proper nail trimming (square-off) combined with moisturizing care and toe stretching. Most early ingrown nails can be resolved at this stage.",
+          "type": "self"
+        },
+        {
+          "stage": "Moderate",
+          "title": "Superelastic Wire Correction",
+          "desc": "A representative conservative treatment at clinics. A shape-memory alloy wire is attached to the nail tip and uses its restoring force to gradually correct the curvature. Low pain, with rapid pain-relief effect expected.",
+          "type": "clinic"
+        },
+        {
+          "stage": "Severe",
+          "title": "Light-curing Resin Nail Extension",
+          "desc": "Applied when there is insufficient nail for wire correction due to over-trimming. Light-curing or acrylic resin artificially extends and shapes the nail to resolve the embedding. Often combined with wire correction.",
+          "type": "clinic"
+        },
+        {
+          "stage": "Infected",
+          "title": "Urgent Visit to Dermatology or Foot Care Clinic",
+          "desc": "Redness, swelling, heat, or granulation around the nail strongly suggests bacterial secondary infection (soft tissue infection). Self-treatment worsens symptoms — seek specialist care immediately.",
+          "type": "urgent"
+        }
       ]
     },
     "sports": {
       "sectionTitle": "Connection to Sports Performance",
       "description": "For athletes, nail condition is a crucial factor that directly affects performance.",
       "items": [
-        { "sport": "Running", "benefit": "Optimizing nail length and shape improves push-off power and ground contact feel." },
-        { "sport": "Ball Sports", "benefit": "Fingertip sensation for controlling balls improves, enhancing grip and precision." },
-        { "sport": "Martial Arts", "benefit": "Prevent nail injuries during grappling while maximizing grip strength and fingertip power." },
-        { "sport": "Swimming", "benefit": "Shaping nails to minimize resistance when pulling water increases propulsion." }
+        {
+          "sport": "Running",
+          "benefit": "Optimizing nail length and shape improves push-off power and ground contact feel."
+        },
+        {
+          "sport": "Ball Sports",
+          "benefit": "Fingertip sensation for controlling balls improves, enhancing grip and precision."
+        },
+        {
+          "sport": "Martial Arts",
+          "benefit": "Prevent nail injuries during grappling while maximizing grip strength and fingertip power."
+        },
+        {
+          "sport": "Swimming",
+          "benefit": "Shaping nails to minimize resistance when pulling water increases propulsion."
+        }
       ]
     },
     "prevention": {
       "sectionTitle": "Prevention & Self-care",
       "items": [
-        { "title": "Strict Square-off Cut", "desc": "Cut nails straight across and round the corners slightly. The most effective ingrown nail prevention method. Recommended by the Japanese Dermatological Association." },
-        { "title": "Toe Muscle Strengthening", "desc": "Towel-gathering exercises (grasping a towel with toes) strengthen toe muscles and improve floating toes." },
-        { "title": "Proper Footwear", "desc": "Choose shoes with about 1cm of space at the toe and the right width. Avoid high heels and narrow-toed shoes." },
-        { "title": "Correct Gait", "desc": "Be mindful of using the full pad of each toe to push off the ground. Land on the heel and push off with the big toe." }
+        {
+          "title": "Strict Square-off Cut",
+          "desc": "Cut nails straight across and round the corners slightly. The most effective ingrown nail prevention method. Recommended by the Japanese Dermatological Association."
+        },
+        {
+          "title": "Toe Muscle Strengthening",
+          "desc": "Towel-gathering exercises (grasping a towel with toes) strengthen toe muscles and improve floating toes."
+        },
+        {
+          "title": "Proper Footwear",
+          "desc": "Choose shoes with about 1cm of space at the toe and the right width. Avoid high heels and narrow-toed shoes."
+        },
+        {
+          "title": "Correct Gait",
+          "desc": "Be mindful of using the full pad of each toe to push off the ground. Land on the heel and push off with the big toe."
+        }
       ]
     },
     "cases": {
       "sectionTitle": "Before & After Cases",
       "items": [
-        { "name": "Client A (Marathon Runner, 40s)", "before": "Nails turned black and eventually fell off after every 10km run", "after": "Zero nail problems after 3 nail seitai sessions. Personal best improved by 3 minutes" },
-        { "name": "Client B (Basketball Player, 20s)", "before": "Ingrown nail caused pain, affecting jumping and landing", "after": "Completely resolved after 2 months of correction treatment. Play quality improved" },
-        { "name": "Client C (Desk Worker, 30s female)", "before": "Recurring cracked nails causing difficulty with typing", "after": "Nail strength improved with dietary guidance and regular care. Work efficiency increased" }
+        {
+          "name": "Client A (Marathon Runner, 40s)",
+          "before": "Nails turned black and eventually fell off after every 10km run",
+          "after": "Zero nail problems after 3 nail seitai sessions. Personal best improved by 3 minutes"
+        },
+        {
+          "name": "Client B (Basketball Player, 20s)",
+          "before": "Ingrown nail caused pain, affecting jumping and landing",
+          "after": "Completely resolved after 2 months of correction treatment. Play quality improved"
+        },
+        {
+          "name": "Client C (Desk Worker, 30s female)",
+          "before": "Recurring cracked nails causing difficulty with typing",
+          "after": "Nail strength improved with dietary guidance and regular care. Work efficiency increased"
+        }
       ]
     },
-    "cta": { "title": "Experience Nail Seitai?", "description": "First, check your current nail condition with AI diagnosis.", "button": "Start AI Diagnosis" },
+    "cta": {
+      "title": "Experience Nail Seitai?",
+      "description": "First, check your current nail condition with AI diagnosis.",
+      "button": "Start AI Diagnosis"
+    },
     "merit": {
       "sectionTitle": "3 Reasons to Choose Nail Seitai",
       "badge": "Why Choose Us",
@@ -376,11 +600,31 @@
       "sectionTitle": "Treatment Process",
       "badge": "Treatment Flow",
       "steps": [
-        { "number": "01", "title": "Consultation", "desc": "We carefully listen to your nail condition, concerns, and lifestyle including sports and occupation." },
-        { "number": "02", "title": "Nail Assessment", "desc": "We examine nail shape, color, and thickness in detail using specialized tools to identify issues." },
-        { "number": "03", "title": "Treatment Plan", "desc": "We propose and explain the optimal treatment plan tailored to your goals and nail condition." },
-        { "number": "04", "title": "Nail Seitai Treatment", "desc": "We carefully perform nail shaping, correction, and care. There is minimal pain during treatment." },
-        { "number": "05", "title": "Aftercare Guidance", "desc": "We explain self-care methods and the recommended schedule for the next session to maintain results." }
+        {
+          "number": "01",
+          "title": "Consultation",
+          "desc": "We carefully listen to your nail condition, concerns, and lifestyle including sports and occupation."
+        },
+        {
+          "number": "02",
+          "title": "Nail Assessment",
+          "desc": "We examine nail shape, color, and thickness in detail using specialized tools to identify issues."
+        },
+        {
+          "number": "03",
+          "title": "Treatment Plan",
+          "desc": "We propose and explain the optimal treatment plan tailored to your goals and nail condition."
+        },
+        {
+          "number": "04",
+          "title": "Nail Seitai Treatment",
+          "desc": "We carefully perform nail shaping, correction, and care. There is minimal pain during treatment."
+        },
+        {
+          "number": "05",
+          "title": "Aftercare Guidance",
+          "desc": "We explain self-care methods and the recommended schedule for the next session to maintain results."
+        }
       ]
     },
     "gallery": {
@@ -418,13 +662,22 @@
   "contact": {
     "title": "Contact",
     "subtitle": "Feel free to ask us anything",
-    "hero": { "badge": "Contact", "title": "Contact Us", "description": "Feel free to ask us anything. We usually reply within 1–2 business days." },
+    "hero": {
+      "badge": "Contact",
+      "title": "Contact Us",
+      "description": "Feel free to ask us anything. We usually reply within 1–2 business days."
+    },
     "form": {
-      "name": "Name", "namePlaceholder": "John Smith",
-      "email": "Email Address", "emailPlaceholder": "example@email.com",
-      "subject": "Subject", "subjectPlaceholder": "Question about AI Diagnosis",
-      "message": "Message", "messagePlaceholder": "Please enter your inquiry here...",
-      "submit": "Send Message", "sending": "Sending...",
+      "name": "Name",
+      "namePlaceholder": "John Smith",
+      "email": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Question about AI Diagnosis",
+      "message": "Message",
+      "messagePlaceholder": "Please enter your inquiry here...",
+      "submit": "Send Message",
+      "sending": "Sending...",
       "success": "Your message has been sent. We will reply shortly.",
       "error": "Failed to send. Please contact us directly by email.",
       "required": "This field is required",
@@ -455,14 +708,20 @@
     "nailSeitai": "Nail Seitai",
     "contactUs": "Contact"
   },
-  "languageSwitcher": { "label": "Select language" },
+  "languageSwitcher": {
+    "label": "Select language"
+  },
   "aiDiagnosis": {
     "title": "AI Nail Diagnosis",
     "uploadTitle": "Upload Nail Photo",
     "chatTitle": "Consultation",
     "resultTitle": "Diagnosis Result",
     "subtitle": "Upload a nail photo and check your nail health through AI conversation",
-    "steps": ["Photo Upload", "Interview", "Diagnosis Results"],
+    "steps": [
+      "Photo Upload",
+      "Interview",
+      "Diagnosis Results"
+    ],
     "upload": {
       "title": "Upload a Photo of Your Nails",
       "dragDrop": "Drag & drop image here",
@@ -472,22 +731,50 @@
       "fileTypes": "JPEG, PNG, WebP (max 5MB)",
       "disclaimer": "This service is not a medical device and does not provide definitive diagnoses. Please consult a healthcare provider if you have concerning symptoms.",
       "guideTitle": "Shooting Guidelines",
-      "guide": ["Shoot in bright light (natural or fluorescent)", "Entire nail in frame", "Focus sharply on the nail", "If multiple nails, include all"],
+      "guide": [
+        "Shoot in bright light (natural or fluorescent)",
+        "Entire nail in frame",
+        "Focus sharply on the nail",
+        "If multiple nails, include all"
+      ],
       "consent": "I consent to using diagnostic data for future service improvement (no personal information stored; images deleted within 24 hours of diagnosis)",
       "consentRequired": "Consent required to proceed",
       "dropHere": "Drop here",
       "uploadedLabel": "Uploaded:",
       "startButton": "Start Diagnosis"
     },
-    "chat": { "inputPlaceholder": "Type a message...", "send": "Send", "aiLabel": "AI Consultation", "aiAssistant": "Nail Seitai AI Assistant", "error": "We apologize. An error occurred. Please try again.", "initialMessage": "I received your nail photo. To provide a more accurate assessment, I have a few questions. How many hours of sleep have you been getting recently? (e.g., 6 hours, 7–8 hours)" },
+    "chat": {
+      "inputPlaceholder": "Type a message...",
+      "send": "Send",
+      "aiLabel": "AI Consultation",
+      "aiAssistant": "Nail Seitai AI Assistant",
+      "error": "We apologize. An error occurred. Please try again.",
+      "initialMessage": "I received your nail photo. To provide a more accurate assessment, I have a few questions. How many hours of sleep have you been getting recently? (e.g., 6 hours, 7–8 hours)"
+    },
     "result": {
       "title": "Diagnosis Result",
       "healthScore": "Health Score",
       "riskLevels": {
-        "excellent": { "label": "Healthy", "range": "80-100", "desc": "In good condition" },
-        "good": { "label": "Caution", "range": "50-79", "desc": "Minor room for improvement" },
-        "fair": { "label": "Consider Medical Visit", "range": "20-49", "desc": "Consider visiting a medical institution" },
-        "poor": { "label": "See Doctor Urgently", "range": "0-19", "desc": "Please visit a dermatologist urgently" }
+        "excellent": {
+          "label": "Healthy",
+          "range": "80-100",
+          "desc": "In good condition"
+        },
+        "good": {
+          "label": "Caution",
+          "range": "50-79",
+          "desc": "Minor room for improvement"
+        },
+        "fair": {
+          "label": "Consider Medical Visit",
+          "range": "20-49",
+          "desc": "Consider visiting a medical institution"
+        },
+        "poor": {
+          "label": "See Doctor Urgently",
+          "range": "0-19",
+          "desc": "Please visit a dermatologist urgently"
+        }
       },
       "issues": "Detected Issues",
       "recommendations": "Improvement Advice",
@@ -508,9 +795,21 @@
       "title": "What is Nail Seitai?",
       "description": "Nail deformities directly affect ground contact angle, plantar pressure distribution, and load alignment through the big toe joint. Problems like ingrown nails, over-trimming, and floating nails cause postural imbalance, pelvic tilt, and asymmetry in running form. No matter how much you train your muscles, an 'input error' at the foot prevents you from reaching your true potential.",
       "cards": [
-        { "icon": "🦶", "title": "Ground Contact", "desc": "When toes contact the ground correctly, the stability and propulsion of each step improves." },
-        { "icon": "🏛️", "title": "Posture", "desc": "Plantar load balance is restored, naturally correcting pelvic and spinal tilt." },
-        { "icon": "⚡", "title": "Power Output", "desc": "Muscle force transmits correctly, allowing explosive speed and endurance to reach their true potential." }
+        {
+          "icon": "🦶",
+          "title": "Ground Contact",
+          "desc": "When toes contact the ground correctly, the stability and propulsion of each step improves."
+        },
+        {
+          "icon": "🏛️",
+          "title": "Posture",
+          "desc": "Plantar load balance is restored, naturally correcting pelvic and spinal tilt."
+        },
+        {
+          "icon": "⚡",
+          "title": "Power Output",
+          "desc": "Muscle force transmits correctly, allowing explosive speed and endurance to reach their true potential."
+        }
       ]
     },
     "sports": {
@@ -519,12 +818,42 @@
       "subtitle": "How nail condition affects performance varies depending on the sport.",
       "featuredLabel": "Featured",
       "cards": [
-        { "icon": "⚽", "title": "Soccer & Futsal", "description": "Every action — kicking, planting, changing direction — begins with toe contact. Corrected nails stabilize load through the ball of the foot, improving explosive acceleration and sharp cuts.", "featured": false },
-        { "icon": "🏀", "title": "Basketball", "description": "Toe stability is essential for stop-and-go and rapid direction changes. Balanced plantar loading improves jump takeoff power and distributes landing impact more effectively.", "featured": false },
-        { "icon": "🤼", "title": "Judo & Jiu-Jitsu [Deep Dive]", "description": "Beyond grip strength, there is a separate attribute called 'finger force.' Proper nail care allows finger pads to sink deeply into the opponent's gi, dramatically improving holding power during pulling, breaking balance, and throwing. With ingrown or over-trimmed nails, force can't reach the fingertips — leaving you unable to control the opponent even with strong hands.", "featured": true },
-        { "icon": "⚾", "title": "Baseball & Softball", "description": "Fingertip feel when pitching and bat grip when hitting are directly linked to nail condition. Unstable fingertips from over-trimming cause inconsistent release points and reduced control.", "featured": false },
-        { "icon": "🏃", "title": "Track & Field (Sprints)", "description": "How you use your toes at the start and through the acceleration phase can make or break your race. Nail correction sharpens toe contact awareness and improves your first-step drive.", "featured": false },
-        { "icon": "🎾", "title": "Tennis & Badminton", "description": "Footwork agility is built on toe grip. Fingernail condition also affects racket grip during serves and smashes.", "featured": false }
+        {
+          "icon": "⚽",
+          "title": "Soccer & Futsal",
+          "description": "Every action — kicking, planting, changing direction — begins with toe contact. Corrected nails stabilize load through the ball of the foot, improving explosive acceleration and sharp cuts.",
+          "featured": false
+        },
+        {
+          "icon": "🏀",
+          "title": "Basketball",
+          "description": "Toe stability is essential for stop-and-go and rapid direction changes. Balanced plantar loading improves jump takeoff power and distributes landing impact more effectively.",
+          "featured": false
+        },
+        {
+          "icon": "🤼",
+          "title": "Judo & Jiu-Jitsu [Deep Dive]",
+          "description": "Beyond grip strength, there is a separate attribute called 'finger force.' Proper nail care allows finger pads to sink deeply into the opponent's gi, dramatically improving holding power during pulling, breaking balance, and throwing. With ingrown or over-trimmed nails, force can't reach the fingertips — leaving you unable to control the opponent even with strong hands.",
+          "featured": true
+        },
+        {
+          "icon": "⚾",
+          "title": "Baseball & Softball",
+          "description": "Fingertip feel when pitching and bat grip when hitting are directly linked to nail condition. Unstable fingertips from over-trimming cause inconsistent release points and reduced control.",
+          "featured": false
+        },
+        {
+          "icon": "🏃",
+          "title": "Track & Field (Sprints)",
+          "description": "How you use your toes at the start and through the acceleration phase can make or break your race. Nail correction sharpens toe contact awareness and improves your first-step drive.",
+          "featured": false
+        },
+        {
+          "icon": "🎾",
+          "title": "Tennis & Badminton",
+          "description": "Footwork agility is built on toe grip. Fingernail condition also affects racket grip during serves and smashes.",
+          "featured": false
+        }
       ]
     },
     "mechanism": {
@@ -534,18 +863,44 @@
       "negativeLabel": "❌ Downward Spiral",
       "positiveLabel": "✅ Upward Chain",
       "dividerLabel": "With nail correction therapy",
-      "negativeFlow": ["Nail Deformity", "Contact Error", "Posture & Form Breakdown", "Performance Loss"],
-      "positiveFlow": ["Nail Correction", "Proper Contact", "Stable Posture & Balance", "Performance Gains"]
+      "negativeFlow": [
+        "Nail Deformity",
+        "Contact Error",
+        "Posture & Form Breakdown",
+        "Performance Loss"
+      ],
+      "positiveFlow": [
+        "Nail Correction",
+        "Proper Contact",
+        "Stable Posture & Balance",
+        "Performance Gains"
+      ]
     },
     "care": {
       "badge": "Daily Care",
       "title": "Daily Care Tips",
       "subtitle": "Consistent self-care alongside professional treatment keeps your nails healthy long-term.",
       "cards": [
-        { "icon": "📏", "title": "Nail Length", "desc": "Trim to the same level as your fingertip. Over-cutting destabilizes the toe — avoid it." },
-        { "icon": "✂️", "title": "Cutting Technique", "desc": "Use a straight square-off cut, leaving the corners. Rounding the edges increases ingrown nail risk." },
-        { "icon": "💧", "title": "Moisturize", "desc": "Care for the skin at the nail root and sides with cream or oil. Dryness causes cracking and chipping." },
-        { "icon": "🔍", "title": "Weekly Check", "desc": "Inspect your toes once a week. Catch discoloration, deformity, or pain early." }
+        {
+          "icon": "📏",
+          "title": "Nail Length",
+          "desc": "Trim to the same level as your fingertip. Over-cutting destabilizes the toe — avoid it."
+        },
+        {
+          "icon": "✂️",
+          "title": "Cutting Technique",
+          "desc": "Use a straight square-off cut, leaving the corners. Rounding the edges increases ingrown nail risk."
+        },
+        {
+          "icon": "💧",
+          "title": "Moisturize",
+          "desc": "Care for the skin at the nail root and sides with cream or oil. Dryness causes cracking and chipping."
+        },
+        {
+          "icon": "🔍",
+          "title": "Weekly Check",
+          "desc": "Inspect your toes once a week. Catch discoloration, deformity, or pain early."
+        }
       ]
     },
     "cta": {
@@ -581,7 +936,9 @@
       "kickboxingSub": "Pro Kickboxer Ayuna",
       "dataTag": "Nail Seitai® Evidence Data",
       "dataTitle": "Visualizing Posture & Movement Changes",
-      "dataSub": "3 cases: ankle stability, trip prevention, walking stability"
+      "dataSub": "3 cases: ankle stability, trip prevention, walking stability",
+      "bannerDesc": "Featuring interviews with jiu-jitsu and kickboxing athletes, plus an evidence data collection.",
+      "viewMagazine": "View Magazine →"
     },
     "cta": {
       "badge": "AI Diagnosis",
@@ -597,19 +954,46 @@
       "intervieweeRole": "SENDAI Jiu-Jitsu Academy Head Instructor / Brazilian Jiu-Jitsu Black Belt 1st Dan",
       "intro": "As head of the jiu-jitsu academy, Noriyuki Tsunoda collaborated on systematizing the Nail Seitai methodology for jiu-jitsu — understanding the real struggles of his athletes and the core of their movement. What emerged was a previously unexplored territory: 'Change your nails, and your entire jiu-jitsu body mechanics change.'",
       "qa": [
-        { "q": "What did you notice when you first tried Nail Seitai?", "a": "The first thing I realized was how little I knew about nails. I'd studied body mechanics and training extensively, but I'd barely thought about nails. Once I started learning, I discovered that nails are deeply tied to fingertip sensation, balance, and force transmission — playing a far more important role than I'd imagined. They affect everything from posture and stability to athletic performance. These small structures are fundamental to how the whole body functions." },
-        { "q": "Why did you decide to collaborate on systematizing this?", "a": "Simply because I found it fascinating. I also wanted to test it personally — to see whether strengthening my nails would actually improve my grip strength." },
-        { "q": "What is the 'athlete-only sensation' that became central to the system?", "a": "Matches are won and lost by razor-thin margins. Small differences accumulate to change results. I believe that nails are one of those marginal factors — one component of closing that gap." },
-        { "q": "What changes did you experience after Nail Seitai treatment?", "a": "The nail on my little toe was nearly gone, and the toe itself barely moved. After the nail was rebuilt, my little toe actually moved properly for the first time. When I tried to brace in a standing position, I could feel the grip strength in my feet had genuinely increased. And honestly, just seeing polished nails gave me a boost of motivation." },
-        { "q": "How do you think Nail Seitai will influence the future of jiu-jitsu in Miyagi?", "a": "Conditioning your nails before a big competition could become a standard part of match preparation — a culture of nail strengthening spreading through the sport. It's a small element, but I believe it's a meaningful one for supporting performance." }
+        {
+          "q": "What did you notice when you first tried Nail Seitai?",
+          "a": "The first thing I realized was how little I knew about nails. I'd studied body mechanics and training extensively, but I'd barely thought about nails. Once I started learning, I discovered that nails are deeply tied to fingertip sensation, balance, and force transmission — playing a far more important role than I'd imagined. They affect everything from posture and stability to athletic performance. These small structures are fundamental to how the whole body functions."
+        },
+        {
+          "q": "Why did you decide to collaborate on systematizing this?",
+          "a": "Simply because I found it fascinating. I also wanted to test it personally — to see whether strengthening my nails would actually improve my grip strength."
+        },
+        {
+          "q": "What is the 'athlete-only sensation' that became central to the system?",
+          "a": "Matches are won and lost by razor-thin margins. Small differences accumulate to change results. I believe that nails are one of those marginal factors — one component of closing that gap."
+        },
+        {
+          "q": "What changes did you experience after Nail Seitai treatment?",
+          "a": "The nail on my little toe was nearly gone, and the toe itself barely moved. After the nail was rebuilt, my little toe actually moved properly for the first time. When I tried to brace in a standing position, I could feel the grip strength in my feet had genuinely increased. And honestly, just seeing polished nails gave me a boost of motivation."
+        },
+        {
+          "q": "How do you think Nail Seitai will influence the future of jiu-jitsu in Miyagi?",
+          "a": "Conditioning your nails before a big competition could become a standard part of match preparation — a culture of nail strengthening spreading through the sport. It's a small element, but I believe it's a meaningful one for supporting performance."
+        }
       ],
       "quote": "I realized that small nails support the body and its performance",
       "foundationTitle": "Walking is the beginning of all movement",
       "foundationQa": [
-        { "q": "Why are feet so important?", "a": "Feet are the body's roots. When sensory information from the soles and nails to the brain is disrupted, posture and movement judgments go awry — leading to fatigue, instability, and injury." },
-        { "q": "What causes dysfunction?", "a": "Fatigue and poor posture often stem not from muscle weakness, but from information errors at the extremities. Caring for nails and soles helps stabilize the entire body." },
-        { "q": "The potential of nails", "a": "Nails play a crucial role in transmitting force and delivering sensation to the brain. Reconsidering how nails contact the ground can elevate the quality of stability and movement from the feet up." },
-        { "q": "The relationship between walking and feet", "a": "Walking is the most fundamental full-body movement. When toes, soles, and nails work correctly, accurate information reaches the brain from the extremities, stabilizing center of gravity and movement." }
+        {
+          "q": "Why are feet so important?",
+          "a": "Feet are the body's roots. When sensory information from the soles and nails to the brain is disrupted, posture and movement judgments go awry — leading to fatigue, instability, and injury."
+        },
+        {
+          "q": "What causes dysfunction?",
+          "a": "Fatigue and poor posture often stem not from muscle weakness, but from information errors at the extremities. Caring for nails and soles helps stabilize the entire body."
+        },
+        {
+          "q": "The potential of nails",
+          "a": "Nails play a crucial role in transmitting force and delivering sensation to the brain. Reconsidering how nails contact the ground can elevate the quality of stability and movement from the feet up."
+        },
+        {
+          "q": "The relationship between walking and feet",
+          "a": "Walking is the most fundamental full-body movement. When toes, soles, and nails work correctly, accurate information reaches the brain from the extremities, stabilizing center of gravity and movement."
+        }
       ],
       "profile": "Born 1985 in Tagajo City, Miyagi. Progressed through karate and judo before specializing in jiu-jitsu. Joined AXIS Jiu-Jitsu Academy in 2005. After working in consulting, founded SENDAI Jiu-Jitsu Academy in 2015. Earned black belt in 2018. Currently serves as external coach for Olympic athletes. Extensive coaching career with numerous achievements.",
       "relatedLabel": "Related Articles",
@@ -625,17 +1009,44 @@
       "missionTitle": "The Nail Seitai Approach: Aligning the Body from Nails, Toes & Soles",
       "missionBody": "Nail Seitai is an approach to aligning the whole body starting from the extremities — the nails, toes, and soles. The body is structured like a tree: the trunk and branches (core and muscles) only function correctly when the roots (foot structure) work properly. Nail Seitai focuses on this root structure. Nails in particular are critical sensory elements that control the direction of ground-contact forces and how toes are used. Based on nail biomechanics principles, adjusting nail shape, angle, and pressure distribution restores coordination between toes and soles.",
       "pillars": [
-        { "label": "Nail Input", "sub": "Nail Input", "desc": "Ground-contact information from the extremities reaches the brain, transforming the quality of motor commands." },
-        { "label": "Nail Output", "sub": "Nail Output", "desc": "Nail tip angle and hardness determine the final output of push, kick, and grip." },
-        { "label": "Nail Training", "sub": "Nail Training", "desc": "Re-inputting fingertip sensory information to the nervous system elevates brain-body coordination and unlocks fundamental gains in force transmission, stability, and performance." }
+        {
+          "label": "Nail Input",
+          "sub": "Nail Input",
+          "desc": "Ground-contact information from the extremities reaches the brain, transforming the quality of motor commands."
+        },
+        {
+          "label": "Nail Output",
+          "sub": "Nail Output",
+          "desc": "Nail tip angle and hardness determine the final output of push, kick, and grip."
+        },
+        {
+          "label": "Nail Training",
+          "sub": "Nail Training",
+          "desc": "Re-inputting fingertip sensory information to the nervous system elevates brain-body coordination and unlocks fundamental gains in force transmission, stability, and performance."
+        }
       ],
       "interviewTitle": "Nail Seitai × Pro Kickboxer",
       "qa": [
-        { "q": "What was your struggle before treatment?", "a": "My stance was unstable — I had a feeling of losing power. I was training my lower body hard, but something felt misaligned." },
-        { "q": "How did you change after treatment?", "a": "I could feel my toes gripping the ground, and my axis stopped wobbling. It felt like my body connected from the extremities inward." },
-        { "q": "What did you notice when you saw your foot AI data?", "a": "Force transmits directly into technique. I had no idea my feet and nails mattered this much. 'When your foundation changes, your movement changes.'" },
-        { "q": "How did you feel seeing the data?", "a": "Honestly, I was shocked. Things like 'my weight distribution is this different left to right' or 'I'm using my feet less than I thought' were showing up as numbers. Parts I thought I was executing correctly by feel — seeing them in data made everything click." },
-        { "q": "What changes came from combining it with Nail Seitai?", "a": "After Nail Seitai treatment, when I measured with the insole again, I could see the center-of-gravity fluctuation had decreased. Specifically — stance stability, less pivot foot wobble, and less fatigue during matches — these clearly changed." }
+        {
+          "q": "What was your struggle before treatment?",
+          "a": "My stance was unstable — I had a feeling of losing power. I was training my lower body hard, but something felt misaligned."
+        },
+        {
+          "q": "How did you change after treatment?",
+          "a": "I could feel my toes gripping the ground, and my axis stopped wobbling. It felt like my body connected from the extremities inward."
+        },
+        {
+          "q": "What did you notice when you saw your foot AI data?",
+          "a": "Force transmits directly into technique. I had no idea my feet and nails mattered this much. 'When your foundation changes, your movement changes.'"
+        },
+        {
+          "q": "How did you feel seeing the data?",
+          "a": "Honestly, I was shocked. Things like 'my weight distribution is this different left to right' or 'I'm using my feet less than I thought' were showing up as numbers. Parts I thought I was executing correctly by feel — seeing them in data made everything click."
+        },
+        {
+          "q": "What changes came from combining it with Nail Seitai?",
+          "a": "After Nail Seitai treatment, when I measured with the insole again, I could see the center-of-gravity fluctuation had decreased. Specifically — stance stability, less pivot foot wobble, and less fatigue during matches — these clearly changed."
+        }
       ],
       "insoleBadge": "NEC-Developed Sensing Insole Introduced",
       "insoleTitle": "Ayuna, competing at the top level of professional kickboxing",
@@ -652,6 +1063,12 @@
       "relatedDiagnosis": "Try AI Diagnosis"
     }
   },
-  "loading": { "message": "Loading..." },
-  "notFound": { "title": "404", "message": "Page not found", "back": "Back to Home" }
+  "loading": {
+    "message": "Loading..."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found",
+    "back": "Back to Home"
+  }
 }
