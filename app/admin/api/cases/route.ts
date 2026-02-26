@@ -92,17 +92,16 @@ export async function GET(req: NextRequest) {
   const { data, error, count } = await supabase
     .from('nail_cases')
     .select(`
-      id,
-      created_at,
-      health_score,
-      locale,
-      ai_diagnosis,
-      detected_issues,
-      recommendations,
-      image_url,
+      id, created_at, locale, model_version, image_url,
+      health_score, nail_score, quiz_score, nail_findings,
+      ai_diagnosis, detected_issues, recommendations,
+      sport, age, gender, height, weight, dominant_foot,
+      arch_type, callus_locations, sports_history, practice_frequency,
+      nail_care_style, nail_care_frequency, uses_insole,
+      nail_color_change, nail_brittle, nail_pain, nail_growth_change,
+      curved_nail, hallux_valgus, toe_grip, grip_confidence, balance,
+      ankle_sprain, current_pain_areas,
       health_data,
-      nail_condition,
-      model_version,
       conversation_logs ( session_id, messages )
     `, { count: 'exact' })
     .order('created_at', { ascending: false })
