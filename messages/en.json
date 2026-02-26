@@ -8,6 +8,8 @@
     "about": "Nail Care",
     "nailSeitai": "Nail Seitai",
     "benefits": "Benefits",
+    "brandName": "Nail Seitai",
+    "brandTagline": "AI Diagnosis",
     "aiDiagnosis": "AI Diagnosis",
     "contact": "Contact"
   },
@@ -49,6 +51,7 @@
     "merit": {
       "badge": "Benefits of Nail Seitai",
       "title": "The Impact of Healthy Nails",
+      "learnMore": "Learn More →",
       "card1": {
         "title": "Benefits of Nail Seitai",
         "desc": "By correcting nail shape and growth direction, nail seitai prevents ingrown nails and other issues, improving the overall balance of the foot and significantly enhancing daily comfort."
@@ -58,9 +61,15 @@
         "desc": "Proper nail care is directly linked to athletic performance. You can expect improved grip strength, better running stability, and the ability to compete without pain."
       }
     },
+    "demo": {
+      "scoreLabel": "AI Diagnosis Score",
+      "healthStatus": "Health Status: Good",
+      "analysisComplete": "Analysis Complete"
+    },
     "conditions": {
       "badge": "Detectable Conditions",
       "title": "Detectable Nail Conditions",
+      "severityLabel": "Severity:",
       "subtitle": "Use this tool to self-check for the following nail conditions. For any concerning symptoms, we recommend consulting a dermatologist.",
       "items": [
         {
@@ -544,6 +553,103 @@
       "title": "Diagnose Your Nail Health with AI",
       "description": "One photo of your nails and a quick questionnaire is all it takes to analyze your toe and nail condition and assess your performance risk.",
       "button": "Start AI Diagnosis"
+    }
+  },
+  "media": {
+    "badge": "MEDIA",
+    "title": "Media & Press",
+    "subtitle": "Latest news and features about Nail Seitai",
+    "latestBadge": "Latest Issue",
+    "contentsLabel": "Contents",
+    "readJujutsu": "Read Jiu-Jitsu Interview",
+    "readKickboxing": "Read Kickboxer Interview",
+    "issue2": {
+      "title": "Body Science Through Nail Seitai",
+      "date": "January 2026 · No.2",
+      "contents": [
+        "Feature: The Nail Seitai Approach — Drawing out peak performance through nail biomechanics",
+        "Special Feature: NEC Sensing Insole Report — Nail Seitai meets data visualization",
+        "Nail Seitai® Evidence Data — Visualizing posture and movement changes",
+        "Interview: Change your nails, change your jiu-jitsu body mechanics!",
+        "Interview: When your foundation changes, your movement changes (Pro Kickboxer Ayuna)"
+      ],
+      "jujutsuTag": "Nail Seitai × Jiu-Jitsu",
+      "jujutsuTitle": "Change Your Nails, Change Your Jiu-Jitsu Body Mechanics!",
+      "jujutsuSub": "SENDAI Jiu-Jitsu Academy Head Instructor Noriyuki Tsunoda",
+      "kickboxingTag": "Nail Seitai × Kickboxing",
+      "kickboxingTitle": "A Pro Kickboxer on the Importance of Your Foundation",
+      "kickboxingSub": "Pro Kickboxer Ayuna",
+      "dataTag": "Nail Seitai® Evidence Data",
+      "dataTitle": "Visualizing Posture & Movement Changes",
+      "dataSub": "3 cases: ankle stability, trip prevention, walking stability"
+    },
+    "cta": {
+      "badge": "AI Diagnosis",
+      "title": "Try AI Nail Diagnosis",
+      "desc": "Curious after reading? Start with a free AI diagnosis.",
+      "button": "Start AI Diagnosis"
+    },
+    "jujutsu": {
+      "backLabel": "Back to Media",
+      "heroTitle": "Change Your Nails, Change Your Jiu-Jitsu Body Mechanics!",
+      "heroSub": "How Nail Seitai changed the core of competitive jiu-jitsu",
+      "interviewee": "Noriyuki Tsunoda",
+      "intervieweeRole": "SENDAI Jiu-Jitsu Academy Head Instructor / Brazilian Jiu-Jitsu Black Belt 1st Dan",
+      "intro": "As head of the jiu-jitsu academy, Noriyuki Tsunoda collaborated on systematizing the Nail Seitai methodology for jiu-jitsu — understanding the real struggles of his athletes and the core of their movement. What emerged was a previously unexplored territory: 'Change your nails, and your entire jiu-jitsu body mechanics change.'",
+      "qa": [
+        { "q": "What did you notice when you first tried Nail Seitai?", "a": "The first thing I realized was how little I knew about nails. I'd studied body mechanics and training extensively, but I'd barely thought about nails. Once I started learning, I discovered that nails are deeply tied to fingertip sensation, balance, and force transmission — playing a far more important role than I'd imagined. They affect everything from posture and stability to athletic performance. These small structures are fundamental to how the whole body functions." },
+        { "q": "Why did you decide to collaborate on systematizing this?", "a": "Simply because I found it fascinating. I also wanted to test it personally — to see whether strengthening my nails would actually improve my grip strength." },
+        { "q": "What is the 'athlete-only sensation' that became central to the system?", "a": "Matches are won and lost by razor-thin margins. Small differences accumulate to change results. I believe that nails are one of those marginal factors — one component of closing that gap." },
+        { "q": "What changes did you experience after Nail Seitai treatment?", "a": "The nail on my little toe was nearly gone, and the toe itself barely moved. After the nail was rebuilt, my little toe actually moved properly for the first time. When I tried to brace in a standing position, I could feel the grip strength in my feet had genuinely increased. And honestly, just seeing polished nails gave me a boost of motivation." },
+        { "q": "How do you think Nail Seitai will influence the future of jiu-jitsu in Miyagi?", "a": "Conditioning your nails before a big competition could become a standard part of match preparation — a culture of nail strengthening spreading through the sport. It's a small element, but I believe it's a meaningful one for supporting performance." }
+      ],
+      "quote": "I realized that small nails support the body and its performance",
+      "foundationTitle": "Walking is the beginning of all movement",
+      "foundationQa": [
+        { "q": "Why are feet so important?", "a": "Feet are the body's roots. When sensory information from the soles and nails to the brain is disrupted, posture and movement judgments go awry — leading to fatigue, instability, and injury." },
+        { "q": "What causes dysfunction?", "a": "Fatigue and poor posture often stem not from muscle weakness, but from information errors at the extremities. Caring for nails and soles helps stabilize the entire body." },
+        { "q": "The potential of nails", "a": "Nails play a crucial role in transmitting force and delivering sensation to the brain. Reconsidering how nails contact the ground can elevate the quality of stability and movement from the feet up." },
+        { "q": "The relationship between walking and feet", "a": "Walking is the most fundamental full-body movement. When toes, soles, and nails work correctly, accurate information reaches the brain from the extremities, stabilizing center of gravity and movement." }
+      ],
+      "profile": "Born 1985 in Tagajo City, Miyagi. Progressed through karate and judo before specializing in jiu-jitsu. Joined AXIS Jiu-Jitsu Academy in 2005. After working in consulting, founded SENDAI Jiu-Jitsu Academy in 2015. Earned black belt in 2018. Currently serves as external coach for Olympic athletes. Extensive coaching career with numerous achievements.",
+      "relatedLabel": "Related Articles",
+      "relatedKickboxing": "Kickboxer Interview",
+      "relatedDiagnosis": "Try AI Diagnosis"
+    },
+    "kickboxing": {
+      "backLabel": "Back to Media",
+      "heroTitle": "A Pro Kickboxer on the Importance of Your Foundation",
+      "heroSub": "When your foundation changes, your movement changes",
+      "interviewee": "Ayuna",
+      "intervieweeRole": "Pro Kickboxer",
+      "missionTitle": "The Nail Seitai Approach: Aligning the Body from Nails, Toes & Soles",
+      "missionBody": "Nail Seitai is an approach to aligning the whole body starting from the extremities — the nails, toes, and soles. The body is structured like a tree: the trunk and branches (core and muscles) only function correctly when the roots (foot structure) work properly. Nail Seitai focuses on this root structure. Nails in particular are critical sensory elements that control the direction of ground-contact forces and how toes are used. Based on nail biomechanics principles, adjusting nail shape, angle, and pressure distribution restores coordination between toes and soles.",
+      "pillars": [
+        { "label": "Nail Input", "sub": "Nail Input", "desc": "Ground-contact information from the extremities reaches the brain, transforming the quality of motor commands." },
+        { "label": "Nail Output", "sub": "Nail Output", "desc": "Nail tip angle and hardness determine the final output of push, kick, and grip." },
+        { "label": "Nail Training", "sub": "Nail Training", "desc": "Re-inputting fingertip sensory information to the nervous system elevates brain-body coordination and unlocks fundamental gains in force transmission, stability, and performance." }
+      ],
+      "interviewTitle": "Nail Seitai × Pro Kickboxer",
+      "qa": [
+        { "q": "What was your struggle before treatment?", "a": "My stance was unstable — I had a feeling of losing power. I was training my lower body hard, but something felt misaligned." },
+        { "q": "How did you change after treatment?", "a": "I could feel my toes gripping the ground, and my axis stopped wobbling. It felt like my body connected from the extremities inward." },
+        { "q": "What did you notice when you saw your foot AI data?", "a": "Force transmits directly into technique. I had no idea my feet and nails mattered this much. 'When your foundation changes, your movement changes.'" },
+        { "q": "How did you feel seeing the data?", "a": "Honestly, I was shocked. Things like 'my weight distribution is this different left to right' or 'I'm using my feet less than I thought' were showing up as numbers. Parts I thought I was executing correctly by feel — seeing them in data made everything click." },
+        { "q": "What changes came from combining it with Nail Seitai?", "a": "After Nail Seitai treatment, when I measured with the insole again, I could see the center-of-gravity fluctuation had decreased. Specifically — stance stability, less pivot foot wobble, and less fatigue during matches — these clearly changed." }
+      ],
+      "insoleBadge": "NEC-Developed Sensing Insole Introduced",
+      "insoleTitle": "Ayuna, competing at the top level of professional kickboxing",
+      "insoleBody": "In her daily training and conditioning, Ayuna sought to build a body that doesn't rely solely on 'feel.' She introduced the NEC-developed sensing insole to bring data to her preparation. Combined with Nail Seitai, the way she uses her feet, her center of gravity, and her stability are now clearly emerging as measurable data.",
+      "quote": "When your foundation changes, your movement changes",
+      "profileItems": [
+        "Karate: 15 years",
+        "Kickboxing: 3 years",
+        "Affiliation: NJKF (Japan Kickboxing Federation)",
+        "Pro record: 3 fights — 1 win, 1 loss, 1 draw"
+      ],
+      "relatedLabel": "Related Articles",
+      "relatedJujutsu": "Jiu-Jitsu Interview",
+      "relatedDiagnosis": "Try AI Diagnosis"
     }
   },
   "loading": { "message": "Loading..." },

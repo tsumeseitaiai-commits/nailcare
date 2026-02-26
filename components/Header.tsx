@@ -53,10 +53,10 @@ export default function Header() {
           </div>
           <div className="flex flex-col leading-tight">
             <span className="text-base font-bold text-foreground sm:text-lg">
-              爪整体
+              {t("brandName")}
             </span>
             <span className="text-[10px] font-semibold text-primary sm:text-xs">
-              AI診断
+              {t("brandTagline")}
             </span>
           </div>
         </Link>

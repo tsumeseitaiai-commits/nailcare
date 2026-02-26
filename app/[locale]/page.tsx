@@ -116,14 +116,14 @@ export default function HomePage() {
 
                   {/* Floating score card */}
                   <div className="glass absolute -bottom-5 -start-5 rounded-xl p-3.5 shadow-xl">
-                    <p className="text-[10px] font-medium text-muted-foreground">AI 診断スコア</p>
+                    <p className="text-[10px] font-medium text-muted-foreground">{t("demo.scoreLabel")}</p>
                     <div className="mt-1.5 flex items-center gap-2">
                       <div className="h-1.5 w-20 overflow-hidden rounded-full bg-muted">
                         <div className="h-full w-[92%] rounded-full bg-emerald-500" />
                       </div>
                       <span className="text-sm font-bold text-foreground">92</span>
                     </div>
-                    <p className="mt-1 text-[10px] font-semibold text-emerald-600">健康状態: 良好</p>
+                    <p className="mt-1 text-[10px] font-semibold text-emerald-600">{t("demo.healthStatus")}</p>
                   </div>
 
                   {/* Floating tag */}
@@ -134,7 +134,7 @@ export default function HomePage() {
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       </div>
-                      <span className="text-xs font-semibold text-foreground">AI分析完了</span>
+                      <span className="text-xs font-semibold text-foreground">{t("demo.analysisComplete")}</span>
                     </div>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function HomePage() {
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-foreground">{t("merit.card1.title")}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card1.desc")}</p>
-                  <p className="mt-3 text-xs font-semibold text-primary">詳しく見る →</p>
+                  <p className="mt-3 text-xs font-semibold text-primary">{t("merit.learnMore")}</p>
                 </div>
               </Link>
 
@@ -224,7 +224,7 @@ export default function HomePage() {
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-foreground">{t("merit.card2.title")}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card2.desc")}</p>
-                  <p className="mt-3 text-xs font-semibold text-primary">詳しく見る →</p>
+                  <p className="mt-3 text-xs font-semibold text-primary">{t("merit.learnMore")}</p>
                 </div>
               </Link>
             </div>
@@ -257,7 +257,7 @@ export default function HomePage() {
                       <span className={`h-1.5 w-1.5 rounded-full ${dotColor(item.color)}`} />
                       {item.action}
                     </span>
-                    <span className="text-xs text-muted-foreground">重症度: {item.severity}</span>
+                    <span className="text-xs text-muted-foreground">{t("conditions.severityLabel")} {item.severity}</span>
                   </div>
                   <h3 className="text-base font-bold text-foreground">{item.name}</h3>
                   <p className="text-xs font-medium text-muted-foreground">{item.eng}</p>

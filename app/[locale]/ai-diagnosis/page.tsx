@@ -787,7 +787,7 @@ export default function AIDiagnosisPage() {
                   </div>
                 )}
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">爪整体AIアシスタント</p>
+                  <p className="text-sm font-semibold text-foreground">{t('chat.aiAssistant')}</p>
                   <div className="flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     <p className="text-xs text-muted-foreground">スポーツ専門 · {quizAnswers.sport}</p>
