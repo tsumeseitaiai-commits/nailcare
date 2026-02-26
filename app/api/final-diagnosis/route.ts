@@ -94,15 +94,10 @@ async function saveToSupabase({
     recommendations: string[];
     analysis: string;
   };
-  quizAnswers?: {
-    sport: string;
-    age: number | '';
-    toeGrip: number;
-    ankleSprain: string;
-    gripConfidence: number;
-  };
+  quizAnswers?: Record<string, unknown>;
   locale: string;
 }) {
+  const q = quizAnswers;
   console.log('[Supabase] saveToSupabase 開始');
 
   try {
