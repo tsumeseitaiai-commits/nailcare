@@ -241,6 +241,7 @@ export default function AdminPage() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError]           = useState('');
   const [selected, setSelected]     = useState<NailCase | null>(null);
+  const [sportFilter, setSportFilter] = useState<string>('');
   const [exporting, setExporting]   = useState<string | null>(null); // label string or null
 
   const LIMIT = 20;
@@ -327,9 +328,22 @@ export default function AdminPage() {
     }
   };
 
+  // ── フィルタリング ──────────────────────────────
+  const filteredCases = sportFilter
+    ? cases.filter((c) => {
+        const sport = (c.health_data?.sport as string) ?? '';
+        return sport === sportFilter;
+      })
+    : cases;
+
+  // 競技名リスト（重複なし）
+  const sportOptions = Array.from(
+    new Set(cases.map((c) => (c.health_data?.sport as string) ?? '').filter(Boolean))
+  ).sort();
+
   // ── avg / hi / low ────────────────────────────
-  const avgScore = cases.length
-    ? Math.round(cases.reduce((s, c) => s + c.health_score, 0) / cases.length)
+  const avgScore = filteredCases.length
+    ? Math.round(filteredCases.reduce((s, c) => s + c.health_score, 0) / filteredCases.length)
     : null;
 
   if (!authed) {
@@ -394,21 +408,50 @@ export default function AdminPage() {
       </header>
 
       {/* ── Stats Bar ──────────────────────────────── */}
-      {avgScore !== null && (
-        <div className="border-b border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-7xl gap-6 px-4 py-2.5 text-sm">
-            <div className="text-slate-500">
-              平均スコア: <span className="font-bold text-slate-800">{avgScore}</span>
-            </div>
-            <div className="text-slate-500">
-              最高: <span className="font-bold text-emerald-600">{Math.max(...cases.map((c) => c.health_score))}</span>
-            </div>
-            <div className="text-slate-500">
-              最低: <span className="font-bold text-red-500">{Math.min(...cases.map((c) => c.health_score))}</span>
-            </div>
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-2.5">
+          {/* 競技フィルター */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400">競技:</span>
+            <select
+              value={sportFilter}
+              onChange={(e) => { setSportFilter(e.target.value); setPage(1); }}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 focus:border-[#7c6b5e] focus:outline-none focus:ring-2 focus:ring-[#7c6b5e]/20"
+            >
+              <option value="">すべて</option>
+              {sportOptions.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            {sportFilter && (
+              <button
+                onClick={() => setSportFilter('')}
+                className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500 hover:bg-slate-200 transition"
+              >
+                ✕ クリア
+              </button>
+            )}
           </div>
+
+          {/* Stats */}
+          {avgScore !== null && (
+            <div className="flex gap-4 text-sm">
+              <span className="text-slate-500">
+                {sportFilter ? `${sportFilter} ` : ''}平均: <span className="font-bold text-slate-800">{avgScore}</span>
+              </span>
+              <span className="text-slate-500">
+                最高: <span className="font-bold text-emerald-600">{Math.max(...filteredCases.map((c) => c.health_score))}</span>
+              </span>
+              <span className="text-slate-500">
+                最低: <span className="font-bold text-red-500">{Math.min(...filteredCases.map((c) => c.health_score))}</span>
+              </span>
+              {sportFilter && (
+                <span className="text-slate-400 text-xs self-center">{filteredCases.length}件</span>
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* ── Main ───────────────────────────────────── */}
       <main className="mx-auto max-w-7xl px-4 py-6">
@@ -448,7 +491,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {cases.map((c) => {
+                  {filteredCases.map((c) => {
                     const color = scoreColor(c.health_score);
                     const logs  = c.conversation_logs?.[0];
                     return (

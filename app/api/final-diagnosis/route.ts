@@ -9,11 +9,24 @@ const MODEL_VERSION = 'gemini-2.5-flash';
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, image, locale = 'ja' } = await req.json();
+    const { messages, image, quizAnswers, locale = 'ja' } = await req.json();
 
-    const DIAGNOSIS_PROMPT = `以下の会話ログと爪の画像から総合的な診断を行い、
-JSON形式で結果を返してください。
+    const q = quizAnswers as Record<string, unknown> | undefined;
+    const quizContext = q ? `
+【問診結果】
+- 競技：${q.sport} / ポジション：${q.position || '不明'}
+- 年齢：${q.age}歳 / 性別：${q.gender} / 利き足：${q.dominantFoot}
+- 競技歴：${q.sportsHistory}年 / 練習：${q.practiceFrequency}
+- 足指感覚：${q.toeGrip}/10 / グリップ：${q.gripConfidence}/10 / バランス：${q.balance}/10 / 踏ん張り：${q.stability}/10
+- 後半スタミナ：${q.lateGameFatigue}
+- 左挫歴：${q.ankleSprain} / 膨痛：${q.kneeInjury} / 腺痛：${q.backPain}
+- 巻き爪：${q.curvedNail} / 外反母足：${q.halluxValgus} / 深爪：${q.ingrownNail} / 足裏タコ：${q.footCallus}
+- 現在の痛み：${Array.isArray(q.currentPainAreas) ? (q.currentPainAreas as string[]).join('・') || 'なし' : 'なし'}
+` : '';
 
+    const DIAGNOSIS_PROMPT = `あなたは爪整体の専門家AIです。スポーツアスリートの足・爪の健康診断を行ってください。
+以下の問診データ・会話ログ・爪の画像から総合的な診断を行い、JSON形式で結果を返してください。
+${quizContext}
 会話ログ:
 ${JSON.stringify(messages)}
 
@@ -49,14 +62,18 @@ ${JSON.stringify(messages)}
 
     // --- Supabase保存（awaitして確実に完了させる）---
     console.log('[API] Supabase保存を開始します...');
-    await saveToSupabase({ image, messages, diagnosis, locale });
+    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale });
     console.log('[API] Supabase保存が完了しました');
 
     return NextResponse.json(diagnosis);
   } catch (error) {
-    console.error('Final diagnosis error:', error);
+    const err = error as { message?: string; stack?: string; name?: string };
+    console.error('=== Final Diagnosis Error ===');
+    console.error('name:', err?.name);
+    console.error('message:', err?.message);
+    console.error('stack:', err?.stack);
     return NextResponse.json(
-      { error: '診断結果の生成に失敗しました' },
+      { error: '診断結果の生成に失敗しました', details: err?.message },
       { status: 500 }
     );
   }
@@ -66,6 +83,7 @@ async function saveToSupabase({
   image,
   messages,
   diagnosis,
+  quizAnswers,
   locale,
 }: {
   image: string;
@@ -75,6 +93,13 @@ async function saveToSupabase({
     detected_issues: string[];
     recommendations: string[];
     analysis: string;
+  };
+  quizAnswers?: {
+    sport: string;
+    age: number | '';
+    toeGrip: number;
+    ankleSprain: string;
+    gripConfidence: number;
   };
   locale: string;
 }) {
@@ -108,11 +133,30 @@ async function saveToSupabase({
     const imageUrl = urlData.publicUrl;
     console.log(`[Supabase] 画像アップロード成功: ${imageUrl}`);
 
-    // 健康データ（一時スキップ）
+    // 問診データを保存（全項目）
     const healthData = {
-      sleep_hours: 0,
-      stress_level: '不明',
-      diet_balance: '不明',
+      sport: q?.sport ?? '不明',
+      position: q?.position ?? null,
+      age: q?.age ?? null,
+      gender: q?.gender ?? null,
+      height: q?.height ?? null,
+      weight: q?.weight ?? null,
+      dominant_foot: q?.dominantFoot ?? null,
+      sports_history: q?.sportsHistory ?? null,
+      practice_frequency: q?.practiceFrequency ?? null,
+      toe_grip: q?.toeGrip ?? null,
+      grip_confidence: q?.gripConfidence ?? null,
+      stability: q?.stability ?? null,
+      balance: q?.balance ?? null,
+      late_game_fatigue: q?.lateGameFatigue ?? null,
+      ingrown_nail: q?.ingrownNail ?? null,
+      curved_nail: q?.curvedNail ?? null,
+      hallux_valgus: q?.halluxValgus ?? null,
+      foot_callus: q?.footCallus ?? null,
+      ankle_sprain: q?.ankleSprain ?? null,
+      knee_injury: q?.kneeInjury ?? null,
+      back_pain: q?.backPain ?? null,
+      current_pain_areas: q?.currentPainAreas ?? [],
       messages_count: messages.length,
     };
 
