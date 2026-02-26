@@ -242,7 +242,10 @@ export default function AdminPage() {
   const [error, setError]           = useState('');
   const [selected, setSelected]     = useState<NailCase | null>(null);
   const [sportFilter, setSportFilter] = useState<string>('');
-  const [exporting, setExporting]   = useState<string | null>(null); // label string or null
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [exporting, setExporting]   = useState<string | null>(null);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting]     = useState(false);
 
   const LIMIT = 20;
   const totalPages = Math.ceil(total / LIMIT);
@@ -328,13 +331,67 @@ export default function AdminPage() {
     }
   };
 
+  // ── 削除 ─────────────────────────────────────
+  const handleDelete = async (ids: string[]) => {
+    if (!password || ids.length === 0) return;
+    const label = ids.length === 1 ? 'この1件' : `選択した${ids.length}件`;
+    if (!confirm(`${label}を削除しますか？この操作は取り消せません。`)) return;
+    setDeleting(true);
+    setError('');
+    try {
+      const res = await fetch('/admin/api/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+        body: JSON.stringify({ ids }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      setCheckedIds(new Set());
+      await fetchCases(password, page);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '削除に失敗しました');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const toggleCheck = (id: string) => {
+    setCheckedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (checkedIds.size === filteredCases.length) {
+      setCheckedIds(new Set());
+    } else {
+      setCheckedIds(new Set(filteredCases.map(c => c.id)));
+    }
+  };
+
   // ── フィルタリング ──────────────────────────────
-  const filteredCases = sportFilter
-    ? cases.filter((c) => {
-        const sport = (c.health_data?.sport as string) ?? '';
-        return sport === sportFilter;
-      })
-    : cases;
+  const filteredCases = cases.filter((c) => {
+    if (sportFilter) {
+      const sport = (c.health_data?.sport as string) ?? '';
+      if (sport !== sportFilter) return false;
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      const searchTargets = [
+        c.id,
+        c.ai_diagnosis ?? '',
+        (c.detected_issues ?? []).join(' '),
+        (c.recommendations ?? []).join(' '),
+        (c.health_data?.sport as string) ?? '',
+        String(c.health_score),
+        c.locale,
+      ].join(' ').toLowerCase();
+      if (!searchTargets.includes(q)) return false;
+    }
+    return true;
+  });
 
   // 競技名リスト（重複なし）
   const sportOptions = Array.from(
@@ -396,6 +453,18 @@ export default function AdminPage() {
               <span className="hidden sm:inline">ZIP（画像込み）</span>
             </button>
 
+            {/* 一括削除 */}
+            {checkedIds.size > 0 && (
+              <button
+                onClick={() => handleDelete(Array.from(checkedIds))}
+                disabled={deleting}
+                className="flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-red-600 disabled:opacity-40"
+              >
+                <span>🗑️</span>
+                <span>{checkedIds.size}件削除</span>
+              </button>
+            )}
+
             <button
               onClick={() => { setAuthed(false); setPassword(null); }}
               className="rounded-lg px-3 py-2 text-xs text-slate-400 hover:bg-slate-100 transition"
@@ -410,6 +479,27 @@ export default function AdminPage() {
       {/* ── Stats Bar ──────────────────────────────── */}
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-2.5">
+          {/* 検索 */}
+          <div className="relative flex items-center">
+            <svg className="absolute left-3 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="キーワード検索..."
+              className="rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-600 placeholder:text-slate-400 focus:border-[#7c6b5e] focus:outline-none focus:ring-2 focus:ring-[#7c6b5e]/20 w-44"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-2 text-slate-400 hover:text-slate-600">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           {/* 競技フィルター */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400">競技:</span>
@@ -481,13 +571,21 @@ export default function AdminPage() {
               <table className="w-full text-sm min-w-[700px]">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 w-10">
+                      <input
+                        type="checkbox"
+                        checked={checkedIds.size === filteredCases.length && filteredCases.length > 0}
+                        onChange={toggleAll}
+                        className="h-4 w-4 cursor-pointer accent-[#7c6b5e]"
+                      />
+                    </th>
                     <th className="px-4 py-3 w-16">画像</th>
                     <th className="px-4 py-3 w-20">スコア</th>
                     <th className="px-4 py-3">日時</th>
                     <th className="px-4 py-3">検出された問題</th>
                     <th className="px-4 py-3 w-14">言語</th>
                     <th className="px-4 py-3 w-20">問診</th>
-                    <th className="px-4 py-3 w-16"></th>
+                    <th className="px-4 py-3 w-28"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -495,7 +593,17 @@ export default function AdminPage() {
                     const color = scoreColor(c.health_score);
                     const logs  = c.conversation_logs?.[0];
                     return (
-                      <tr key={c.id} className="transition hover:bg-slate-50/80 cursor-default">
+                      <tr key={c.id} className={`transition hover:bg-slate-50/80 cursor-default ${checkedIds.has(c.id) ? 'bg-red-50/40' : ''}`}>
+
+                        {/* Checkbox */}
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={checkedIds.has(c.id)}
+                            onChange={() => toggleCheck(c.id)}
+                            className="h-4 w-4 cursor-pointer accent-[#7c6b5e]"
+                          />
+                        </td>
 
                         {/* Thumbnail */}
                         <td className="px-4 py-3">
@@ -550,14 +658,24 @@ export default function AdminPage() {
                           {logs ? `${logs.messages?.length ?? 0} msg` : '—'}
                         </td>
 
-                        {/* Detail */}
+                        {/* Actions */}
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => setSelected(c)}
-                            className="rounded-lg bg-[#7c6b5e]/10 px-3 py-1.5 text-xs font-semibold text-[#7c6b5e] transition hover:bg-[#7c6b5e] hover:text-white"
-                          >
-                            詳細
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => setSelected(c)}
+                              className="rounded-lg bg-[#7c6b5e]/10 px-3 py-1.5 text-xs font-semibold text-[#7c6b5e] transition hover:bg-[#7c6b5e] hover:text-white"
+                            >
+                              詳細
+                            </button>
+                            <button
+                              onClick={() => handleDelete([c.id])}
+                              disabled={deleting}
+                              className="rounded-lg bg-red-50 px-2 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-500 hover:text-white disabled:opacity-40"
+                              title="削除"
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
