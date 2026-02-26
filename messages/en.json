@@ -488,6 +488,64 @@
       "urgentWarning": "This result is for screening purposes. We strongly recommend visiting a dermatologist urgently for a definitive diagnosis."
     }
   },
+  "benefits": {
+    "hero": {
+      "badge": "Nail Seitai Benefits",
+      "title": "Better Nails, Better Performance",
+      "subtitle": "Movement changes from the tips of your toes outward. The potential of nail correction therapy."
+    },
+    "intro": {
+      "badge": "What is Nail Seitai",
+      "title": "What is Nail Seitai?",
+      "description": "Nail deformities directly affect ground contact angle, plantar pressure distribution, and load alignment through the big toe joint. Problems like ingrown nails, over-trimming, and floating nails cause postural imbalance, pelvic tilt, and asymmetry in running form. No matter how much you train your muscles, an 'input error' at the foot prevents you from reaching your true potential.",
+      "cards": [
+        { "icon": "🦶", "title": "Ground Contact", "desc": "When toes contact the ground correctly, the stability and propulsion of each step improves." },
+        { "icon": "🏛️", "title": "Posture", "desc": "Plantar load balance is restored, naturally correcting pelvic and spinal tilt." },
+        { "icon": "⚡", "title": "Power Output", "desc": "Muscle force transmits correctly, allowing explosive speed and endurance to reach their true potential." }
+      ]
+    },
+    "sports": {
+      "badge": "Sports Performance",
+      "title": "Performance Gains by Sport",
+      "subtitle": "How nail condition affects performance varies depending on the sport.",
+      "featuredLabel": "Featured",
+      "cards": [
+        { "icon": "⚽", "title": "Soccer & Futsal", "description": "Every action — kicking, planting, changing direction — begins with toe contact. Corrected nails stabilize load through the ball of the foot, improving explosive acceleration and sharp cuts.", "featured": false },
+        { "icon": "🏀", "title": "Basketball", "description": "Toe stability is essential for stop-and-go and rapid direction changes. Balanced plantar loading improves jump takeoff power and distributes landing impact more effectively.", "featured": false },
+        { "icon": "🤼", "title": "Judo & Jiu-Jitsu [Deep Dive]", "description": "Beyond grip strength, there is a separate attribute called 'finger force.' Proper nail care allows finger pads to sink deeply into the opponent's gi, dramatically improving holding power during pulling, breaking balance, and throwing. With ingrown or over-trimmed nails, force can't reach the fingertips — leaving you unable to control the opponent even with strong hands.", "featured": true },
+        { "icon": "⚾", "title": "Baseball & Softball", "description": "Fingertip feel when pitching and bat grip when hitting are directly linked to nail condition. Unstable fingertips from over-trimming cause inconsistent release points and reduced control.", "featured": false },
+        { "icon": "🏃", "title": "Track & Field (Sprints)", "description": "How you use your toes at the start and through the acceleration phase can make or break your race. Nail correction sharpens toe contact awareness and improves your first-step drive.", "featured": false },
+        { "icon": "🎾", "title": "Tennis & Badminton", "description": "Footwork agility is built on toe grip. Fingernail condition also affects racket grip during serves and smashes.", "featured": false }
+      ]
+    },
+    "mechanism": {
+      "badge": "Mechanism",
+      "title": "The Body's Chain Reaction",
+      "subtitle": "Nail condition doesn't stop at the foot — it cascades through your entire body.",
+      "negativeLabel": "❌ Downward Spiral",
+      "positiveLabel": "✅ Upward Chain",
+      "dividerLabel": "With nail correction therapy",
+      "negativeFlow": ["Nail Deformity", "Contact Error", "Posture & Form Breakdown", "Performance Loss"],
+      "positiveFlow": ["Nail Correction", "Proper Contact", "Stable Posture & Balance", "Performance Gains"]
+    },
+    "care": {
+      "badge": "Daily Care",
+      "title": "Daily Care Tips",
+      "subtitle": "Consistent self-care alongside professional treatment keeps your nails healthy long-term.",
+      "cards": [
+        { "icon": "📏", "title": "Nail Length", "desc": "Trim to the same level as your fingertip. Over-cutting destabilizes the toe — avoid it." },
+        { "icon": "✂️", "title": "Cutting Technique", "desc": "Use a straight square-off cut, leaving the corners. Rounding the edges increases ingrown nail risk." },
+        { "icon": "💧", "title": "Moisturize", "desc": "Care for the skin at the nail root and sides with cream or oil. Dryness causes cracking and chipping." },
+        { "icon": "🔍", "title": "Weekly Check", "desc": "Inspect your toes once a week. Catch discoloration, deformity, or pain early." }
+      ]
+    },
+    "cta": {
+      "badge": "Get Started",
+      "title": "Diagnose Your Nail Health with AI",
+      "description": "One photo of your nails and a quick questionnaire is all it takes to analyze your toe and nail condition and assess your performance risk.",
+      "button": "Start AI Diagnosis"
+    }
+  },
   "loading": { "message": "Loading..." },
   "notFound": { "title": "404", "message": "Page not found", "back": "Back to Home" }
 }
