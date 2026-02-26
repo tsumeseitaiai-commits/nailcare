@@ -160,6 +160,7 @@ export default function AIDiagnosisPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isFinalDiagnosisCalled = useRef(false);
+  const isInitialFetchCalled = useRef(false);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
@@ -219,10 +220,13 @@ export default function AIDiagnosisPage() {
   const handleStartFreeChat = () => {
     setShowPrelim(false); setStep('freeChat'); setMessages([]);
     isFinalDiagnosisCalled.current = false;
+    isInitialFetchCalled.current = false;
     fetchInitialFreeMessage();
   };
 
   const fetchInitialFreeMessage = async () => {
+    if (isInitialFetchCalled.current) return;
+    isInitialFetchCalled.current = true;
     setIsLoading(true);
     try {
       const res = await fetch('/api/chat-diagnosis', {
