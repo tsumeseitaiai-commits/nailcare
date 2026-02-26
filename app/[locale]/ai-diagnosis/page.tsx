@@ -17,20 +17,47 @@ interface Message {
 
 interface DiagnosisResult {
   health_score: number;
+  nail_score?: number;
+  quiz_score?: number;
+  nail_findings?: string[];
   detected_issues: string[];
   recommendations: string[];
   analysis: string;
 }
 
 interface QuizAnswers {
+  // Q1
   sport: string;
+  // Q2
   age: number | '';
   gender: string;
+  // Q3
+  height: number | '';
+  weight: number | '';
+  dominantFoot: string;
+  // Q4
+  sportsHistory: number | '';
+  practiceFrequency: string;
+  // Q5 爪の自覚症状
+  nailColorChange: boolean;
+  nailBrittle: boolean;
+  nailPain: boolean;
+  nailGrowthChange: boolean;
+  // Q6 足の形態
+  archType: string;
+  callusLocations: string[];
+  // Q7 爪ケア
+  nailCareStyle: string;
+  nailCareFrequency: string;
+  usesInsole: boolean | '';
+  // Q8
   curvedNail: string;
   halluxValgus: string;
+  // Q9
   toeGrip: number;
   gripConfidence: number;
   balance: number;
+  // Q10
   ankleSprain: string;
   currentPainAreas: string[];
 }
@@ -51,16 +78,22 @@ const SPORTS_LIST = [
 ];
 
 const PAIN_AREAS = ['足指', '足首', '膝', '股関節', '腰', '背中', '肩', '肘', '首', 'なし'];
+const CALLUS_LOCATIONS = ['親指の付け根', '小指の付け根', '足指の先', '踵', 'なし'];
 
 const INITIAL_ANSWERS: QuizAnswers = {
   sport: '', age: '', gender: '',
+  height: '', weight: '', dominantFoot: '',
+  sportsHistory: '', practiceFrequency: '',
+  nailColorChange: false, nailBrittle: false, nailPain: false, nailGrowthChange: false,
+  archType: '', callusLocations: [],
+  nailCareStyle: '', nailCareFrequency: '', usesInsole: '',
   curvedNail: '', halluxValgus: '',
   toeGrip: 5, gripConfidence: 5, balance: 5,
   ankleSprain: '',
   currentPainAreas: [],
 };
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 10;
 
 // ============================================================
 // ユーティリティ
@@ -177,11 +210,22 @@ export default function AIDiagnosisPage() {
   // ============================================================
   // バリデーション
   // ============================================================
+  const toggleCallusLocation = (loc: string) => {
+    if (loc === 'なし') { set('callusLocations', ['なし']); return; }
+    const current = quizAnswers.callusLocations.filter(l => l !== 'なし');
+    const next = current.includes(loc) ? current.filter(l => l !== loc) : [...current, loc];
+    set('callusLocations', next);
+  };
+
   const canProceed = (): boolean => {
     if (quizStep === 1) return quizAnswers.sport !== '';
     if (quizStep === 2) return quizAnswers.age !== '' && Number(quizAnswers.age) >= 5 && quizAnswers.gender !== '';
-    if (quizStep === 3) return quizAnswers.curvedNail !== '' && quizAnswers.halluxValgus !== '';
-    if (quizStep === 6) return quizAnswers.ankleSprain !== '';
+    if (quizStep === 3) return quizAnswers.height !== '' && quizAnswers.weight !== '' && quizAnswers.dominantFoot !== '';
+    if (quizStep === 4) return quizAnswers.sportsHistory !== '' && quizAnswers.practiceFrequency !== '';
+    if (quizStep === 6) return quizAnswers.archType !== '';
+    if (quizStep === 7) return quizAnswers.nailCareStyle !== '' && quizAnswers.nailCareFrequency !== '' && quizAnswers.usesInsole !== '';
+    if (quizStep === 8) return quizAnswers.curvedNail !== '' && quizAnswers.halluxValgus !== '';
+    if (quizStep === 10) return quizAnswers.ankleSprain !== '';
     return true;
   };
 
@@ -456,11 +500,150 @@ export default function AIDiagnosisPage() {
                 </div>
               )}
 
-              {/* Q3: 巻き爪 + 外反母趾（同一画面） */}
+              {/* Q3: 身長・体重・利き足 */}
               {quizStep === 3 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q3</p>
-                  <h2 className="mb-5 text-xl font-bold">爪・足の状態を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">体格と利き足を教えてください</h2>
+                  <div className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="mb-2 text-sm font-semibold text-foreground">身長</p>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={100} max={250} value={quizAnswers.height}
+                            onChange={e => set('height', e.target.value === '' ? '' : Number(e.target.value))}
+                            placeholder="170"
+                            className="w-full rounded-lg border-2 border-border px-3 py-3 text-center text-xl font-bold focus:border-primary focus:outline-none" />
+                          <span className="text-sm text-muted-foreground shrink-0">cm</span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="mb-2 text-sm font-semibold text-foreground">体重</p>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={20} max={200} value={quizAnswers.weight}
+                            onChange={e => set('weight', e.target.value === '' ? '' : Number(e.target.value))}
+                            placeholder="65"
+                            className="w-full rounded-lg border-2 border-border px-3 py-3 text-center text-xl font-bold focus:border-primary focus:outline-none" />
+                          <span className="text-sm text-muted-foreground shrink-0">kg</span>
+                        </div>
+                      </div>
+                    </div>
+                    {quizAnswers.height && quizAnswers.weight && (
+                      <p className="text-center text-sm text-muted-foreground">
+                        BMI: <span className="font-bold text-foreground">{(Number(quizAnswers.weight) / Math.pow(Number(quizAnswers.height) / 100, 2)).toFixed(1)}</span>
+                      </p>
+                    )}
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">利き足</p>
+                      <ChoiceButtons options={['右足', '左足', '両方']} value={quizAnswers.dominantFoot} onChange={v => set('dominantFoot', v)} cols={3} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Q4: 競技歴・練習頻度 */}
+              {quizStep === 4 && (
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
+                  <h2 className="mb-5 text-xl font-bold">競技歴と練習頻度を教えてください</h2>
+                  <div className="space-y-5">
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">競技歴</p>
+                      <div className="flex items-center gap-3">
+                        <input type="number" min={0} max={50} value={quizAnswers.sportsHistory}
+                          onChange={e => set('sportsHistory', e.target.value === '' ? '' : Number(e.target.value))}
+                          placeholder="5"
+                          className="w-28 rounded-lg border-2 border-border px-4 py-3 text-center text-2xl font-bold focus:border-primary focus:outline-none" />
+                        <span className="text-base text-muted-foreground">年</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">週の練習回数</p>
+                      <ChoiceButtons options={['週1〜2回', '週3〜4回', '週5回以上', '毎日']} value={quizAnswers.practiceFrequency} onChange={v => set('practiceFrequency', v)} cols={2} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Q5: 爪の自覚症状（複数選択） */}
+              {quizStep === 5 && (
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q5</p>
+                  <h2 className="mb-2 text-xl font-bold">爪に関して気になる症状は？</h2>
+                  <p className="mb-5 text-sm text-muted-foreground">当てはまるものをすべて選んでください（なければスキップ）</p>
+                  <div className="space-y-3">
+                    {([
+                      { key: 'nailColorChange', label: '色の変化がある（黄色・白・黒など）', icon: '🎨' },
+                      { key: 'nailBrittle',     label: '割れやすい・欠けやすい',             icon: '💔' },
+                      { key: 'nailPain',        label: '痛みや圧痛がある',                   icon: '😣' },
+                      { key: 'nailGrowthChange',label: '伸びる速さが変わった気がする',       icon: '📏' },
+                    ] as { key: keyof QuizAnswers; label: string; icon: string }[]).map(({ key, label, icon }) => (
+                      <button key={key}
+                        onClick={() => set(key, !quizAnswers[key] as QuizAnswers[typeof key])}
+                        className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition-all ${
+                          quizAnswers[key] ? 'border-primary bg-primary/5 text-primary' : 'border-border text-foreground hover:border-primary/40'
+                        }`}>
+                        <span className="text-xl">{icon}</span>{label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Q6: 足の形態 */}
+              {quizStep === 6 && (
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q6</p>
+                  <h2 className="mb-5 text-xl font-bold">足の形態を教えてください</h2>
+                  <div className="space-y-5">
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">足のアーチタイプ</p>
+                      <ChoiceButtons options={['扁平足（土踏まずがない）', '正常', 'ハイアーチ（高すぎる）', 'わからない']} value={quizAnswers.archType} onChange={v => set('archType', v)} cols={2} />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">タコ・魚の目がある場所</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {CALLUS_LOCATIONS.map(loc => (
+                          <button key={loc} onClick={() => toggleCallusLocation(loc)}
+                            className={`rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all ${
+                              quizAnswers.callusLocations.includes(loc)
+                                ? 'border-primary bg-primary/5 text-primary'
+                                : 'border-border text-foreground hover:border-primary/40'
+                            }`}>{loc}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Q7: 爪ケア習慣 */}
+              {quizStep === 7 && (
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q7</p>
+                  <h2 className="mb-5 text-xl font-bold">爪のケア習慣を教えてください</h2>
+                  <div className="space-y-5">
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">爪の切り方</p>
+                      <ChoiceButtons options={['深爪気味', 'スクエアカット', 'ラウンドカット', 'バラバラ・気にしない']} value={quizAnswers.nailCareStyle} onChange={v => set('nailCareStyle', v)} cols={2} />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">ケア頻度</p>
+                      <ChoiceButtons options={['週1回以上', '2週間に1回', '月1回', 'ほとんどしない']} value={quizAnswers.nailCareFrequency} onChange={v => set('nailCareFrequency', v)} cols={2} />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">インソール（中敷き）使用</p>
+                      <ChoiceButtons options={['使っている', '使っていない']} value={quizAnswers.usesInsole === '' ? '' : quizAnswers.usesInsole ? '使っている' : '使っていない'} onChange={v => set('usesInsole', v === '使っている')} cols={2} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Q8: 巻き爪 + 外反母趾 */}
+              {quizStep === 8 && (
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q8</p>
+                  <h2 className="mb-5 text-xl font-bold">爪・足の変形を教えてください</h2>
                   <div className="space-y-5">
                     <div>
                       <p className="mb-2 text-sm font-semibold text-foreground">巻き爪の傾向</p>
@@ -474,23 +657,17 @@ export default function AIDiagnosisPage() {
                 </div>
               )}
 
-              {/* Q4: 足指グリップ感覚 */}
-              {quizStep === 4 && (
+              {/* Q9: 機能スコア（スライダー3つ） */}
+              {quizStep === 9 && (
                 <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
-                  <h2 className="mb-2 text-xl font-bold">足指で地面を掴める感覚は？</h2>
-                  <p className="mb-5 text-sm text-muted-foreground">競技中のグリップ感覚を1〜10で教えてください</p>
-                  <SliderInput value={quizAnswers.toeGrip} onChange={v => set('toeGrip', v)} leftLabel="全く感じない" rightLabel="完全に感じる" />
-                </div>
-              )}
-
-              {/* Q5: グリップ力 + バランス（スライダー2つ） */}
-              {quizStep === 5 && (
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q5</p>
-                  <h2 className="mb-5 text-xl font-bold">パフォーマンスを教えてください</h2>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q9</p>
+                  <h2 className="mb-5 text-xl font-bold">競技中のパフォーマンスを教えてください</h2>
                   <div className="space-y-6">
                     <div>
+                      <p className="mb-3 text-sm font-semibold text-foreground">足指で地面を掴める感覚</p>
+                      <SliderInput value={quizAnswers.toeGrip} onChange={v => set('toeGrip', v)} leftLabel="全く感じない" rightLabel="完全に感じる" />
+                    </div>
+                    <div className="border-t border-border pt-5">
                       <p className="mb-3 text-sm font-semibold text-foreground">踏ん張り・グリップ力の自信</p>
                       <SliderInput value={quizAnswers.gripConfidence} onChange={v => set('gripConfidence', v)} leftLabel="全く自信がない" rightLabel="とても自信がある" />
                     </div>
@@ -502,32 +679,31 @@ export default function AIDiagnosisPage() {
                 </div>
               )}
 
-              {/* Q6: 捻挫歴 */}
-              {quizStep === 6 && (
+              {/* Q10: 捻挫歴 + 現在の痛み（最終問） */}
+              {quizStep === 10 && (
                 <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q6</p>
-                  <h2 className="mb-5 text-xl font-bold">足首の捻挫歴を教えてください</h2>
-                  <ChoiceButtons options={['なし', '1回', '2〜3回', '4回以上']} value={quizAnswers.ankleSprain} onChange={v => set('ankleSprain', v)} cols={2} />
-                </div>
-              )}
-
-              {/* Q7: 現在の痛み（複数選択） */}
-              {quizStep === 7 && (
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q7（最終問）</p>
-                  <h2 className="mb-2 text-xl font-bold">現在、痛みがある部位は？</h2>
-                  <p className="mb-5 text-sm text-muted-foreground">複数選択できます</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {PAIN_AREAS.map(area => (
-                      <button key={area} onClick={() => togglePainArea(area)}
-                        className={`rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all ${
-                          quizAnswers.currentPainAreas.includes(area)
-                            ? 'border-primary bg-primary/5 text-primary'
-                            : 'border-border text-foreground hover:border-primary/40'
-                        }`}>
-                        {area}
-                      </button>
-                    ))}
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q10（最終問）</p>
+                  <h2 className="mb-5 text-xl font-bold">ケガ歴と現在の痛みを教えてください</h2>
+                  <div className="space-y-5">
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">足首の捻挫歴</p>
+                      <ChoiceButtons options={['なし', '1回', '2〜3回', '4回以上']} value={quizAnswers.ankleSprain} onChange={v => set('ankleSprain', v)} cols={2} />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-foreground">現在、痛みがある部位（複数選択可）</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {PAIN_AREAS.map(area => (
+                          <button key={area} onClick={() => togglePainArea(area)}
+                            className={`rounded-xl border-2 px-3 py-3 text-sm font-semibold transition-all ${
+                              quizAnswers.currentPainAreas.includes(area)
+                                ? 'border-primary bg-primary/5 text-primary'
+                                : 'border-border text-foreground hover:border-primary/40'
+                            }`}>
+                            {area}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -702,6 +878,23 @@ export default function AIDiagnosisPage() {
                     <span className={`text-sm font-bold ${style.text}`}>{riskLevels[level].label}</span>
                   </div>
                   <p className={`text-sm font-medium ${style.text}`}>{riskLevels[level].desc}</p>
+
+                  {/* スコア内訳 */}
+                  {(diagnosisResult.nail_score !== undefined && diagnosisResult.quiz_score !== undefined) && (
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-border bg-white/80 p-3 text-center">
+                        <p className="text-xs text-muted-foreground mb-1">💅 爪スコア</p>
+                        <p className="text-2xl font-bold text-foreground">{diagnosisResult.nail_score}</p>
+                        <p className="text-xs text-muted-foreground">× 60%</p>
+                      </div>
+                      <div className="rounded-xl border border-border bg-white/80 p-3 text-center">
+                        <p className="text-xs text-muted-foreground mb-1">📋 問診スコア</p>
+                        <p className="text-2xl font-bold text-foreground">{diagnosisResult.quiz_score}</p>
+                        <p className="text-xs text-muted-foreground">× 40%</p>
+                      </div>
+                    </div>
+                  )}
+
                   {(level === 'poor' || level === 'fair') && (
                     <div className="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-left">
                       <svg className="mt-0.5 h-4 w-4 shrink-0 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -711,6 +904,20 @@ export default function AIDiagnosisPage() {
                     </div>
                   )}
                 </div>
+                {/* 爪の観察結果 */}
+                {diagnosisResult.nail_findings && diagnosisResult.nail_findings.length > 0 && (
+                  <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+                    <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-pink-100 text-pink-600">
+                        💅
+                      </span>画像からの爪診断
+                    </h3>
+                    <ul className="space-y-2">{diagnosisResult.nail_findings.map((f, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm"><span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-pink-400" />{f}</li>
+                    ))}</ul>
+                  </div>
+                )}
+
                 <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
                   <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
                     <span className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-100 text-amber-600">

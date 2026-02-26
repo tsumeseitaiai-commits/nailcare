@@ -11,6 +11,12 @@ interface ConversationLog {
   messages: { role: string; content: string }[];
 }
 
+interface NailCondition {
+  nail_score?: number;
+  quiz_score?: number;
+  nail_findings?: string[];
+}
+
 interface NailCase {
   id: string;
   created_at: string;
@@ -21,6 +27,7 @@ interface NailCase {
   recommendations: string[];
   image_url: string | null;
   health_data: Record<string, unknown>;
+  nail_condition: NailCondition;
   model_version: string;
   conversation_logs: ConversationLog[];
 }
@@ -140,14 +147,44 @@ function DetailModal({ item, onClose }: { item: NailCase; onClose: () => void })
             <div className="flex-1">
               <div className={`inline-flex items-baseline gap-1 rounded-xl px-4 py-2 ring-2 ${color.bg} ${color.ring}`}>
                 <span className={`text-4xl font-bold ${color.text}`}>{item.health_score}</span>
-                <span className={`text-sm ${color.text}`}>/100</span>
+                <span className={`text-sm ${color.text}`}>/100 総合</span>
               </div>
+              {/* スコア内訳 */}
+              {(item.nail_condition?.nail_score != null || item.nail_condition?.quiz_score != null) && (
+                <div className="mt-2 flex gap-2">
+                  {item.nail_condition.nail_score != null && (
+                    <span className="rounded-lg bg-pink-50 px-2 py-1 text-xs font-semibold text-pink-600">
+                      💅 爪 {item.nail_condition.nail_score}
+                    </span>
+                  )}
+                  {item.nail_condition.quiz_score != null && (
+                    <span className="rounded-lg bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
+                      📋 問診 {item.nail_condition.quiz_score}
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
                 <span className="rounded-full bg-slate-100 px-2 py-1 font-medium">{item.locale.toUpperCase()}</span>
                 <span className="rounded-full bg-slate-100 px-2 py-1">{item.model_version}</span>
               </div>
             </div>
           </div>
+
+          {/* 爪所見 */}
+          {item.nail_condition?.nail_findings && item.nail_condition.nail_findings.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">💅 画像からの爪所見</h3>
+              <ul className="space-y-1">
+                {item.nail_condition.nail_findings.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-pink-400" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Issues */}
           <div>

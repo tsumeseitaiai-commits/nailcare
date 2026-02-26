@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
       recommendations,
       image_url,
       health_data,
+      nail_condition,
       model_version,
       conversation_logs ( session_id, messages )
     `, { count: 'exact' })
