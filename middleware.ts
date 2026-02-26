@@ -1,10 +1,2 @@
-import createMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
-
-export default createMiddleware(routing);
-
-export const config = {
-  matcher: [
-    "/((?!api|admin|_next/static|_next/image|favicon.ico|images|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.ico|.*\\.json).*)",
-  ],
-};
+// このファイルは proxy.ts に移行しました。削除してください。
+// See: https://nextjs.org/docs/messages/middleware-to-proxy

@@ -139,6 +139,9 @@ async function saveToSupabase({
   messages: { role: string; content: string }[];
   diagnosis: {
     health_score: number;
+    nail_score?: number;
+    quiz_score?: number;
+    nail_findings?: string[];
     detected_issues: string[];
     recommendations: string[];
     analysis: string;
