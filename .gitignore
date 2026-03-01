@@ -40,6 +40,10 @@ yarn-error.log*
 files/PASS.txt
 files/*.txt
 
+# local work directories
+files/
+tmp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
