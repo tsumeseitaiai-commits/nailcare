@@ -9,9 +9,14 @@ const MODEL_VERSION = 'gemini-2.5-flash';
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, image, quizAnswers, locale = 'ja' } = await req.json();
+    const { messages, image, quizAnswers, locale = 'ja', bodyPart = 'nail' } = await req.json();
 
     const q = quizAnswers as Record<string, unknown> | undefined;
+
+    // かかと診断の場合は専用プロンプトで処理
+    if (bodyPart === 'heel') {
+      return await handleHeelDiagnosis({ messages, image, quizAnswers: q, locale });
+    }
 
     // Language instruction based on locale
     const langName = locale === 'ar' ? 'Arabic (العربية)' : locale === 'en' ? 'English' : 'Japanese (日本語)';
@@ -311,4 +316,156 @@ async function saveToSupabase({
     console.error('[Supabase] stack:', err?.stack);
     throw error; // 外側の catch に伝播
   }
+}
+
+// ============================================================
+// かかと診断ハンドラー
+// ============================================================
+async function handleHeelDiagnosis({
+  messages,
+  image,
+  quizAnswers,
+  locale,
+}: {
+  messages: { role: string; content: string }[];
+  image: string;
+  quizAnswers?: Record<string, unknown>;
+  locale: string;
+}) {
+  const q = quizAnswers;
+  const langName = locale === 'ar' ? 'Arabic (العربية)' : locale === 'en' ? 'English' : 'Japanese (日本語)';
+  const langInstruction = `IMPORTANT: All output text MUST be written in ${langName}.`;
+
+  const HEEL_PROMPT = `${langInstruction}
+
+You are a heel care specialist AI. Analyze the heel photo and interview data, then provide a structured diagnosis.
+
+[Interview Data]
+- Callus severity (self-reported): ${q?.heelSeverity ?? 'unknown'}
+- Moisturizing frequency: ${q?.heelMoisture ?? 'unknown'}
+- Primary footwear: ${q?.heelFootwear ?? 'unknown'}
+- Standing work hours/day: ${q?.heelStanding ?? 'unknown'}
+
+[Chat log]
+${JSON.stringify(messages)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[STEP 1] Visual assessment of heel image (heel_score: 0-100)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Evaluate from the image:
+- Callus thickness: thin = ideal, thick/cracked = deduct
+- Skin texture: smooth = ideal, rough/flaky = deduct
+- Cracks: none = ideal, deep cracks = severe deduct
+- Color: natural = ideal, yellowing/discoloration = deduct
+- Moisture: moist = ideal, dry/peeling = deduct
+
+→ List findings in heel_findings
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[STEP 2] Context score (context_score: 0-100)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score based on risk factors:
+- Long standing hours + heel-type shoes + no moisturizing = low score
+- Good routine + appropriate footwear = high score
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[STEP 3] Output
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+health_score = heel_score × 0.7 + context_score × 0.3 (integer)
+
+self_care_steps: Provide 4-6 clear step-by-step home care instructions in ${langName}.
+Practitioner_points: Explain 2-3 points where professional treatment would be most effective.
+
+Return ONLY this JSON (no code blocks, no explanation):
+{
+  "heel_score": 0-100,
+  "context_score": 0-100,
+  "health_score": 0-100,
+  "severity": "mild" | "moderate" | "severe",
+  "heel_findings": ["finding 1", "finding 2"],
+  "detected_issues": ["issue 1", "issue 2"],
+  "self_care_steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."],
+  "practitioner_points": ["point 1", "point 2"],
+  "recommendations": ["rec 1", "rec 2"],
+  "analysis": "Overall analysis paragraph..."
+}`;
+
+  const model = genAI.getGenerativeModel({ model: MODEL_VERSION });
+
+  const result = await model.generateContent([
+    { text: HEEL_PROMPT },
+    { inlineData: { mimeType: 'image/jpeg', data: image } },
+  ]);
+
+  const responseText = result.response.text();
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('Invalid JSON from Gemini (heel)');
+
+  const diagnosis = JSON.parse(jsonMatch[0]);
+
+  // Supabase保存
+  try {
+    const supabase = getSupabaseAdmin();
+    const timestamp = Date.now();
+    const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const imagePath = `cases/${year}/${month}/${timestamp}-heel.jpg`;
+
+    const buffer = Buffer.from(image, 'base64');
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('nail-images')
+      .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
+
+    if (uploadError) {
+      console.error('[Supabase][Heel] 画像アップロード失敗:', uploadError);
+    } else {
+      const { data: urlData } = supabase.storage.from('nail-images').getPublicUrl(imagePath);
+      const imageUrl = urlData.publicUrl;
+
+      const { data: savedCase, error: insertError } = await supabase
+        .from('nail_cases')
+        .insert({
+          image_url: imageUrl,
+          image_path: imagePath,
+          body_part: 'heel',
+          health_score: diagnosis.health_score,
+          detected_issues: diagnosis.detected_issues,
+          recommendations: diagnosis.recommendations,
+          ai_diagnosis: diagnosis.analysis,
+          nail_findings: diagnosis.heel_findings ?? [],
+          nail_condition: {},
+          health_data: {
+            heelSeverity: q?.heelSeverity,
+            heelMoisture: q?.heelMoisture,
+            heelFootwear: q?.heelFootwear,
+            heelStanding: q?.heelStanding,
+          },
+          model_version: MODEL_VERSION,
+          user_consent: true,
+          locale,
+          messages_count: messages.length,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('[Supabase][Heel] nail_cases 保存失敗:', insertError);
+      } else if (savedCase) {
+        await supabase.from('conversation_logs').insert({
+          session_id: `session-${timestamp}`,
+          nail_case_id: savedCase.id,
+          messages,
+          extracted_health_data: {
+            heelSeverity: q?.heelSeverity,
+            heelMoisture: q?.heelMoisture,
+          },
+        });
+      }
+    }
+  } catch (e) {
+    console.error('[Supabase][Heel] 保存エラー:', e);
+  }
+
+  // body_part フラグを付けて返す
+  return NextResponse.json({ ...diagnosis, body_part: 'heel' });
 }

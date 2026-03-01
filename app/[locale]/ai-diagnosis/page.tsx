@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
+import ClinicSuggest from '@/components/ClinicSuggest';
 
 // ============================================================
 // 型定義
@@ -19,10 +20,24 @@ interface DiagnosisResult {
   health_score: number;
   nail_score?: number;
   quiz_score?: number;
+  heel_score?: number;
+  context_score?: number;
   nail_findings?: string[];
+  heel_findings?: string[];
   detected_issues: string[];
   recommendations: string[];
+  self_care_steps?: string[];
+  practitioner_points?: string[];
   analysis: string;
+  body_part?: 'nail' | 'heel';
+  severity?: 'mild' | 'moderate' | 'severe';
+}
+
+interface HeelAnswers {
+  heelSeverity: string;
+  heelMoisture: string;
+  heelFootwear: string;
+  heelStanding: string;
 }
 
 interface QuizAnswers {
@@ -71,6 +86,14 @@ const INITIAL_ANSWERS: QuizAnswers = {
 };
 
 const TOTAL_STEPS = 10;
+const HEEL_TOTAL_STEPS = 4;
+
+const INITIAL_HEEL_ANSWERS: HeelAnswers = {
+  heelSeverity: '',
+  heelMoisture: '',
+  heelFootwear: '',
+  heelStanding: '',
+};
 
 // ============================================================
 // ユーティリティ
@@ -201,7 +224,12 @@ export default function AIDiagnosisPage() {
   const ankleSprainLabel = (v: string) => toOpts(qt.ankleSprain).find(o => o.value === v)?.label ?? v;
   const genderLabel = (v: string) => toOpts(qt.gender).find(o => o.value === v)?.label ?? v;
 
-  const [step, setStep] = useState<'upload' | 'quiz' | 'freeChat' | 'result'>('upload');
+  const [bodyPart, setBodyPart] = useState<'nail' | 'heel' | null>(null);
+  const [heelAnswers, setHeelAnswers] = useState<HeelAnswers>(INITIAL_HEEL_ANSWERS);
+  const [heelStep, setHeelStep] = useState(1);
+  const [practitionerMode, setPractitionerMode] = useState(false);
+
+  const [step, setStep] = useState<'select' | 'upload' | 'quiz' | 'freeChat' | 'result'>('select');
   const [quizStep, setQuizStep] = useState(1);
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>(INITIAL_ANSWERS);
   const [prelimScore, setPrelimScore] = useState<number | null>(null);
@@ -301,7 +329,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers, isInitial: true, locale }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, isInitial: true, locale, bodyPart }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -319,7 +347,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated, image, quizAnswers, locale }),
+        body: JSON.stringify({ messages: updated, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -341,7 +369,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/final-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgs, image, quizAnswers, locale }),
+        body: JSON.stringify({ messages: msgs, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart }),
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -353,14 +381,17 @@ export default function AIDiagnosisPage() {
 
   const handleReset = () => {
     isFinalDiagnosisCalled.current = false;
-    setStep('upload'); setQuizStep(1); setQuizAnswers(INITIAL_ANSWERS);
+    setStep('select'); setBodyPart(null);
+    setQuizStep(1); setQuizAnswers(INITIAL_ANSWERS);
+    setHeelStep(1); setHeelAnswers(INITIAL_HEEL_ANSWERS);
     setPrelimScore(null); setShowPrelim(false);
     setImage(null); setImagePreview(null); setMessages([]);
     setDiagnosisResult(null); setUserInput(''); setUserConsent(false);
+    setPractitionerMode(false);
   };
 
   const uiStepLabels = qt.uiSteps;
-  const currentUiStepIndex = ['upload', 'quiz', 'freeChat', 'result'].indexOf(step);
+  const currentUiStepIndex = ['select', 'upload', 'quiz', 'freeChat', 'result'].indexOf(step) - 1;
 
   // ============================================================
   // レンダリング
@@ -391,6 +422,41 @@ export default function AIDiagnosisPage() {
               </div>
             ))}
           </div>
+
+          {/* ===== 部位選択 ===== */}
+          {step === 'select' && (
+            <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
+              <div className="mb-6 text-center">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">STEP 1</p>
+                <h2 className="text-2xl font-bold text-foreground">どこを診断しますか？</h2>
+                <p className="mt-2 text-sm text-muted-foreground">写真をアップロードして、AIが詳しく診断します</p>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {/* 爪カード */}
+                <button
+                  onClick={() => { setBodyPart('nail'); setStep('upload'); }}
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border p-8 text-center transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                >
+                  <span className="text-5xl">💅</span>
+                  <div>
+                    <p className="text-lg font-bold text-foreground group-hover:text-primary">爪を診断する</p>
+                    <p className="mt-1 text-xs text-muted-foreground">爪の形・色・状態をAIが分析<br />スポーツパフォーマンスとの関係も診断</p>
+                  </div>
+                </button>
+                {/* かかとカード */}
+                <button
+                  onClick={() => { setBodyPart('heel'); setStep('upload'); }}
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border p-8 text-center transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                >
+                  <span className="text-5xl">🦶</span>
+                  <div>
+                    <p className="text-lg font-bold text-foreground group-hover:text-primary">かかとを診断する</p>
+                    <p className="mt-1 text-xs text-muted-foreground">かかとの角質・ひび割れをAIが分析<br />セルフケア手順と施術ポイントをご提案</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ===== Upload ===== */}
           {step === 'upload' && (
@@ -450,7 +516,7 @@ export default function AIDiagnosisPage() {
               )}
               {imagePreview && (
                 <button
-                  onClick={() => { if (!image || !userConsent) return; setStep('quiz'); setQuizStep(1); }}
+                  onClick={() => { if (!image || !userConsent) return; setStep('quiz'); setQuizStep(1); setHeelStep(1); }}
                   disabled={!userConsent}
                   className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -466,8 +532,116 @@ export default function AIDiagnosisPage() {
             </div>
           )}
 
-          {/* ===== Quiz ===== */}
-          {step === 'quiz' && !showPrelim && (
+          {/* ===== かかとQuiz ===== */}
+          {step === 'quiz' && bodyPart === 'heel' && (() => {
+            const heelCanProceed = () => {
+              if (heelStep === 1) return heelAnswers.heelSeverity !== '';
+              if (heelStep === 2) return heelAnswers.heelMoisture !== '';
+              if (heelStep === 3) return heelAnswers.heelFootwear !== '';
+              if (heelStep === 4) return heelAnswers.heelStanding !== '';
+              return true;
+            };
+            const heelNext = () => {
+              if (heelStep < HEEL_TOTAL_STEPS) { setHeelStep(heelStep + 1); }
+              else { handleStartFreeChat(); }
+            };
+            const heelBack = () => {
+              if (heelStep > 1) setHeelStep(heelStep - 1);
+              else setStep('upload');
+            };
+
+            const severityOpts = [
+              { value: 'mild', label: '気にならない' },
+              { value: 'moderate', label: '少し気になる' },
+              { value: 'severe', label: 'ひどい' },
+            ];
+            const moistureOpts = [
+              { value: 'daily', label: '毎日' },
+              { value: 'weekly', label: '週几回' },
+              { value: 'rarely', label: 'ほぼしない' },
+            ];
+            const footwearOpts = [
+              { value: 'heels', label: 'ヒール' },
+              { value: 'flats', label: 'フラット' },
+              { value: 'sneakers', label: 'スニーカー' },
+              { value: 'barefoot', label: '裸足が多い' },
+            ];
+            const standingOpts = [
+              { value: 'under2', label: '2時間未満' },
+              { value: '2to5', label: '2〜5時間' },
+              { value: 'over5', label: '5時間以上' },
+            ];
+
+            return (
+              <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
+                {/* 進捗バー */}
+                <div className="mb-6">
+                  <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>質問 {heelStep} / {HEEL_TOTAL_STEPS}</span>
+                    <span>{Math.round((heelStep / HEEL_TOTAL_STEPS) * 100)}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{ width: `${(heelStep / HEEL_TOTAL_STEPS) * 100}%` }} />
+                  </div>
+                </div>
+
+                {/* Q1 */}
+                {heelStep === 1 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q1</p>
+                    <h2 className="mb-5 text-xl font-bold">かかとのひび割れ・硬さはどの程度ですか？</h2>
+                    <ChoiceButtons options={severityOpts} value={heelAnswers.heelSeverity}
+                      onChange={v => setHeelAnswers(prev => ({ ...prev, heelSeverity: v }))} cols={3} />
+                  </div>
+                )}
+
+                {/* Q2 */}
+                {heelStep === 2 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q2</p>
+                    <h2 className="mb-5 text-xl font-bold">保湿ケアの頻度は？</h2>
+                    <ChoiceButtons options={moistureOpts} value={heelAnswers.heelMoisture}
+                      onChange={v => setHeelAnswers(prev => ({ ...prev, heelMoisture: v }))} cols={3} />
+                  </div>
+                )}
+
+                {/* Q3 */}
+                {heelStep === 3 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q3</p>
+                    <h2 className="mb-5 text-xl font-bold">よく履く靴の種類は？</h2>
+                    <ChoiceButtons options={footwearOpts} value={heelAnswers.heelFootwear}
+                      onChange={v => setHeelAnswers(prev => ({ ...prev, heelFootwear: v }))} cols={2} />
+                  </div>
+                )}
+
+                {/* Q4 */}
+                {heelStep === 4 && (
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
+                    <h2 className="mb-5 text-xl font-bold">1日の立ち仕事の時間は？</h2>
+                    <ChoiceButtons options={standingOpts} value={heelAnswers.heelStanding}
+                      onChange={v => setHeelAnswers(prev => ({ ...prev, heelStanding: v }))} cols={3} />
+                  </div>
+                )}
+
+                {/* ナビゲーション */}
+                <div className="mt-8 flex gap-3">
+                  <button onClick={heelBack} className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted">
+                    {qt.backBtn}
+                  </button>
+                  <button onClick={heelNext} disabled={!heelCanProceed()}
+                    className="flex-1 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50">
+                    {heelStep < HEEL_TOTAL_STEPS ? qt.nextBtn : 'チャットへ進む'}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ===== 爪Quiz ===== */}
+          {step === 'quiz' && bodyPart === 'nail' && !showPrelim && (
             <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
               {/* 進捗バー */}
               <div className="mb-6">
@@ -753,8 +927,8 @@ export default function AIDiagnosisPage() {
             </div>
           )}
 
-          {/* ===== 簡易スコア ===== */}
-          {step === 'quiz' && showPrelim && prelimScore !== null && (() => {
+          {/* ===== 簡易スコア（爪）===== */}
+          {step === 'quiz' && bodyPart === 'nail' && showPrelim && prelimScore !== null && (() => {
             const level = getRiskLevel(prelimScore);
             const style = getRiskStyle(level);
             const circumference = 2 * Math.PI * 44;
@@ -934,6 +1108,61 @@ export default function AIDiagnosisPage() {
                   )}
                 </div>
 
+                {/* かかと所見 */}
+                {diagnosisResult.body_part === 'heel' && diagnosisResult.heel_findings && diagnosisResult.heel_findings.length > 0 && (
+                  <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+                    <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-orange-100 text-orange-600">🦶</span>
+                      かかとの状態
+                    </h3>
+                    <ul className="space-y-2">{diagnosisResult.heel_findings.map((f, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm"><span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />{f}</li>
+                    ))}</ul>
+                  </div>
+                )}
+
+                {/* セルフケア手順（かかと） */}
+                {diagnosisResult.body_part === 'heel' && diagnosisResult.self_care_steps && diagnosisResult.self_care_steps.length > 0 && (
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+                    <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-emerald-800">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-200 text-emerald-700">🏠</span>
+                      セルフケア手順
+                    </h3>
+                    <ol className="space-y-3">{diagnosisResult.self_care_steps.map((s, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">{i + 1}</span>
+                        <span className="leading-relaxed text-emerald-900">{s}</span>
+                      </li>
+                    ))}</ol>
+                  </div>
+                )}
+
+                {/* 整体師モードボタン */}
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                  <button
+                    onClick={() => setPractitionerMode(prev => !prev)}
+                    className={`w-full rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${
+                      practitionerMode
+                        ? 'bg-indigo-600 text-white'
+                        : 'border border-indigo-300 bg-white text-indigo-700 hover:bg-indigo-100'
+                    }`}
+                  >
+                    {practitionerMode ? '✅ 整体師モード ON' : '🔧 整体師モードをONにする'}
+                  </button>
+                  {practitionerMode && diagnosisResult.practitioner_points && diagnosisResult.practitioner_points.length > 0 && (
+                    <div className="mt-4">
+                      <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-700">施術者向け情報</p>
+                      <div className="space-y-2">
+                        {diagnosisResult.practitioner_points.map((p, i) => (
+                          <div key={i} className="flex items-start gap-2 rounded-lg border border-indigo-200 bg-white p-3 text-sm text-indigo-900">
+                            <span className="text-lg">📌</span>{p}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* 爪の観察結果 */}
                 {diagnosisResult.nail_findings && diagnosisResult.nail_findings.length > 0 && (
                   <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
@@ -972,6 +1201,9 @@ export default function AIDiagnosisPage() {
                   <h3 className="mb-3 text-base font-bold">{t('result.analysis')}</h3>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{diagnosisResult.analysis}</p>
                 </div>
+                {/* 登録店舗サジェスト */}
+                <ClinicSuggest bodyPart={bodyPart} />
+
                 <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
                   <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

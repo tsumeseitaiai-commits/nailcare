@@ -1,11 +1,43 @@
-import { useTranslations } from 'next-intl';
+'use client';
+
+import { useState } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
 
+import enMessages from '../../../messages/en.json';
+import arMessages from '../../../messages/ar.json';
+import jaMessages from '../../../messages/ja.json';
+
+const IMAGES = [
+  '/images/chiropractuin202601/01.png',
+  '/images/chiropractuin202601/02.png',
+  '/images/chiropractuin202601/03.png',
+  '/images/chiropractuin202601/04.png',
+  '/images/chiropractuin202601/05.jpg',
+  '/images/chiropractuin202601/06.jpg',
+  '/images/chiropractuin202601/07.png',
+  '/images/chiropractuin202601/08.png',
+];
+
+type Tab = 'ja' | 'en' | 'ar';
+
+const viewerByLang = {
+  ja: jaMessages.media.viewer,
+  en: enMessages.media.viewer,
+  ar: arMessages.media.viewer,
+};
+
 export default function MediaPage() {
   const t = useTranslations('media');
+  const locale = useLocale();
+  const [tab, setTab] = useState<Tab>(
+    locale === 'ar' ? 'ar' : locale === 'en' ? 'en' : 'ja'
+  );
+
+  const v = viewerByLang[tab === 'ja' ? 'ja' : tab];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -23,124 +55,300 @@ export default function MediaPage() {
           </div>
         </section>
 
-        {/* 最新号 */}
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <div className="mb-10 flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">{t('latestBadge')}</span>
-            <div className="h-px flex-1 bg-border" />
+        {/* Magazine Viewer */}
+        <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+          {/* Tab bar */}
+          <div className="mb-8 flex justify-center gap-2">
+            {(['ja', 'en', 'ar'] as const).map((key) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
+                  tab === key
+                    ? 'bg-primary text-white shadow'
+                    : 'border border-border bg-white text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {t(`viewer.tabs.${key}`)}
+              </button>
+            ))}
           </div>
 
-          {/* 号カード */}
-          <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-            {/* マガジンヘッダー */}
-            <div className="grid md:grid-cols-2">
-              {/* 表紙画像 */}
-              <div className="relative min-h-[320px]">
+          {/* ── Japanese tab: stacked images ── */}
+          {tab === 'ja' && (
+            <div className="space-y-1 rounded-2xl overflow-hidden border border-border shadow-sm bg-white">
+              {IMAGES.map((src, i) => (
                 <Image
-                  src="/images/chiropractuin202601/473A1E6C-504E-4ED6-A50C-B88D476A92E4.png"
-                  alt="NAIL CHIROPRACTIC TIMES No.2"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  key={i}
+                  src={src}
+                  alt={`NAIL CHIROPRACTIC TIMES No.2 – Page ${i + 1}`}
+                  width={1200}
+                  height={1700}
+                  className="w-full h-auto"
+                  sizes="(max-width: 1024px) 100vw, 896px"
+                  priority={i < 2}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4">
-                  <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">2026 JANUARY No.2</span>
-                </div>
-              </div>
+              ))}
+            </div>
+          )}
 
-              {/* 号情報 */}
-              <div className="p-8 flex flex-col justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">NAIL CHIROPRACTIC TIMES</p>
-                  <h2 className="text-2xl font-bold text-foreground mb-1">{t('issue2.title')}</h2>
-                  <p className="text-sm text-muted-foreground mb-6">{t('issue2.date')}</p>
+          {/* ── English / Arabic tab: web text ── */}
+          {(tab === 'en' || tab === 'ar') && (
+            <div dir={tab === 'ar' ? 'rtl' : undefined} className="space-y-10">
 
-                  <div className="space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t('contentsLabel')}</p>
-                    {(t.raw('issue2.contents') as string[]).map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm">
+              {/* S1 – Cover */}
+              <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  {v.s1.sectionLabel}
+                </p>
+                <h2 className="text-2xl font-bold text-foreground">{v.s1.title}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{v.s1.tagline}</p>
+
+                <div className="mt-6">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {v.s1.featureTitle}
+                  </p>
+                  <ul className="space-y-2">
+                    {v.s1.features.map((f: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                        {item}
-                      </div>
+                        {f}
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
 
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/media/interview-jujutsu"
-                    className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-dark transition">
-                    {t('readJujutsu')}
-                  </Link>
-                  <Link href="/media/interview-kickboxing"
-                    className="rounded-xl border border-primary px-5 py-2.5 text-sm font-bold text-primary hover:bg-primary/5 transition">
-                    {t('readKickboxing')}
-                  </Link>
+                <div className="mt-6">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {v.s1.interviewsTitle}
+                  </p>
+                  <ul className="space-y-2">
+                    {v.s1.interviews.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              </article>
+
+              {/* S2 – Kickboxing Interview */}
+              <article className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+                <div className="bg-red-50 px-8 py-5 border-b border-border">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-widest text-red-600">
+                    {v.s2.sectionLabel}
+                  </p>
+                  <h2 className="text-xl font-bold text-foreground">{v.s2.title}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{v.s2.interviewee} · {v.s2.role}</p>
+                </div>
+                <div className="p-8 space-y-5">
+                  {v.s2.qa.map((item: { q: string; a: string }, i: number) => (
+                    <div key={i}>
+                      <div className="flex items-start gap-3 mb-2">
+                        <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">Q{i + 1}</span>
+                        <p className="font-bold text-foreground text-sm">{item.q}</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">A</span>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mt-6 rounded-xl bg-primary/5 border border-primary/20 p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{v.s2.insoleTitle}</p>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{v.s2.insoleBody}</p>
+                  </div>
+
+                  <div className="mt-4 rounded-xl bg-muted p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">PROFILE</p>
+                    <p className="text-sm text-foreground">{v.s2.profile}</p>
+                  </div>
+                </div>
+              </article>
+
+              {/* S3 – Biomechanics / Nail Approach */}
+              <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  {v.s3.sectionLabel}
+                </p>
+                <h2 className="text-xl font-bold text-foreground">{v.s3.title}</h2>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{v.s3.body}</p>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                  {v.s3.pillars.map((p: { label: string; sub: string; desc: string }, i: number) => (
+                    <div key={i} className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-center">
+                      <p className="font-bold text-primary text-sm">{p.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 mb-2">{p.sub}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              {/* S4 – Jiu-Jitsu Interview */}
+              <article className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+                <div className="bg-primary/5 px-8 py-5 border-b border-border">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-widest text-primary">
+                    {v.s4.sectionLabel}
+                  </p>
+                  <h2 className="text-xl font-bold text-foreground">{v.s4.title}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{v.s4.interviewee} · {v.s4.role}</p>
+                </div>
+                <div className="p-8 space-y-5">
+                  {v.s4.qa.map((item: { q: string; a: string }, i: number) => (
+                    <div key={i}>
+                      <div className="flex items-start gap-3 mb-2">
+                        <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">Q{i + 1}</span>
+                        <p className="font-bold text-foreground text-sm">{item.q}</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">A</span>
+                        <p className="text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mt-4 rounded-xl bg-muted p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">PROFILE</p>
+                    <p className="text-sm text-foreground">{v.s4.profile}</p>
+                  </div>
+                </div>
+              </article>
+
+              {/* S5 – Evidence Data */}
+              <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  {v.s5.sectionLabel}
+                </p>
+                <h2 className="text-xl font-bold text-foreground">{v.s5.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{v.s5.subtitle}</p>
+
+                <div className="mt-6 space-y-4">
+                  {v.s5.cases.map((c: { label: string; before: string; after: string }, i: number) => (
+                    <div key={i} className="rounded-xl border border-border p-5">
+                      <p className="font-bold text-foreground text-sm mb-3">{c.label}</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-lg bg-red-50 p-3">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-red-500 mb-1">Before</p>
+                          <p className="text-xs leading-relaxed text-red-800">{c.before}</p>
+                        </div>
+                        <div className="rounded-lg bg-emerald-50 p-3">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">After</p>
+                          <p className="text-xs leading-relaxed text-emerald-800">{c.after}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              {/* S6 – Activities & Achievements */}
+              <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  {v.s6.sectionLabel}
+                </p>
+                <h2 className="text-xl font-bold text-foreground">{v.s6.title}</h2>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                  {v.s6.items.map((item: { category: string; title: string; desc: string }, i: number) => (
+                    <div key={i} className="rounded-xl border border-border p-5">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">{item.category}</p>
+                      <p className="font-bold text-foreground text-sm mb-2">{item.title}</p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              {/* S7 – Foundation */}
+              <article className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+                <div className="bg-amber-50 px-8 py-5 border-b border-border">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-widest text-amber-700">
+                    {v.s7.sectionLabel}
+                  </p>
+                  <h2 className="text-xl font-bold text-foreground">{v.s7.title}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{v.s7.interviewee} · {v.s7.intervieweeRole}</p>
+                </div>
+                <div className="p-8 space-y-5">
+                  {v.s7.qa.map((item: { q: string; a: string }, i: number) => (
+                    <div key={i}>
+                      <p className="mb-1 text-sm font-bold text-foreground">Q{i + 1}. {item.q}</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                    </div>
+                  ))}
+
+                  <div className="mt-4 rounded-xl bg-muted p-5">
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">PROFILE</p>
+                    <p className="text-sm text-foreground">{v.s7.profile}</p>
+                  </div>
+                </div>
+              </article>
+
+              {/* S8 – Clinic */}
+              <article className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">
+                  {v.s8.sectionLabel}
+                </p>
+                <h2 className="text-xl font-bold text-foreground">{v.s8.title}</h2>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{v.s8.body}</p>
+
+                <div className="mt-6">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    {v.s8.pointsTitle}
+                  </p>
+                  <ul className="space-y-3">
+                    {v.s8.points.map((point: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-foreground">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                          {i + 1}
+                        </span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+
             </div>
+          )}
+        </section>
 
-            {/* 記事サムネイル一覧 */}
-            <div className="border-t border-border grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
-              {/* インタビュー 柔術 */}
-              <Link href="/media/interview-jujutsu" className="group p-6 hover:bg-muted/50 transition">
-                <div className="relative h-40 rounded-xl overflow-hidden mb-4">
-                  <Image
-                    src="/images/chiropractuin202601/AAB1D85E-2E7E-4F52-A255-1CC71F66E61D.png"
-                    alt={t("issue2.jujutsuTag")}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">INTERVIEW</span>
-                  </div>
-                </div>
-                <p className="text-xs font-semibold text-primary mb-1">{t('issue2.jujutsuTag')}</p>
-                <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition">{t('issue2.jujutsuTitle')}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{t('issue2.jujutsuSub')}</p>
-              </Link>
-
-              {/* インタビュー キックボクシング */}
-              <Link href="/media/interview-kickboxing" className="group p-6 hover:bg-muted/50 transition">
-                <div className="relative h-40 rounded-xl overflow-hidden mb-4">
-                  <Image
-                    src="/images/chiropractuin202601/D393CE18-57C6-4F7E-A752-6873568DF537.png"
-                    alt={t("issue2.kickboxingTag")}
-                    fill
-                    className="object-cover object-right group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">INTERVIEW</span>
-                  </div>
-                </div>
-                <p className="text-xs font-semibold text-primary mb-1">{t('issue2.kickboxingTag')}</p>
-                <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition">{t('issue2.kickboxingTitle')}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{t('issue2.kickboxingSub')}</p>
-              </Link>
-
-              {/* 実証データ */}
-              <div className="p-6">
-                <div className="relative h-40 rounded-xl overflow-hidden mb-4">
-                  <Image
-                    src="/images/chiropractuin202601/S__78143490.jpg"
-                    alt={t("issue2.dataTag")}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">DATA</span>
-                  </div>
-                </div>
-                <p className="text-xs font-semibold text-primary mb-1">{t('issue2.dataTag')}</p>
-                <h3 className="text-sm font-bold text-foreground leading-snug">{t('issue2.dataTitle')}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{t('issue2.dataSub')}</p>
+        {/* Interview Links */}
+        <section className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Link href="/media/interview-jujutsu"
+              className="group flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                <Image src="/images/chiropractuin202601/04.png" alt="" fill className="object-cover" sizes="64px" />
               </div>
-            </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-primary">{t('issue2.jujutsuTag')}</p>
+                <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition">{t('issue2.jujutsuTitle')}</p>
+              </div>
+              <svg className="h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+            <Link href="/media/interview-kickboxing"
+              className="group flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                <Image src="/images/chiropractuin202601/02.png" alt="" fill className="object-cover" sizes="64px" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-primary">{t('issue2.kickboxingTag')}</p>
+                <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition">{t('issue2.kickboxingTitle')}</p>
+              </div>
+              <svg className="h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </section>
 
-        {/* AI診断CTA */}
-        <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+        {/* AI CTA */}
+        <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
           <div className="rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-10 text-center text-white">
             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/60">{t('cta.badge')}</p>
             <h2 className="mb-3 text-2xl font-bold">{t('cta.title')}</h2>

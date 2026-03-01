@@ -16,7 +16,7 @@ export default function InterviewJujutsuPage() {
         <section className="relative overflow-hidden bg-slate-900 py-24 text-white">
           <div className="absolute inset-0">
             <Image
-              src="/images/chiropractuin202601/AAB1D85E-2E7E-4F52-A255-1CC71F66E61D.png"
+              src="/images/chiropractuin202601/04.png"
               alt={t("heroTitle")}
               fill
               className="object-cover opacity-30"
@@ -96,7 +96,7 @@ export default function InterviewJujutsuPage() {
               <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
                 <div className="relative aspect-[3/4]">
                   <Image
-                    src="/images/chiropractuin202601/AAB1D85E-2E7E-4F52-A255-1CC71F66E61D.png"
+                    src="/images/chiropractuin202601/04.png"
                     alt="NAIL CHIROPRACTIC TIMES No.2"
                     fill
                     className="object-cover"

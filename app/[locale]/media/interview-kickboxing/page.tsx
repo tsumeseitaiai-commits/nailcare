@@ -16,7 +16,7 @@ export default function InterviewKickboxingPage() {
         <section className="relative overflow-hidden bg-slate-900 py-24 text-white">
           <div className="absolute inset-0">
             <Image
-              src="/images/chiropractuin202601/D393CE18-57C6-4F7E-A752-6873568DF537.png"
+              src="/images/chiropractuin202601/02.png"
               alt={t("heroTitle")}
               fill
               className="object-cover object-right opacity-30"
@@ -109,7 +109,7 @@ export default function InterviewKickboxingPage() {
               <div className="rounded-2xl overflow-hidden border border-border shadow-sm">
                 <div className="relative aspect-[3/4]">
                   <Image
-                    src="/images/chiropractuin202601/D393CE18-57C6-4F7E-A752-6873568DF537.png"
+                    src="/images/chiropractuin202601/02.png"
                     alt="NAIL CHIROPRACTIC TIMES No.2"
                     fill
                     className="object-cover object-right"

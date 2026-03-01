@@ -464,7 +464,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 9a. Interview Cards ===== */}
+        {/* ===== 9. Media / Magazine Section ===== */}
         <section className="py-20 sm:py-28">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="mb-10 text-center">
@@ -472,52 +472,74 @@ export default function HomePage() {
                 NAIL CHIROPRACTIC TIMES No.2
               </span>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {/* Card 1 – Jiu-Jitsu */}
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Magazine Cover */}
+              <Link href="/media" className="group relative overflow-hidden rounded-2xl shadow-lg lg:row-span-2">
+                <div className="relative aspect-[3/4] w-full lg:h-full">
+                  <Image
+                    src="/images/chiropractuin202601/01.png"
+                    alt={tMedia("issue2.title")}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                </div>
+                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-white/60">
+                    2026.01 No.2
+                  </p>
+                  <h3 className="text-xl font-bold leading-snug sm:text-2xl">{tMedia("issue2.title")}</h3>
+                  <p className="mt-2 text-sm text-white/75">{tMedia("issue2.bannerDesc")}</p>
+                </div>
+              </Link>
+
+              {/* Card – Jiu-Jitsu */}
               <Link
                 href="/media/interview-jujutsu"
                 className="group relative overflow-hidden rounded-2xl shadow-md"
               >
-                <div className="relative h-72 w-full">
+                <div className="relative h-56 w-full">
                   <Image
-                    src="/images/chiropractuin202601/AAB1D85E-2E7E-4F52-A255-1CC71F66E61D.png"
+                    src="/images/chiropractuin202601/04.png"
                     alt={tMedia("issue2.jujutsuTitle")}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, 50vw"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
                 </div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
+                <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
                   <span className="mb-2 inline-flex w-fit items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
                     {tMedia("issue2.jujutsuTag")}
                   </span>
-                  <h3 className="text-lg font-bold leading-snug">{tMedia("issue2.jujutsuTitle")}</h3>
-                  <p className="mt-1 text-sm text-white/75">{tMedia("issue2.jujutsuSub")}</p>
+                  <h3 className="text-base font-bold leading-snug">{tMedia("issue2.jujutsuTitle")}</h3>
+                  <p className="mt-1 text-xs text-white/75">{tMedia("issue2.jujutsuSub")}</p>
                 </div>
               </Link>
 
-              {/* Card 2 – Kickboxing */}
+              {/* Card – Kickboxing */}
               <Link
                 href="/media/interview-kickboxing"
                 className="group relative overflow-hidden rounded-2xl shadow-md"
               >
-                <div className="relative h-72 w-full">
+                <div className="relative h-56 w-full">
                   <Image
-                    src="/images/chiropractuin202601/D393CE18-57C6-4F7E-A752-6873568DF537.png"
+                    src="/images/chiropractuin202601/02.png"
                     alt={tMedia("issue2.kickboxingTitle")}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, 50vw"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
                 </div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
+                <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
                   <span className="mb-2 inline-flex w-fit items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm">
                     {tMedia("issue2.kickboxingTag")}
                   </span>
-                  <h3 className="text-lg font-bold leading-snug">{tMedia("issue2.kickboxingTitle")}</h3>
-                  <p className="mt-1 text-sm text-white/75">{tMedia("issue2.kickboxingSub")}</p>
+                  <h3 className="text-base font-bold leading-snug">{tMedia("issue2.kickboxingTitle")}</h3>
+                  <p className="mt-1 text-xs text-white/75">{tMedia("issue2.kickboxingSub")}</p>
                 </div>
               </Link>
             </div>
@@ -529,44 +551,6 @@ export default function HomePage() {
               >
                 {tMedia("title")} →
               </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== 9b. Magazine Banner ===== */}
-        <section className="py-8 sm:py-12">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-col overflow-hidden rounded-2xl bg-slate-900 shadow-xl sm:flex-row">
-              {/* Magazine cover */}
-              <div className="relative h-48 w-full shrink-0 sm:h-auto sm:w-52">
-                <Image
-                  src="/images/chiropractuin202601/473A1E6C-504E-4ED6-A50C-B88D476A92E4.png"
-                  alt={tMedia("issue2.title")}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, 208px"
-                />
-              </div>
-              {/* Text */}
-              <div className="flex flex-1 flex-col justify-center gap-4 p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                  NAIL CHIROPRACTIC TIMES · 2026.01 No.2
-                </p>
-                <h3 className="text-xl font-bold text-white sm:text-2xl">
-                  {tMedia("issue2.title")}
-                </h3>
-                <p className="text-sm leading-relaxed text-slate-300">
-                  {tMedia("issue2.bannerDesc")}
-                </p>
-                <div>
-                  <Link
-                    href="/media"
-                    className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow transition-all hover:bg-primary-dark hover:-translate-y-0.5"
-                  >
-                    {tMedia("issue2.viewMagazine")}
-                  </Link>
-                </div>
-              </div>
             </div>
           </div>
         </section>
