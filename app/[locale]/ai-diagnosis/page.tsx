@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
 import ClinicSuggest from '@/components/ClinicSuggest';
+import { createClient } from '@/lib/supabaseClient';
 
 // ============================================================
 // 型定義
@@ -228,6 +229,18 @@ export default function AIDiagnosisPage() {
   const [heelAnswers, setHeelAnswers] = useState<HeelAnswers>(INITIAL_HEEL_ANSWERS);
   const [heelStep, setHeelStep] = useState(1);
   const [practitionerMode, setPractitionerMode] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+      setUserRole(profile?.role ?? 'member');
+    }
+    checkAuth();
+  }, []);
 
   const [step, setStep] = useState<'select' | 'upload' | 'quiz' | 'freeChat' | 'result'>('select');
   const [quizStep, setQuizStep] = useState(1);
@@ -391,7 +404,7 @@ export default function AIDiagnosisPage() {
   };
 
   const uiStepLabels = qt.uiSteps;
-  const currentUiStepIndex = ['select', 'upload', 'quiz', 'freeChat', 'result'].indexOf(step) - 1;
+  const currentUiStepIndex = step === 'select' ? -1 : ['upload', 'quiz', 'freeChat', 'result'].indexOf(step);
 
   // ============================================================
   // レンダリング
@@ -466,8 +479,8 @@ export default function AIDiagnosisPage() {
                   <Image src="/images/optimized/nailanaly.jpg" alt="AI Nail Diagnosis" fill className="object-cover" sizes="112px" priority />
                 </div>
               </div>
-              <h2 className="mb-2 text-xl font-bold text-foreground">{t('upload.title')}</h2>
-              <p className="mb-6 text-sm text-muted-foreground">{t('upload.description')}</p>
+              <h2 className="mb-2 text-xl font-bold text-foreground">{bodyPart === 'heel' ? 'かかとの写真をアップロード' : t('upload.title')}</h2>
+              <p className="mb-6 text-sm text-muted-foreground">{bodyPart === 'heel' ? '診断したいかかとの写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。' : t('upload.description')}</p>
               <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{t('upload.guideTitle')}</h3>
                 <ul className="space-y-1">
@@ -1138,6 +1151,7 @@ export default function AIDiagnosisPage() {
                 )}
 
                 {/* 整体師モードボタン */}
+                {userRole === 'practitioner' && (
                 <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
                   <button
                     onClick={() => setPractitionerMode(prev => !prev)}
@@ -1162,6 +1176,7 @@ export default function AIDiagnosisPage() {
                     </div>
                   )}
                 </div>
+                )}
 
                 {/* 爪の観察結果 */}
                 {diagnosisResult.nail_findings && diagnosisResult.nail_findings.length > 0 && (
@@ -1203,6 +1218,19 @@ export default function AIDiagnosisPage() {
                 </div>
                 {/* 登録店舗サジェスト */}
                 <ClinicSuggest bodyPart={bodyPart} />
+
+                {/* 会員登録バナー */}
+                {!userRole && (
+                  <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-6 text-center">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Members Only</p>
+                    <h3 className="mb-2 text-base font-bold text-foreground">爪整体テキストを無料で閲覧</h3>
+                    <p className="mb-4 text-sm text-muted-foreground">会員登録すると、プロ向け爪整体テキスト（全11冊）のPDFが無料でダウンロードできます。</p>
+                    <div className="flex gap-3 justify-center">
+                      <a href="/ja/register" className="rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white hover:bg-primary/90">無料で会員登録</a>
+                      <a href="/ja/login" className="rounded-xl border border-primary px-6 py-2.5 text-sm font-bold text-primary hover:bg-primary/5">ログイン</a>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
                   <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
