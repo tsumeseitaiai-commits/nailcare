@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
+import { HEEL_KNOWLEDGE } from '@/lib/heelKnowledge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -14,6 +15,8 @@ function buildHeelSystemPrompt(quizAnswers?: Record<string, unknown>, locale = '
   const langInstruction = getLangInstruction(locale);
 
   return `${langInstruction}
+
+${HEEL_KNOWLEDGE}
 
 You are a heel and foot care specialist counselor. You are having a conversation with a patient about heel callus and dryness.
 

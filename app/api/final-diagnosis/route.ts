@@ -3,6 +3,7 @@ export const runtime = 'nodejs'; // Edge回避
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { HEEL_KNOWLEDGE } from '@/lib/heelKnowledge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const MODEL_VERSION = 'gemini-2.5-flash';
@@ -338,56 +339,59 @@ async function handleHeelDiagnosis({
 
   const HEEL_PROMPT = `${langInstruction}
 
-You are a heel care specialist AI. Analyze the heel photo and interview data, then provide a structured diagnosis.
+あなたはかかと・足裏ケアの専門AIです。以下の専門知識ベースとアンケート・チャット内容・写真をもとに診断してください。
 
-[Interview Data]
-- Callus severity (self-reported): ${q?.heelSeverity ?? 'unknown'}
-- Moisturizing frequency: ${q?.heelMoisture ?? 'unknown'}
-- Primary footwear: ${q?.heelFootwear ?? 'unknown'}
-- Standing work hours/day: ${q?.heelStanding ?? 'unknown'}
+${HEEL_KNOWLEDGE}
 
-[Chat log]
+[アンケート回答]
+- ひび割れ・硬さの程度: ${q?.heelSeverity ?? '不明'}
+- 保湿ケアの頻度: ${q?.heelMoisture ?? '不明'}
+- よく履く靴: ${q?.heelFootwear ?? '不明'}
+- 1日の立ち仕事時間: ${q?.heelStanding ?? '不明'}
+
+[チャットログ]
 ${JSON.stringify(messages)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[STEP 1] Visual assessment of heel image (heel_score: 0-100)
+[STEP 1] 写真からかかとの状態を評価（heel_score: 0-100）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Evaluate from the image:
-- Callus thickness: thin = ideal, thick/cracked = deduct
-- Skin texture: smooth = ideal, rough/flaky = deduct
-- Cracks: none = ideal, deep cracks = severe deduct
-- Color: natural = ideal, yellowing/discoloration = deduct
-- Moisture: moist = ideal, dry/peeling = deduct
+以下を画像から評価：
+- 角質の厚み: 薄い=理想、厚い/ひび割れ=減点
+- 皮膚の質感: なめらか=理想、ざらつき/皮むけ=減点
+- ひび割れ: なし=理想、深いひび=大幅減点
+- 色: 自然な肌色=理想、黄ばみ/変色=減点
+- 潤い: ある=理想、乾燥/皮むけ=減点
+- タコ・魚の目・イボの疑いがある場合は必ず指摘
 
-→ List findings in heel_findings
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[STEP 2] Context score (context_score: 0-100)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Score based on risk factors:
-- Long standing hours + heel-type shoes + no moisturizing = low score
-- Good routine + appropriate footwear = high score
+→ 所見を heel_findings に列挙
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[STEP 3] Output
+[STEP 2] 生活習慣リスクスコア（context_score: 0-100）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-health_score = heel_score × 0.7 + context_score × 0.3 (integer)
+アンケートとチャットから評価：
+- 長時間立ち仕事 + ヒール + 保湿なし = 低スコア
+- 適切なケア + 履き物 = 高スコア
 
-self_care_steps: Provide 4-6 clear step-by-step home care instructions in ${langName}.
-Practitioner_points: Explain 2-3 points where professional treatment would be most effective.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[STEP 3] 総合診断
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+health_score = heel_score × 0.7 + context_score × 0.3（整数）
 
-Return ONLY this JSON (no code blocks, no explanation):
+self_care_steps: 専門知識ベースに基づいた具体的なセルフケア手順を4〜6ステップで。
+practitioner_points: 施術者が優先的に対応すべき点を2〜3つ。イボ疑いがある場合は医師紹介を必ず含める。
+
+以下のJSONのみ返してください（コードブロック・説明不要）:
 {
   "heel_score": 0-100,
   "context_score": 0-100,
   "health_score": 0-100,
   "severity": "mild" | "moderate" | "severe",
-  "heel_findings": ["finding 1", "finding 2"],
-  "detected_issues": ["issue 1", "issue 2"],
-  "self_care_steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."],
-  "practitioner_points": ["point 1", "point 2"],
-  "recommendations": ["rec 1", "rec 2"],
-  "analysis": "Overall analysis paragraph..."
+  "heel_findings": ["所見1", "所見2"],
+  "detected_issues": ["問題1", "問題2"],
+  "self_care_steps": ["Step 1: ...", "Step 2: ..."],
+  "practitioner_points": ["ポイント1", "ポイント2"],
+  "recommendations": ["推奨1", "推奨2"],
+  "analysis": "総合分析の文章..."
 }`;
 
   const model = genAI.getGenerativeModel({ model: MODEL_VERSION });
