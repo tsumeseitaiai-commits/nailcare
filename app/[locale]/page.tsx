@@ -188,7 +188,7 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2">
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <Link
                 href="/benefits"
                 className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
@@ -199,7 +199,7 @@ export default function HomePage() {
                     alt={t("merit.card1.title")}
                     fill
                     className="object-cover transition-transform group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
                 <div className="p-6">
@@ -219,12 +219,32 @@ export default function HomePage() {
                     alt={t("merit.card2.title")}
                     fill
                     className="object-cover transition-transform group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-foreground">{t("merit.card2.title")}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card2.desc")}</p>
+                  <p className="mt-3 text-xs font-semibold text-primary">{t("merit.learnMore")}</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/foot-care"
+                className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src="/images/optimized/sportsfoot.jpg"
+                    alt={t("merit.card3.title")}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold text-foreground">{t("merit.card3.title")}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("merit.card3.desc")}</p>
                   <p className="mt-3 text-xs font-semibold text-primary">{t("merit.learnMore")}</p>
                 </div>
               </Link>

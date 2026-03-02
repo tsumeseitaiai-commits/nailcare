@@ -11,7 +11,8 @@
     "brandName": "Nail Seitai",
     "brandTagline": "AI Diagnosis",
     "aiDiagnosis": "AI Diagnosis",
-    "contact": "Contact"
+    "contact": "Contact",
+    "footCare": "Foot Care"
   },
   "home": {
     "hero": {
@@ -68,6 +69,10 @@
       "card2": {
         "title": "Sports Performance Enhancement",
         "desc": "Proper nail care is directly linked to athletic performance. You can expect improved grip strength, better running stability, and the ability to compete without pain."
+      },
+      "card3": {
+        "title": "Foot Care & Callus Removal",
+        "desc": "Expert care for calluses, corns, and cracked heels based on professional manuals. Check our treatment guide and try AI diagnosis."
       }
     },
     "demo": {
