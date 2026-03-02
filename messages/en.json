@@ -910,6 +910,7 @@
       "ankleSprain": {
         "none": "None",
         "once": "Once",
+        "2plus": "2+ times",
         "2-3": "2-3 times",
         "4plus": "4+ times"
       },
