@@ -853,10 +853,10 @@ export default function AIDiagnosisPage() {
                   <div ref={messagesEndRef} />
                 </div>
               </div>
-              {messages.length >= 2 && (
+              {messages.length >= 1 && (
                 <div className="border-t border-border px-4 py-3 text-center">
                   <button onClick={() => handleFinalDiagnosis(messages)} disabled={isLoading}
-                    className="rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-50">
+                    className="w-full rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 disabled:opacity-50">
                     {qt.chatBar.viewResult}
                   </button>
                 </div>
