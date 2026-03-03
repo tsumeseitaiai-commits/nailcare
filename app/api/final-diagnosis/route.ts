@@ -10,7 +10,7 @@ const MODEL_VERSION = 'gemini-2.5-flash';
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, image, quizAnswers, locale = 'ja', bodyPart = 'nail' } = await req.json();
+    const { messages, image, quizAnswers, locale = 'ja', bodyPart = 'nail', caseId } = await req.json();
 
     const q = quizAnswers as Record<string, unknown> | undefined;
 
@@ -127,9 +127,9 @@ Return ONLY the following JSON (no explanation, no code blocks):
 
     const diagnosis = JSON.parse(jsonMatch[0]);
 
-    // --- Supabase保存（awaitして確実に完了させる）---
+    // --- Supabase保存（caseIdがあればUPDATE、なければINSERT）---
     console.log('[API] Supabase保存を開始します...');
-    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale });
+    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale, caseId });
     console.log('[API] Supabase保存が完了しました');
 
     return NextResponse.json(diagnosis);
@@ -152,6 +152,7 @@ async function saveToSupabase({
   diagnosis,
   quizAnswers,
   locale,
+  caseId,
 }: {
   image: string;
   messages: { role: string; content: string }[];
@@ -166,31 +167,55 @@ async function saveToSupabase({
   };
   quizAnswers?: Record<string, unknown>;
   locale: string;
+  caseId?: string;
 }) {
   const q = quizAnswers;
   console.log('[Supabase] saveToSupabase 開始');
 
   try {
+    // caseIdがあれば画像アップロード不要、診断結果だけUPDATE
+    if (caseId) {
+      console.log(`[Supabase] caseId=${caseId} が存在するためUPDATEします`);
+      const updatePayload = {
+        nail_score:      diagnosis.nail_score ?? null,
+        quiz_score:      diagnosis.quiz_score ?? null,
+        nail_findings:   diagnosis.nail_findings ?? [],
+        ai_diagnosis:    diagnosis.analysis,
+        health_score:    diagnosis.health_score,
+        detected_issues: diagnosis.detected_issues,
+        recommendations: diagnosis.recommendations,
+        model_version:   MODEL_VERSION,
+        messages_count:  messages.length,
+      };
+      const { error: updateError } = await getSupabaseAdmin()
+        .from('nail_cases')
+        .update(updatePayload)
+        .eq('id', caseId);
+      if (updateError) throw updateError;
+
+      // conversation_logs も保存
+      await getSupabaseAdmin().from('conversation_logs').insert({
+        session_id: `session-${Date.now()}`,
+        nail_case_id: caseId,
+        messages,
+        extracted_health_data: {},
+      });
+      console.log(`[Supabase] UPDATE完了: id=${caseId}`);
+      return;
+    }
+
+    // caseIdなし → 従来通りINSERT（フォールバック）
     const buffer = Buffer.from(image, 'base64');
     const timestamp = Date.now();
     const year = new Date().getFullYear();
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const imagePath = `cases/${year}/${month}/${timestamp}-nail.jpg`;
 
-    console.log(`[Supabase] アップロード開始: ${imagePath} (${(buffer.length / 1024).toFixed(1)} KB)`);
-    console.time('[Supabase] upload time');
-
-    const { data: uploadData, error: uploadError } = await getSupabaseAdmin().storage
+    const { error: uploadError } = await getSupabaseAdmin().storage
       .from('nail-images')
       .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
 
-    console.timeEnd('[Supabase] upload time');
-    console.log('[Supabase] uploadData:', uploadData);
-    console.log('[Supabase] uploadError:', uploadError);
-
-    if (uploadError) {
-      throw uploadError;
-    }
+    if (uploadError) throw uploadError;
 
     const { data: urlData } = getSupabaseAdmin().storage
       .from('nail-images')

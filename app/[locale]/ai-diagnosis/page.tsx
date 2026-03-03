@@ -261,6 +261,7 @@ export default function AIDiagnosisPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isFinalDiagnosisCalled = useRef(false);
   const isInitialFetchCalled = useRef(false);
+  const [caseId, setCaseId] = useState<string | null>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
@@ -327,17 +328,34 @@ export default function AIDiagnosisPage() {
     setShowPrelim(false); setStep('freeChat'); setMessages([]);
     isFinalDiagnosisCalled.current = false;
     isInitialFetchCalled.current = false;
-    fetchInitialFreeMessage();
+    // 現時点のstateを引数として直接渡す（クロージャ問題を回避）
+    const currentAnswers = bodyPart === 'heel' ? heelAnswers : quizAnswers;
+    // 定型質問完了時点で画像＋回答を保存
+    saveQuizData(currentAnswers);
+    fetchInitialFreeMessage(currentAnswers);
   };
 
-  const fetchInitialFreeMessage = async () => {
+  const saveQuizData = async (answers: typeof quizAnswers | typeof heelAnswers) => {
+    try {
+      const res = await fetch('/api/save-quiz', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image, quizAnswers: bodyPart === 'nail' ? answers : undefined, heelAnswers: bodyPart === 'heel' ? answers : undefined, bodyPart, locale }),
+      });
+      const data = await res.json();
+      if (data.id) setCaseId(data.id);
+    } catch (e) {
+      console.error('[save-quiz]', e); // 保存失敗しても診断フローは止めない
+    }
+  };
+
+  const fetchInitialFreeMessage = async (answers: typeof quizAnswers | typeof heelAnswers) => {
     if (isInitialFetchCalled.current) return;
     isInitialFetchCalled.current = true;
     setIsLoading(true);
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, isInitial: true, locale, bodyPart }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers: answers, isInitial: true, locale, bodyPart }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -377,7 +395,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/final-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgs, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart }),
+        body: JSON.stringify({ messages: msgs, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart, caseId }),
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -395,7 +413,7 @@ export default function AIDiagnosisPage() {
     setPrelimScore(null); setShowPrelim(false);
     setImage(null); setImagePreview(null); setMessages([]);
     setDiagnosisResult(null); setUserInput(''); setUserConsent(false);
-    setPractitionerMode(false);
+    setPractitionerMode(false); setCaseId(null);
   };
 
   const uiStepLabels = qt.uiSteps;
