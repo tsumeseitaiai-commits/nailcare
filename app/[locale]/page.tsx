@@ -235,7 +235,7 @@ export default function HomePage() {
               >
                 <div className="relative h-56 overflow-hidden">
                   <Image
-                    src="/images/optimized/sportsfoot.jpg"
+                    src="/images/optimized/foot.jpg"
                     alt={t("merit.card3.title")}
                     fill
                     className="object-cover transition-transform group-hover:scale-105"
