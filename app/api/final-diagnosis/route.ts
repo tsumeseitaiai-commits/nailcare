@@ -244,7 +244,7 @@ async function saveToSupabase({
       practice_frequency:  q?.practiceFrequency ?? null,
       nail_care_style:     q?.nailCareStyle ?? null,
       nail_care_frequency: q?.nailCareFrequency ?? null,
-      uses_insole:         q?.usesInsole ?? false,
+      uses_insole:         q?.usesInsole === true ? true : q?.usesInsole === false ? false : null,
       // 爪の自覚症状
       nail_color_change:   q?.nailColorChange ?? false,
       nail_brittle:        q?.nailBrittle ?? false,
