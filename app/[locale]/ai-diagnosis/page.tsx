@@ -224,6 +224,188 @@ function ChoiceButtons({ options, value, onChange, cols = 1 }: {
 }
 
 // ============================================================
+// DiagnosisLoadingScreen
+// ============================================================
+function DiagnosisLoadingScreen() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(p => Math.min(p + 0.008, 0.97));
+    }, 80);
+    return () => clearInterval(interval);
+  }, []);
+
+  const scanLogs = [
+    '画像データを受信中...',
+    '爪の形状を解析中...',
+    '色素パターンを検出中...',
+    '健康データと照合中...',
+    'リスクファクターを評価中...',
+    'データベースと照合中...',
+    '診断モデルを実行中...',
+    '結果を生成中...',
+  ];
+
+  const pct = Math.round(progress * 100);
+  const activeLogCount = Math.min(Math.floor(progress / 0.125) + 1, scanLogs.length);
+  const visibleLogs = scanLogs.slice(0, activeLogCount);
+
+  // Circular progress ring
+  const radius = 44;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = `${progress * circumference} ${circumference}`;
+
+  // Radar chart (6 axes)
+  const radarSize = 120;
+  const center = radarSize / 2;
+  const axes = 6;
+  const maxR = center - 10;
+  const radarValues = [0.85, 0.72, 0.90, 0.65, 0.78, 0.88];
+
+  const radarPoints = Array.from({ length: axes }, (_, i) => {
+    const angle = (i * 2 * Math.PI) / axes - Math.PI / 2;
+    const r = maxR * radarValues[i] * progress;
+    return { x: center + r * Math.cos(angle), y: center + r * Math.sin(angle) };
+  });
+  const radarPath = radarPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
+  const radarGrids = [0.33, 0.67, 1.0].map(scale => {
+    const pts = Array.from({ length: axes }, (_, i) => {
+      const angle = (i * 2 * Math.PI) / axes - Math.PI / 2;
+      return { x: center + maxR * scale * Math.cos(angle), y: center + maxR * scale * Math.sin(angle) };
+    });
+    return pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+  });
+
+  const axisLines = Array.from({ length: axes }, (_, i) => {
+    const angle = (i * 2 * Math.PI) / axes - Math.PI / 2;
+    return { x: center + maxR * Math.cos(angle), y: center + maxR * Math.sin(angle) };
+  });
+
+  const cornerStyles = [
+    { top: 0, left: 0, borderTop: '2px solid #00e5ff', borderLeft: '2px solid #00e5ff' },
+    { top: 0, right: 0, borderTop: '2px solid #00e5ff', borderRight: '2px solid #00e5ff' },
+    { bottom: 0, left: 0, borderBottom: '2px solid #00e5ff', borderLeft: '2px solid #00e5ff' },
+    { bottom: 0, right: 0, borderBottom: '2px solid #00e5ff', borderRight: '2px solid #00e5ff' },
+  ] as const;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#020b14', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Courier New', monospace" }}>
+      <style>{`
+        @keyframes glitch-main {
+          0%, 85%, 100% { transform: translate(0, 0); }
+          88% { transform: translate(-3px, 1px); }
+          91% { transform: translate(3px, -1px); }
+          94% { transform: translate(-2px, 2px); }
+          97% { transform: translate(2px, -2px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes pulse-cyan {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.6; }
+        }
+        @keyframes scan-line {
+          0% { top: 0; }
+          100% { top: 100%; }
+        }
+      `}</style>
+
+      {/* Hex grid overlay */}
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04 }}>
+        <defs>
+          <pattern id="diag-hex" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+            <polygon points="30,2 58,17 58,35 30,50 2,35 2,17" fill="none" stroke="#00e5ff" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#diag-hex)" />
+      </svg>
+
+      {/* Scan line */}
+      <div style={{ position: 'absolute', left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, #00e5ff, transparent)', opacity: 0.3, animation: 'scan-line 3s linear infinite' }} />
+
+      {/* Main card */}
+      <div style={{ position: 'relative', width: '100%', maxWidth: '480px', padding: '0 16px' }}>
+        {/* Corner accents */}
+        {cornerStyles.map((s, i) => (
+          <div key={i} style={{ position: 'absolute', width: '20px', height: '20px', ...s }} />
+        ))}
+
+        <div style={{ padding: '32px', background: 'rgba(0,10,20,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,229,255,0.15)' }}>
+          {/* Title with glitch */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <h2 style={{ color: '#00e5ff', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', animation: 'glitch-main 3s ease-in-out infinite', display: 'inline-block', marginBottom: '4px', margin: '0 0 4px' }}>
+              AI NAIL DIAGNOSIS
+            </h2>
+            <p style={{ color: 'rgba(0,229,255,0.5)', fontSize: '10px', letterSpacing: '2px', margin: 0 }}>SYSTEM ANALYSIS IN PROGRESS</p>
+          </div>
+
+          {/* Progress ring + Radar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', marginBottom: '28px' }}>
+            {/* Circular progress */}
+            <div style={{ position: 'relative', width: '110px', height: '110px', flexShrink: 0 }}>
+              <svg width="110" height="110" style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx="55" cy="55" r={radius} fill="none" stroke="rgba(0,229,255,0.1)" strokeWidth="6" />
+                <circle cx="55" cy="55" r={radius} fill="none" stroke="#00e5ff" strokeWidth="6"
+                  strokeDasharray={strokeDasharray} strokeLinecap="round"
+                  style={{ filter: 'drop-shadow(0 0 6px #00e5ff)', transition: 'stroke-dasharray 0.1s linear' }} />
+              </svg>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: '#00e5ff', fontSize: '26px', fontWeight: 700, lineHeight: 1, animation: 'pulse-cyan 2s ease-in-out infinite' }}>{pct}</span>
+                <span style={{ color: 'rgba(0,229,255,0.6)', fontSize: '10px', letterSpacing: '1px' }}>%</span>
+              </div>
+            </div>
+
+            {/* Radar chart */}
+            <svg width={radarSize} height={radarSize}>
+              {radarGrids.map((d, i) => (
+                <path key={i} d={d} fill="none" stroke="rgba(0,229,255,0.15)" strokeWidth="0.5" />
+              ))}
+              {axisLines.map((pt, i) => (
+                <line key={i} x1={center} y1={center} x2={pt.x} y2={pt.y} stroke="rgba(0,229,255,0.2)" strokeWidth="0.5" />
+              ))}
+              <path d={radarPath} fill="rgba(0,229,255,0.15)" stroke="#00e5ff" strokeWidth="1.5" style={{ filter: 'drop-shadow(0 0 4px #00e5ff)' }} />
+            </svg>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ height: '3px', background: 'rgba(0,229,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%', width: `${pct}%`, borderRadius: '2px',
+                background: 'linear-gradient(90deg, #00e5ff 0%, rgba(0,229,255,0.6) 50%, #00e5ff 100%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s ease-in-out infinite',
+                transition: 'width 0.1s linear',
+                boxShadow: '0 0 8px #00e5ff',
+              }} />
+            </div>
+          </div>
+
+          {/* Scan logs */}
+          <div style={{ background: 'rgba(0,229,255,0.03)', border: '1px solid rgba(0,229,255,0.1)', padding: '12px', height: '120px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '4px' }}>
+            {visibleLogs.map((log, i) => {
+              const isLatest = i === visibleLogs.length - 1;
+              const age = visibleLogs.length - 1 - i;
+              const opacity = isLatest ? 1 : Math.max(0.15, 1 - age * 0.2);
+              return (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: isLatest ? '#00e5ff' : 'rgba(0,229,255,0.4)', fontSize: '10px', flexShrink: 0 }}>{isLatest ? '▶' : '✓'}</span>
+                  <span style={{ color: isLatest ? '#00e5ff' : `rgba(224,247,250,${opacity})`, fontSize: '11px', letterSpacing: '0.5px', animation: isLatest ? 'pulse-cyan 1.5s ease-in-out infinite' : 'none' }}>{log}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // メインコンポーネント
 // ============================================================
 export default function AIDiagnosisPage() {
@@ -352,6 +534,7 @@ export default function AIDiagnosisPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFinalLoading, setIsFinalLoading] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [userConsent, setUserConsent] = useState(false);
@@ -530,6 +713,7 @@ export default function AIDiagnosisPage() {
   const handleFinalDiagnosis = async (chatMessages?: Message[]) => {
     const msgs = chatMessages || messages;
     setIsLoading(true);
+    setIsFinalLoading(true);
     try {
       const res = await fetch('/api/final-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -540,7 +724,7 @@ export default function AIDiagnosisPage() {
       setDiagnosisResult(data); setStep('result');
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: t('chat.error'), timestamp: new Date().toISOString() }]);
-    } finally { setIsLoading(false); }
+    } finally { setIsLoading(false); setIsFinalLoading(false); }
   };
 
   const handleReset = () => {
@@ -565,6 +749,7 @@ export default function AIDiagnosisPage() {
   // ============================================================
   return (
     <div className="flex min-h-screen flex-col bg-muted">
+      {isFinalLoading && !diagnosisResult && <DiagnosisLoadingScreen />}
       <Header />
       <main className="flex-1 py-12">
         <div className="mx-auto max-w-3xl px-4">
