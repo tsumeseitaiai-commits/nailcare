@@ -41,6 +41,47 @@ interface HeelAnswers {
   heelStanding: string;
 }
 
+interface ResearchImage {
+  type: 'hand_nail' | 'foot_nail' | 'sole';
+  dataUrl: string;
+  b64: string;
+}
+
+interface ResearchAnswers {
+  age: number | '';
+  gender: string;
+  height: number | '';
+  weight: number | '';
+  country: string;
+  sport: string;
+  position: string;
+  dominant_hand: string;
+  dominant_foot: string;
+  sports_history: number | '';
+  weekly_sessions: string;
+  session_duration: string;
+  monthly_matches: number | '';
+  training_intensity: number;
+  weekly_rest_days: number | '';
+  fatigue_level: number;
+  sleep_hours: number | '';
+  sleep_quality: number;
+  stress_level: number;
+  body_pain: string;
+  nail_cut_frequency: string;
+  days_before_match: string;
+  deep_nail_habit: string;
+  toe_grip_sense: number;
+  hallux_valgus: string;
+  toe_pain: number;
+  injury_count_year: number | '';
+  major_injury_site: string;
+  recovery_period: string;
+  injury_recurrence: string;
+  images: ResearchImage[];
+  consent: boolean;
+}
+
 interface QuizAnswers {
   sport: string;
   age: number | '';
@@ -88,6 +129,19 @@ const INITIAL_ANSWERS: QuizAnswers = {
 
 const TOTAL_STEPS = 5;
 const HEEL_TOTAL_STEPS = 4;
+const RESEARCH_TOTAL_STEPS = 8;
+
+const INITIAL_RESEARCH: ResearchAnswers = {
+  age: '', gender: '', height: '', weight: '', country: '', sport: '',
+  position: '', dominant_hand: '', dominant_foot: '', sports_history: '',
+  weekly_sessions: '', session_duration: '', monthly_matches: '', training_intensity: 5,
+  weekly_rest_days: '',
+  fatigue_level: 5, sleep_hours: '', sleep_quality: 5, stress_level: 5, body_pain: '',
+  nail_cut_frequency: '', days_before_match: '', deep_nail_habit: '',
+  toe_grip_sense: 5, hallux_valgus: '', toe_pain: 3,
+  injury_count_year: '', major_injury_site: '', recovery_period: '', injury_recurrence: '',
+  images: [], consent: false,
+};
 
 const INITIAL_HEEL_ANSWERS: HeelAnswers = {
   heelSeverity: '',
@@ -224,7 +278,37 @@ export default function AIDiagnosisPage() {
   };
 
   // Select translations
-  const st = t.raw('select') as { title: string; subtitle: string; nailTitle: string; nailDesc: string; heelTitle: string; heelDesc: string };
+  const st = t.raw('select') as { title: string; subtitle: string; nailTitle: string; nailDesc: string; heelTitle: string; heelDesc: string; researchTitle: string; researchDesc: string };
+  // Research translations
+  const rt = t.raw('research') as {
+    step1Title: string; step1Desc: string; step1Start: string;
+    step2Title: string; step3Title: string; step4Title: string;
+    step5Title: string; step6Title: string; step7Title: string; step8Title: string;
+    progressLabel: string; backBtn: string; nextBtn: string; submitBtn: string; submitting: string;
+    doneTitle: string; doneDesc: string; doneBack: string;
+    country: string; position: string; dominantHand: string; dominantFoot: string;
+    weeklySessions: { label: string; '1-2': string; '3-4': string; '5-6': string; daily: string };
+    sessionDuration: { label: string; under1: string; '1-2': string; '2-3': string; over3: string };
+    monthlyMatches: string;
+    trainingIntensity: { label: string; left: string; right: string };
+    weeklyRestDays: string;
+    fatigueLevel: { label: string; left: string; right: string };
+    sleepHours: string; sleepQuality: { label: string; left: string; right: string };
+    stressLevel: { label: string; left: string; right: string };
+    bodyPain: string;
+    nailCutFreq: { label: string; weekly: string; biweekly: string; monthly: string; rarely: string };
+    daysBeforeMatch: { label: string; yes: string; no: string; sometimes: string };
+    deepNailHabit: { label: string; yes: string; no: string };
+    toeGripSense: { label: string; left: string; right: string };
+    halluxValgus: { label: string; none: string; mild: string; moderate: string; severe: string };
+    toePain: { label: string; left: string; right: string };
+    injuryCountYear: string;
+    injurySite: { label: string; ankle: string; knee: string; toe: string; hip: string; shoulder: string; elbow: string; back: string; none: string };
+    recoveryPeriod: { label: string; under1week: string; '1-4weeks': string; '1-3months': string; over3months: string; none: string };
+    injuryRecurrence: { label: string; yes: string; no: string };
+    imageSection: { title: string; handNail: string; footNail: string; sole: string; uploadBtn: string };
+    consent: string; consentRequired: string;
+  };
 
   // Convert translation maps to option arrays
   const toOpts = (map: Record<string, string>) => Object.entries(map).map(([value, label]) => ({ value, label }));
@@ -237,7 +321,10 @@ export default function AIDiagnosisPage() {
   const ankleSprainLabel = (v: string) => toOpts(qt.ankleSprain).find(o => o.value === v)?.label ?? v;
   const genderLabel = (v: string) => toOpts(qt.gender).find(o => o.value === v)?.label ?? v;
 
-  const [bodyPart, setBodyPart] = useState<'nail' | 'sole' | null>(null);
+  const [bodyPart, setBodyPart] = useState<'nail' | 'sole' | 'research' | null>(null);
+  const [researchAnswers, setResearchAnswers] = useState<ResearchAnswers>(INITIAL_RESEARCH);
+  const [researchStep, setResearchStep] = useState(1);
+  const [researchSubmitting, setResearchSubmitting] = useState(false);
   const [heelAnswers, setHeelAnswers] = useState<HeelAnswers>(INITIAL_HEEL_ANSWERS);
   const [heelStep, setHeelStep] = useState(1);
   const [practitionerMode, setPractitionerMode] = useState(false);
@@ -254,7 +341,7 @@ export default function AIDiagnosisPage() {
     checkAuth();
   }, []);
 
-  const [step, setStep] = useState<'select' | 'upload' | 'quiz' | 'freeChat' | 'result'>('select');
+  const [step, setStep] = useState<'select' | 'upload' | 'quiz' | 'freeChat' | 'result' | 'research' | 'researchDone'>('select');
   const [quizStep, setQuizStep] = useState(1);
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers>(INITIAL_ANSWERS);
   const [prelimScore, setPrelimScore] = useState<number | null>(null);
@@ -422,6 +509,7 @@ export default function AIDiagnosisPage() {
     setStep('select'); setBodyPart(null);
     setQuizStep(1); setQuizAnswers(INITIAL_ANSWERS);
     setHeelStep(1); setHeelAnswers(INITIAL_HEEL_ANSWERS);
+    setResearchStep(1); setResearchAnswers(INITIAL_RESEARCH);
     setPrelimScore(null); setShowPrelim(false);
     setImage(null); setImagePreview(null); setMessages([]);
     setDiagnosisResult(null); setUserInput(''); setUserConsent(false);
@@ -469,7 +557,7 @@ export default function AIDiagnosisPage() {
                 <h2 className="text-2xl font-bold text-foreground">{st.title}</h2>
                 <p className="mt-2 text-sm text-muted-foreground">{st.subtitle}</p>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {/* 爪カード */}
                 <button
                   onClick={() => { setBodyPart('nail'); setStep('upload'); }}
@@ -481,7 +569,7 @@ export default function AIDiagnosisPage() {
                     <p className="mt-1 text-xs text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>{st.nailDesc}</p>
                   </div>
                 </button>
-                {/* かかとカード */}
+                {/* 足裏カード */}
                 <button
                   onClick={() => { setBodyPart('sole'); setStep('upload'); }}
                   className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border p-8 text-center transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
@@ -490,6 +578,17 @@ export default function AIDiagnosisPage() {
                   <div>
                     <p className="text-lg font-bold text-foreground group-hover:text-primary">{st.heelTitle}</p>
                     <p className="mt-1 text-xs text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>{st.heelDesc}</p>
+                  </div>
+                </button>
+                {/* 研究データカード */}
+                <button
+                  onClick={() => { setBodyPart('research'); setStep('research'); }}
+                  className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-border p-8 text-center transition-all hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md"
+                >
+                  <span className="text-5xl">🔬</span>
+                  <div>
+                    <p className="text-lg font-bold text-foreground group-hover:text-emerald-700">{st.researchTitle}</p>
+                    <p className="mt-1 text-xs text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>{st.researchDesc}</p>
                   </div>
                 </button>
               </div>
@@ -1059,7 +1158,7 @@ export default function AIDiagnosisPage() {
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{diagnosisResult.analysis}</p>
                 </div>
                 {/* 登録店舗サジェスト */}
-                <ClinicSuggest bodyPart={bodyPart} />
+                <ClinicSuggest bodyPart={bodyPart as 'nail' | 'sole' | null} />
 
                 {/* 会員登録バナー */}
                 {!userRole && (
@@ -1086,6 +1185,434 @@ export default function AIDiagnosisPage() {
               </div>
             );
           })()}
+
+          {/* ===== 研究フォーム ===== */}
+          {step === 'research' && (() => {
+            const setR = <K extends keyof ResearchAnswers>(key: K, value: ResearchAnswers[K]) =>
+              setResearchAnswers(prev => ({ ...prev, [key]: value }));
+
+            const researchCanProceed = () => {
+              if (researchStep === 2) return researchAnswers.age !== '' && researchAnswers.gender !== '' && researchAnswers.sport !== '';
+              return true;
+            };
+
+            const researchNext = () => {
+              if (researchStep < RESEARCH_TOTAL_STEPS) setResearchStep(researchStep + 1);
+            };
+            const researchBack = () => {
+              if (researchStep > 1) setResearchStep(researchStep - 1);
+              else { setStep('select'); setBodyPart(null); }
+            };
+
+            const handleResearchImageUpload = (type: ResearchImage['type'], file: File) => {
+              if (!file.type.startsWith('image/')) return;
+              const reader = new FileReader();
+              reader.onload = e => {
+                const dataUrl = e.target?.result as string;
+                const b64 = dataUrl.split(',')[1];
+                setR('images', [...researchAnswers.images.filter(i => i.type !== type), { type, dataUrl, b64 }]);
+              };
+              reader.readAsDataURL(file);
+            };
+
+            const handleResearchSubmit = async () => {
+              if (!researchAnswers.consent) return;
+              setResearchSubmitting(true);
+              try {
+                await fetch('/api/save-research', {
+                  method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ...researchAnswers, locale }),
+                });
+                setStep('researchDone');
+              } catch {
+                // 送信失敗してもDone画面へ
+                setStep('researchDone');
+              } finally { setResearchSubmitting(false); }
+            };
+
+            const wkSessionOpts = [
+              { value: '1-2', label: rt.weeklySessions['1-2'] },
+              { value: '3-4', label: rt.weeklySessions['3-4'] },
+              { value: '5-6', label: rt.weeklySessions['5-6'] },
+              { value: 'daily', label: rt.weeklySessions.daily },
+            ];
+            const sessionDurOpts = [
+              { value: 'under1', label: rt.sessionDuration.under1 },
+              { value: '1-2', label: rt.sessionDuration['1-2'] },
+              { value: '2-3', label: rt.sessionDuration['2-3'] },
+              { value: 'over3', label: rt.sessionDuration.over3 },
+            ];
+            const nailCutOpts = [
+              { value: 'weekly', label: rt.nailCutFreq.weekly },
+              { value: 'biweekly', label: rt.nailCutFreq.biweekly },
+              { value: 'monthly', label: rt.nailCutFreq.monthly },
+              { value: 'rarely', label: rt.nailCutFreq.rarely },
+            ];
+            const daysBefOpts = [
+              { value: 'yes', label: rt.daysBeforeMatch.yes },
+              { value: 'no', label: rt.daysBeforeMatch.no },
+              { value: 'sometimes', label: rt.daysBeforeMatch.sometimes },
+            ];
+            const deepNailOpts = [
+              { value: 'yes', label: rt.deepNailHabit.yes },
+              { value: 'no', label: rt.deepNailHabit.no },
+            ];
+            const halluxOpts = [
+              { value: 'none', label: rt.halluxValgus.none },
+              { value: 'mild', label: rt.halluxValgus.mild },
+              { value: 'moderate', label: rt.halluxValgus.moderate },
+              { value: 'severe', label: rt.halluxValgus.severe },
+            ];
+            const injurySiteOpts = [
+              { value: 'ankle', label: rt.injurySite.ankle },
+              { value: 'knee', label: rt.injurySite.knee },
+              { value: 'toe', label: rt.injurySite.toe },
+              { value: 'hip', label: rt.injurySite.hip },
+              { value: 'shoulder', label: rt.injurySite.shoulder },
+              { value: 'elbow', label: rt.injurySite.elbow },
+              { value: 'back', label: rt.injurySite.back },
+              { value: 'none', label: rt.injurySite.none },
+            ];
+            const recoveryOpts = [
+              { value: 'none', label: rt.recoveryPeriod.none },
+              { value: 'under1week', label: rt.recoveryPeriod.under1week },
+              { value: '1-4weeks', label: rt.recoveryPeriod['1-4weeks'] },
+              { value: '1-3months', label: rt.recoveryPeriod['1-3months'] },
+              { value: 'over3months', label: rt.recoveryPeriod.over3months },
+            ];
+            const injuryRecurOpts = [
+              { value: 'yes', label: rt.injuryRecurrence.yes },
+              { value: 'no', label: rt.injuryRecurrence.no },
+            ];
+
+            return (
+              <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
+                {/* Step 1 は進捗バーなし */}
+                {researchStep > 1 && (
+                  <div className="mb-6">
+                    <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{rt.progressLabel} {researchStep} / {RESEARCH_TOTAL_STEPS}</span>
+                      <span>{Math.round((researchStep / RESEARCH_TOTAL_STEPS) * 100)}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                      <div className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                        style={{ width: `${(researchStep / RESEARCH_TOTAL_STEPS) * 100}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 1: 説明 */}
+                {researchStep === 1 && (
+                  <div className="text-center">
+                    <span className="text-6xl">🔬</span>
+                    <h2 className="mt-4 mb-3 text-2xl font-bold text-foreground">{rt.step1Title}</h2>
+                    <p className="mb-8 text-sm text-muted-foreground leading-relaxed">{rt.step1Desc}</p>
+                    <button onClick={researchNext}
+                      className="w-full rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-600">
+                      {rt.step1Start}
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 2: 基本情報 */}
+                {researchStep === 2 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step2Title}</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q2.ageLabel} *</label>
+                        <input type="number" min={5} max={100} value={researchAnswers.age}
+                          onChange={e => setR('age', e.target.value === '' ? '' : Number(e.target.value))}
+                          className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q2.genderLabel} *</label>
+                        <ChoiceButtons options={toOpts(qt.gender)} value={researchAnswers.gender} onChange={v => setR('gender', v)} cols={3} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q3.heightLabel}</label>
+                        <input type="number" min={100} max={250} value={researchAnswers.height}
+                          onChange={e => setR('height', e.target.value === '' ? '' : Number(e.target.value))}
+                          className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q3.weightLabel}</label>
+                        <input type="number" min={30} max={200} value={researchAnswers.weight}
+                          onChange={e => setR('weight', e.target.value === '' ? '' : Number(e.target.value))}
+                          className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.country}</label>
+                      <input type="text" value={researchAnswers.country} onChange={e => setR('country', e.target.value)}
+                        placeholder="Japan"
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q1.title} *</label>
+                      <select value={researchAnswers.sport} onChange={e => setR('sport', e.target.value)}
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none">
+                        <option value="">{qt.q1.placeholder}</option>
+                        {SPORTS_LIST.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: 競技情報 */}
+                {researchStep === 3 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step3Title}</h2>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.position}</label>
+                      <input type="text" value={researchAnswers.position} onChange={e => setR('position', e.target.value)}
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.dominantHand}</label>
+                      <ChoiceButtons options={toOpts(qt.dominantFoot)} value={researchAnswers.dominant_hand} onChange={v => setR('dominant_hand', v)} cols={3} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.dominantFoot}</label>
+                      <ChoiceButtons options={toOpts(qt.dominantFoot)} value={researchAnswers.dominant_foot} onChange={v => setR('dominant_foot', v)} cols={3} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q4.historyLabel}（{qt.q4.historyUnit}）</label>
+                      <input type="number" min={0} max={50} value={researchAnswers.sports_history}
+                        onChange={e => setR('sports_history', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: トレーニング */}
+                {researchStep === 4 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step4Title}</h2>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.weeklySessions.label}</label>
+                      <ChoiceButtons options={wkSessionOpts} value={researchAnswers.weekly_sessions} onChange={v => setR('weekly_sessions', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.sessionDuration.label}</label>
+                      <ChoiceButtons options={sessionDurOpts} value={researchAnswers.session_duration} onChange={v => setR('session_duration', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.monthlyMatches}</label>
+                      <input type="number" min={0} max={30} value={researchAnswers.monthly_matches}
+                        onChange={e => setR('monthly_matches', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.trainingIntensity.label}</label>
+                      <SliderInput value={researchAnswers.training_intensity} onChange={v => setR('training_intensity', v)}
+                        leftLabel={rt.trainingIntensity.left} rightLabel={rt.trainingIntensity.right} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.weeklyRestDays}</label>
+                      <input type="number" min={0} max={7} value={researchAnswers.weekly_rest_days}
+                        onChange={e => setR('weekly_rest_days', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 5: コンディション */}
+                {researchStep === 5 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step5Title}</h2>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.fatigueLevel.label}</label>
+                      <SliderInput value={researchAnswers.fatigue_level} onChange={v => setR('fatigue_level', v)}
+                        leftLabel={rt.fatigueLevel.left} rightLabel={rt.fatigueLevel.right} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.sleepHours}</label>
+                      <input type="number" min={2} max={12} step={0.5} value={researchAnswers.sleep_hours}
+                        onChange={e => setR('sleep_hours', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.sleepQuality.label}</label>
+                      <SliderInput value={researchAnswers.sleep_quality} onChange={v => setR('sleep_quality', v)}
+                        leftLabel={rt.sleepQuality.left} rightLabel={rt.sleepQuality.right} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.stressLevel.label}</label>
+                      <SliderInput value={researchAnswers.stress_level} onChange={v => setR('stress_level', v)}
+                        leftLabel={rt.stressLevel.left} rightLabel={rt.stressLevel.right} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.bodyPain}</label>
+                      <input type="text" value={researchAnswers.body_pain} onChange={e => setR('body_pain', e.target.value)}
+                        placeholder="なし"
+                        className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 6: 足・爪の状態 */}
+                {researchStep === 6 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step6Title}</h2>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.nailCutFreq.label}</label>
+                      <ChoiceButtons options={nailCutOpts} value={researchAnswers.nail_cut_frequency} onChange={v => setR('nail_cut_frequency', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.daysBeforeMatch.label}</label>
+                      <ChoiceButtons options={daysBefOpts} value={researchAnswers.days_before_match} onChange={v => setR('days_before_match', v)} cols={3} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.deepNailHabit.label}</label>
+                      <ChoiceButtons options={deepNailOpts} value={researchAnswers.deep_nail_habit} onChange={v => setR('deep_nail_habit', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.toeGripSense.label}</label>
+                      <SliderInput value={researchAnswers.toe_grip_sense} onChange={v => setR('toe_grip_sense', v)}
+                        leftLabel={rt.toeGripSense.left} rightLabel={rt.toeGripSense.right} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.halluxValgus.label}</label>
+                      <ChoiceButtons options={halluxOpts} value={researchAnswers.hallux_valgus} onChange={v => setR('hallux_valgus', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.toePain.label}</label>
+                      <SliderInput value={researchAnswers.toe_pain} onChange={v => setR('toe_pain', v)}
+                        leftLabel={rt.toePain.left} rightLabel={rt.toePain.right} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 7: ケガ歴 */}
+                {researchStep === 7 && (
+                  <div className="space-y-5">
+                    <h2 className="text-xl font-bold">{rt.step7Title}</h2>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.injuryCountYear}</label>
+                      <input type="number" min={0} max={50} value={researchAnswers.injury_count_year}
+                        onChange={e => setR('injury_count_year', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.injurySite.label}</label>
+                      <ChoiceButtons options={injurySiteOpts} value={researchAnswers.major_injury_site} onChange={v => setR('major_injury_site', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.recoveryPeriod.label}</label>
+                      <ChoiceButtons options={recoveryOpts} value={researchAnswers.recovery_period} onChange={v => setR('recovery_period', v)} cols={2} />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.injuryRecurrence.label}</label>
+                      <ChoiceButtons options={injuryRecurOpts} value={researchAnswers.injury_recurrence} onChange={v => setR('injury_recurrence', v)} cols={2} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 8: 写真提供 + 同意 + 送信 */}
+                {researchStep === 8 && (
+                  <div className="space-y-6">
+                    <h2 className="text-xl font-bold">{rt.step8Title}</h2>
+                    <p className="text-xs text-muted-foreground">{rt.imageSection.title}</p>
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600">{t('upload.guideTitle')}</h3>
+                      <ul className="space-y-1">
+                        {guideItems.map((g, i) => (
+                          <li key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />{g}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {(['hand_nail', 'foot_nail', 'sole'] as const).map(type => {
+                        const existing = researchAnswers.images.find(i => i.type === type);
+                        const label = type === 'hand_nail' ? rt.imageSection.handNail : type === 'foot_nail' ? rt.imageSection.footNail : rt.imageSection.sole;
+                        return (
+                          <div key={type} className="text-center">
+                            <label className="mb-2 block text-xs font-semibold text-muted-foreground">{label}</label>
+                            {existing ? (
+                              <div className="relative">
+                                <img src={existing.dataUrl} alt={type} className="h-24 w-full rounded-xl object-cover border border-border" />
+                                <button onClick={() => setR('images', researchAnswers.images.filter(i => i.type !== type))}
+                                  className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">✕</button>
+                              </div>
+                            ) : (
+                              <label className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border hover:border-emerald-400">
+                                <span className="text-2xl">📷</span>
+                                <span className="mt-1 text-[10px] text-muted-foreground">{rt.imageSection.uploadBtn}</span>
+                                <input type="file" accept="image/*" className="hidden"
+                                  onChange={e => { const f = e.target.files?.[0]; if (f) handleResearchImageUpload(type, f); }} />
+                              </label>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="rounded-xl border border-border bg-muted/50 p-4">
+                      <label className="flex cursor-pointer items-start gap-3">
+                        <input type="checkbox" checked={researchAnswers.consent} onChange={e => setR('consent', e.target.checked)}
+                          className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-500" />
+                        <span className="text-xs leading-relaxed text-muted-foreground">{rt.consent}</span>
+                      </label>
+                    </div>
+
+                    {!researchAnswers.consent && (
+                      <p className="text-center text-xs text-red-500">{rt.consentRequired}</p>
+                    )}
+
+                    <button onClick={handleResearchSubmit} disabled={!researchAnswers.consent || researchSubmitting}
+                      className="w-full rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50">
+                      {researchSubmitting ? rt.submitting : rt.submitBtn}
+                    </button>
+                  </div>
+                )}
+
+                {/* ナビゲーション */}
+                {researchStep > 1 && researchStep < 8 && (
+                  <div className="mt-8 flex gap-3">
+                    <button onClick={researchBack} className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted">
+                      {rt.backBtn}
+                    </button>
+                    <button onClick={researchNext} disabled={!researchCanProceed()}
+                      className="flex-1 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50">
+                      {rt.nextBtn}
+                    </button>
+                  </div>
+                )}
+                {researchStep === 1 && (
+                  <div className="mt-4 text-center">
+                    <button onClick={researchBack} className="text-xs text-muted-foreground hover:underline">
+                      {rt.backBtn}
+                    </button>
+                  </div>
+                )}
+                {researchStep === 8 && (
+                  <div className="mt-4">
+                    <button onClick={researchBack} className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground hover:bg-muted">
+                      {rt.backBtn}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* ===== 研究完了 ===== */}
+          {step === 'researchDone' && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
+              <span className="text-6xl">🎉</span>
+              <h2 className="mt-4 mb-3 text-2xl font-bold text-emerald-800">{rt.doneTitle}</h2>
+              <p className="mb-8 text-sm text-emerald-700 leading-relaxed">{rt.doneDesc}</p>
+              <button onClick={handleReset}
+                className="rounded-xl bg-emerald-500 px-8 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-600">
+                {rt.doneBack}
+              </button>
+            </div>
+          )}
 
         </div>
       </main>

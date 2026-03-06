@@ -1047,7 +1047,142 @@
       "nailTitle": "Diagnose Nails",
       "nailDesc": "AI analyzes nail shape, color, and condition\nAlso evaluates its relation to sports performance",
       "heelTitle": "Diagnose Foot Sole",
-      "heelDesc": "AI analyzes foot sole calluses and cracks\nSuggests self-care steps and treatment points"
+      "heelDesc": "AI analyzes foot sole calluses and cracks\nSuggests self-care steps and treatment points",
+      "researchTitle": "Research Participation",
+      "researchDesc": "Contribute foot & nail research data\nHelp scientifically clarify the sport-nail connection"
+    },
+    "research": {
+      "cardTitle": "Research Participation",
+      "cardDesc": "Contribute foot & nail research data\nHelp scientifically clarify the sport-nail connection",
+      "step1Title": "About Research Participation",
+      "step1Desc": "This research aims to scientifically clarify the relationship between sports and nail/foot health. All collected data will be used anonymously for research purposes only.",
+      "step1Start": "Participate →",
+      "step2Title": "Basic Information",
+      "step3Title": "Athletic Information",
+      "step4Title": "Training Details",
+      "step5Title": "Physical Condition",
+      "step6Title": "Foot & Nail Condition",
+      "step7Title": "Injury History",
+      "step8Title": "Photo Submission (Optional)",
+      "progressLabel": "Step",
+      "backBtn": "← Back",
+      "nextBtn": "Next →",
+      "submitBtn": "Submit",
+      "submitting": "Submitting...",
+      "doneTitle": "Thank you for your contribution!",
+      "doneDesc": "Your data will be used anonymously for research purposes only. Thank you for supporting nail health research.",
+      "doneBack": "Back to Top",
+      "country": "Country / Region",
+      "position": "Position / Event",
+      "dominantHand": "Dominant Hand",
+      "dominantFoot": "Dominant Foot",
+      "weeklySessions": {
+        "label": "Weekly Training Sessions",
+        "1-2": "1-2 times/week",
+        "3-4": "3-4 times/week",
+        "5-6": "5-6 times/week",
+        "daily": "Every day"
+      },
+      "sessionDuration": {
+        "label": "Session Duration",
+        "under1": "Under 1 hour",
+        "1-2": "1-2 hours",
+        "2-3": "2-3 hours",
+        "over3": "Over 3 hours"
+      },
+      "monthlyMatches": "Monthly Matches / Competitions",
+      "trainingIntensity": {
+        "label": "Training Intensity",
+        "left": "Light",
+        "right": "Intense"
+      },
+      "weeklyRestDays": "Weekly Rest Days",
+      "fatigueLevel": {
+        "label": "Current Fatigue Level",
+        "left": "None",
+        "right": "Very tired"
+      },
+      "sleepHours": "Average Sleep Hours",
+      "sleepQuality": {
+        "label": "Sleep Quality",
+        "left": "Poor",
+        "right": "Excellent"
+      },
+      "stressLevel": {
+        "label": "Stress Level",
+        "left": "None",
+        "right": "Very high"
+      },
+      "bodyPain": "Current Body Pain (area, or 'none')",
+      "nailCutFreq": {
+        "label": "Nail Cutting Frequency",
+        "weekly": "Weekly or more",
+        "biweekly": "Every 2 weeks",
+        "monthly": "Monthly",
+        "rarely": "Rarely"
+      },
+      "daysBeforeMatch": {
+        "label": "Cut nails before a match?",
+        "yes": "Yes",
+        "no": "No",
+        "sometimes": "Sometimes"
+      },
+      "deepNailHabit": {
+        "label": "Deep-cut nail habit",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "toeGripSense": {
+        "label": "Toe Grip Sense",
+        "left": "Can't feel it",
+        "right": "Strong grip"
+      },
+      "halluxValgus": {
+        "label": "Hallux Valgus (Bunion)",
+        "none": "None",
+        "mild": "Mild",
+        "moderate": "Moderate",
+        "severe": "Severe"
+      },
+      "toePain": {
+        "label": "Toe Pain",
+        "left": "None",
+        "right": "Very severe"
+      },
+      "injuryCountYear": "Injuries in the past year",
+      "injurySite": {
+        "label": "Primary Injury Site",
+        "ankle": "Ankle",
+        "knee": "Knee",
+        "toe": "Toe / Nail",
+        "hip": "Hip / Lower back",
+        "shoulder": "Shoulder",
+        "elbow": "Elbow",
+        "back": "Back",
+        "none": "None"
+      },
+      "recoveryPeriod": {
+        "label": "Longest Recovery Period",
+        "under1week": "Under 1 week",
+        "1-4weeks": "1-4 weeks",
+        "1-3months": "1-3 months",
+        "over3months": "Over 3 months",
+        "none": "No injury"
+      },
+      "injuryRecurrence": {
+        "label": "Recurring Injury (same site)",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "imageSection": {
+        "title": "Photo Submission (Optional – all skippable)",
+        "handNail": "Hand Nail",
+        "footNail": "Foot Nail",
+        "sole": "Foot Sole",
+        "uploadBtn": "Select Photo"
+      },
+      "consent": "I consent to my data being used anonymously for research purposes only",
+      "consentRequired": "Consent required to submit"
     }
   },
   "benefits": {

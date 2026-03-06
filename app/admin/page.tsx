@@ -672,6 +672,300 @@ function SoleCasesTab({ password }: { password: string }) {
 }
 
 // ────────────────────────────────────────────────
+// Research Cases Tab
+// ────────────────────────────────────────────────
+interface ResearchImage {
+  type: string;
+  path: string;
+  url: string;
+}
+
+interface ResearchCase {
+  id: string;
+  created_at: string;
+  locale: string;
+  age: number | null;
+  gender: string | null;
+  height: number | null;
+  weight: number | null;
+  country: string | null;
+  sport: string | null;
+  position: string | null;
+  dominant_hand: string | null;
+  dominant_foot: string | null;
+  sports_history: number | null;
+  weekly_sessions: string | null;
+  session_duration: string | null;
+  monthly_matches: number | null;
+  training_intensity: number | null;
+  weekly_rest_days: number | null;
+  fatigue_level: number | null;
+  sleep_hours: number | null;
+  sleep_quality: number | null;
+  stress_level: number | null;
+  body_pain: string | null;
+  nail_cut_frequency: string | null;
+  days_before_match: string | null;
+  deep_nail_habit: string | null;
+  toe_grip_sense: number | null;
+  hallux_valgus: string | null;
+  toe_pain: number | null;
+  injury_count_year: number | null;
+  major_injury_site: string | null;
+  recovery_period: string | null;
+  injury_recurrence: string | null;
+  images: ResearchImage[];
+  image_count: number;
+}
+
+function ResearchTab({ password }: { password: string }) {
+  const [cases, setCases] = useState<ResearchCase[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selected, setSelected] = useState<ResearchCase | null>(null);
+  const LIMIT = 20;
+
+  const fetchCases = useCallback(async (p: number) => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch(`/admin/api/research-cases?page=${p}&limit=${LIMIT}`, { headers: { 'x-admin-password': password } });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setCases(json.data || []); setTotal(json.total || 0);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'データ取得失敗');
+    } finally { setLoading(false); }
+  }, [password]);
+
+  useEffect(() => { fetchCases(page); }, [page, fetchCases]);
+
+  const totalPages = Math.ceil(total / LIMIT);
+
+  const handleExportCsv = () => {
+    fetch('/admin/api/research-cases?format=csv', { headers: { 'x-admin-password': password } })
+      .then(r => r.blob())
+      .then(b => {
+        const u = URL.createObjectURL(b);
+        const a = document.createElement('a');
+        a.href = u; a.download = `research_cases_${Date.now()}.csv`; a.click();
+        URL.revokeObjectURL(u);
+      });
+  };
+
+  // Summary stats
+  const avgFatigue = cases.length ? (cases.reduce((s, c) => s + (c.fatigue_level ?? 0), 0) / cases.filter(c => c.fatigue_level != null).length || 0).toFixed(1) : null;
+  const avgToeGrip = cases.length ? (cases.reduce((s, c) => s + (c.toe_grip_sense ?? 0), 0) / cases.filter(c => c.toe_grip_sense != null).length || 0).toFixed(1) : null;
+  const topSports = Object.entries(cases.reduce((acc, c) => { if (c.sport) acc[c.sport] = (acc[c.sport] || 0) + 1; return acc; }, {} as Record<string, number>))
+    .sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 py-6">
+      {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">⚠️ {error}</div>}
+
+      {/* Summary Cards */}
+      {cases.length > 0 && (
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-center">
+            <p className="text-2xl font-bold text-[#7c6b5e]">{total}</p>
+            <p className="text-xs text-slate-500 mt-1">総件数</p>
+          </div>
+          {avgFatigue && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-center">
+              <p className="text-2xl font-bold text-amber-600">{avgFatigue}</p>
+              <p className="text-xs text-slate-500 mt-1">平均疲労度</p>
+            </div>
+          )}
+          {avgToeGrip && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-center">
+              <p className="text-2xl font-bold text-emerald-600">{avgToeGrip}</p>
+              <p className="text-xs text-slate-500 mt-1">平均足指感覚</p>
+            </div>
+          )}
+          {topSports.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold text-slate-500 mb-1">競技 Top3</p>
+              {topSports.map(([sport, cnt]) => (
+                <p key={sport} className="text-xs text-slate-700">{sport} <span className="font-bold text-[#7c6b5e]">{cnt}</span></p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-sm font-bold text-slate-700">研究データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{total} 件</span></span>
+        <button onClick={handleExportCsv}
+          className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+          📊 CSV
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-32 text-slate-400 gap-3">
+          <svg className="h-6 w-6 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          読み込み中...
+        </div>
+      ) : cases.length === 0 ? (
+        <div className="py-32 text-center text-slate-400"><p className="text-4xl mb-2">🔬</p><p className="text-sm">研究データがありません</p></div>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full text-sm min-w-[900px]">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50 text-left">
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">日時</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">競技</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">年齢</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">性別</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">国</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">疲労</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">足指感覚</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">ケガ部位</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">写真</th>
+                  <th className="px-3 py-3 w-16"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {cases.map(c => (
+                  <tr key={c.id} className="transition hover:bg-slate-50/80 cursor-pointer" onClick={() => setSelected(c)}>
+                    <td className="px-3 py-2.5 text-xs text-slate-500 whitespace-nowrap">{fmtDate(c.created_at)}</td>
+                    <td className="px-3 py-2.5 text-xs font-semibold text-slate-700">{c.sport || '—'}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate-600">{c.age ? `${c.age}歳` : '—'}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate-600">{c.gender || '—'}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate-600">{c.country || '—'}</td>
+                    <td className="px-3 py-2.5 text-xs">
+                      {c.fatigue_level != null ? (
+                        <span className={`font-semibold ${c.fatigue_level >= 7 ? 'text-red-600' : c.fatigue_level >= 4 ? 'text-amber-600' : 'text-emerald-600'}`}>{c.fatigue_level}/10</span>
+                      ) : '—'}
+                    </td>
+                    <td className="px-3 py-2.5 text-xs text-slate-600">{c.toe_grip_sense != null ? `${c.toe_grip_sense}/10` : '—'}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate-600">{c.major_injury_site || '—'}</td>
+                    <td className="px-3 py-2.5 text-xs text-slate-500">{c.image_count || 0}枚</td>
+                    <td className="px-3 py-2.5">
+                      <button onClick={e => { e.stopPropagation(); setSelected(c); }}
+                        className="rounded-lg bg-[#7c6b5e]/10 px-2.5 py-1.5 text-xs font-semibold text-[#7c6b5e] hover:bg-[#7c6b5e] hover:text-white transition">
+                        詳細
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40">← 前へ</button>
+              <span className="text-xs text-slate-500">{page} / {totalPages}</span>
+              <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40">次へ →</button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Detail Modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-10 backdrop-blur-sm"
+          onClick={e => e.target === e.currentTarget && setSelected(null)}>
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <div>
+                <p className="text-xs text-slate-400">{fmtDate(selected.created_at)}</p>
+                <p className="font-mono text-xs text-slate-500">{selected.id}</p>
+              </div>
+              <button onClick={() => setSelected(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="space-y-5 p-6 overflow-y-auto max-h-[80vh]">
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">👤 基本情報</h3>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-slate-50 p-4 text-xs">
+                  {([
+                    ['競技', selected.sport], ['年齢', selected.age ? `${selected.age}歳` : null],
+                    ['性別', selected.gender], ['国', selected.country],
+                    ['身長', selected.height ? `${selected.height}cm` : null], ['体重', selected.weight ? `${selected.weight}kg` : null],
+                    ['ポジション', selected.position], ['利き手', selected.dominant_hand],
+                    ['利き足', selected.dominant_foot], ['競技歴', selected.sports_history ? `${selected.sports_history}年` : null],
+                  ] as [string, string | null][]).filter(([, v]) => v).map(([label, value], i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="w-20 shrink-0 font-semibold text-slate-500">{label}</span>
+                      <span className="text-slate-700">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">🏋️ トレーニング / コンディション</h3>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-slate-50 p-4 text-xs">
+                  {([
+                    ['週練習回数', selected.weekly_sessions], ['1回の時間', selected.session_duration],
+                    ['月試合数', selected.monthly_matches != null ? String(selected.monthly_matches) : null],
+                    ['トレ強度', selected.training_intensity != null ? `${selected.training_intensity}/10` : null],
+                    ['週休養日', selected.weekly_rest_days != null ? `${selected.weekly_rest_days}日` : null],
+                    ['疲労感', selected.fatigue_level != null ? `${selected.fatigue_level}/10` : null],
+                    ['睡眠時間', selected.sleep_hours != null ? `${selected.sleep_hours}h` : null],
+                    ['睡眠の質', selected.sleep_quality != null ? `${selected.sleep_quality}/10` : null],
+                    ['ストレス', selected.stress_level != null ? `${selected.stress_level}/10` : null],
+                    ['身体の痛み', selected.body_pain],
+                  ] as [string, string | null][]).filter(([, v]) => v).map(([label, value], i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="w-24 shrink-0 font-semibold text-slate-500">{label}</span>
+                      <span className="text-slate-700">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">🦶 足・爪の状態 / ケガ歴</h3>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-slate-50 p-4 text-xs">
+                  {([
+                    ['爪切り頻度', selected.nail_cut_frequency],
+                    ['試合前日に切る', selected.days_before_match],
+                    ['深爪の習慣', selected.deep_nail_habit],
+                    ['足指感覚', selected.toe_grip_sense != null ? `${selected.toe_grip_sense}/10` : null],
+                    ['外反母趾', selected.hallux_valgus],
+                    ['足指の痛み', selected.toe_pain != null ? `${selected.toe_pain}/10` : null],
+                    ['年間ケガ数', selected.injury_count_year != null ? `${selected.injury_count_year}回` : null],
+                    ['主なケガ部位', selected.major_injury_site],
+                    ['回復期間', selected.recovery_period],
+                    ['繰り返しケガ', selected.injury_recurrence],
+                  ] as [string, string | null][]).filter(([, v]) => v).map(([label, value], i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="w-24 shrink-0 font-semibold text-slate-500">{label}</span>
+                      <span className="text-slate-700">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {selected.images && selected.images.length > 0 && (
+                <div>
+                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">📷 提供画像 ({selected.images.length}枚)</h3>
+                  <div className="flex gap-3 flex-wrap">
+                    {selected.images.map((img, i) => (
+                      <div key={i} className="text-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img.url} alt={img.type} className="h-24 w-24 rounded-xl border object-cover shadow-sm" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        <p className="mt-1 text-[10px] text-slate-400">{img.type}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
 // Textbook Tab
 // ────────────────────────────────────────────────
 interface Textbook {
@@ -838,7 +1132,7 @@ function TextbookTab({ password }: { password: string }) {
 // Main
 // ────────────────────────────────────────────────
 export default function AdminPage() {
-  const [tab, setTab]                   = useState<'cases' | 'sole' | 'textbooks'>('cases');
+  const [tab, setTab]                   = useState<'cases' | 'sole' | 'research' | 'textbooks'>('cases');
   const [password, setPassword]         = useState<string | null>(null);
   const [authed, setAuthed]             = useState(false);
   const [cases, setCases]               = useState<NailCase[]>([]);
@@ -1049,10 +1343,10 @@ export default function AdminPage() {
       {/* Tabs */}
       <div className="border-b border-slate-200 bg-white px-4">
         <div className="mx-auto flex max-w-[1400px] gap-1">
-          {(['cases', 'sole', 'textbooks'] as const).map(t => (
+          {(['cases', 'sole', 'research', 'textbooks'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition ${tab === t ? 'border-[#7c6b5e] text-[#7c6b5e]' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
-              {t === 'cases' ? '爪データ' : t === 'sole' ? '足裏データ' : 'テキスト管理'}
+              {t === 'cases' ? '爪データ' : t === 'sole' ? '足裏データ' : t === 'research' ? '研究データ' : 'テキスト管理'}
             </button>
           ))}
         </div>
@@ -1072,6 +1366,7 @@ export default function AdminPage() {
       )}
 
       {tab === 'sole' && password && <SoleCasesTab password={password} />}
+      {tab === 'research' && password && <ResearchTab password={password} />}
       {tab === 'textbooks' && password && <TextbookTab password={password} />}
 
       {/* Body: Filter + Table */}

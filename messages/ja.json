@@ -1047,7 +1047,142 @@
       "nailTitle": "爪を診断する",
       "nailDesc": "爪の形・色・状態をAIが分析\nスポーツパフォーマンスとの関係も診断",
       "heelTitle": "足裏を診断する",
-      "heelDesc": "足裏の角質・ひび割れをAIが分析\nセルフケア手順と施術ポイントをご提案"
+      "heelDesc": "足裏の角質・ひび割れをAIが分析\nセルフケア手順と施術ポイントをご提案",
+      "researchTitle": "研究データ協力",
+      "researchDesc": "足・爪に関する研究データを提供\nスポーツと爪の関係を科学的に解明"
+    },
+    "research": {
+      "cardTitle": "研究データ協力",
+      "cardDesc": "足・爪に関する研究データを提供\nスポーツと爪の関係を科学的に解明",
+      "step1Title": "研究へのご協力について",
+      "step1Desc": "この研究は、スポーツと爪・足裏の健康の関係を科学的に解明するためのものです。収集したデータは個人を特定しない形で研究目的にのみ使用されます。",
+      "step1Start": "協力する →",
+      "step2Title": "基本情報",
+      "step3Title": "競技情報",
+      "step4Title": "トレーニング内容",
+      "step5Title": "コンディション",
+      "step6Title": "足・爪の状態",
+      "step7Title": "ケガ歴",
+      "step8Title": "写真提供（任意）",
+      "progressLabel": "ステップ",
+      "backBtn": "← 戻る",
+      "nextBtn": "次へ →",
+      "submitBtn": "送信する",
+      "submitting": "送信中...",
+      "doneTitle": "ご協力ありがとうございます！",
+      "doneDesc": "データは研究目的のみに匿名で使用されます。今後の爪整体研究にお役立てします。",
+      "doneBack": "トップへ戻る",
+      "country": "国・地域",
+      "position": "ポジション / 種目",
+      "dominantHand": "利き手",
+      "dominantFoot": "利き足",
+      "weeklySessions": {
+        "label": "週の練習回数",
+        "1-2": "週1〜2回",
+        "3-4": "週3〜4回",
+        "5-6": "週5〜6回",
+        "daily": "毎日"
+      },
+      "sessionDuration": {
+        "label": "1回の練習時間",
+        "under1": "1時間未満",
+        "1-2": "1〜2時間",
+        "2-3": "2〜3時間",
+        "over3": "3時間以上"
+      },
+      "monthlyMatches": "月の試合・大会数",
+      "trainingIntensity": {
+        "label": "トレーニング強度",
+        "left": "軽め",
+        "right": "激しい"
+      },
+      "weeklyRestDays": "週の休養日数",
+      "fatigueLevel": {
+        "label": "疲労感（現在）",
+        "left": "全くない",
+        "right": "かなり疲れている"
+      },
+      "sleepHours": "平均睡眠時間（時間）",
+      "sleepQuality": {
+        "label": "睡眠の質",
+        "left": "眠れていない",
+        "right": "よく眠れる"
+      },
+      "stressLevel": {
+        "label": "ストレスレベル",
+        "left": "全くない",
+        "right": "非常に高い"
+      },
+      "bodyPain": "現在の身体の痛み（部位、なければ「なし」）",
+      "nailCutFreq": {
+        "label": "爪を切る頻度",
+        "weekly": "週1回以上",
+        "biweekly": "2週に1回",
+        "monthly": "月1回",
+        "rarely": "あまり切らない"
+      },
+      "daysBeforeMatch": {
+        "label": "試合前日に爪を切るか",
+        "yes": "はい",
+        "no": "いいえ",
+        "sometimes": "たまに"
+      },
+      "deepNailHabit": {
+        "label": "深爪の習慣",
+        "yes": "ある",
+        "no": "ない"
+      },
+      "toeGripSense": {
+        "label": "足指で地面を掴む感覚",
+        "left": "全く感じない",
+        "right": "しっかり感じる"
+      },
+      "halluxValgus": {
+        "label": "外反母趾",
+        "none": "なし",
+        "mild": "軽度",
+        "moderate": "中程度",
+        "severe": "重度"
+      },
+      "toePain": {
+        "label": "足指の痛み",
+        "left": "全くない",
+        "right": "非常に強い"
+      },
+      "injuryCountYear": "過去1年のケガの回数",
+      "injurySite": {
+        "label": "主なケガ部位",
+        "ankle": "足首",
+        "knee": "膝",
+        "toe": "足指・爪",
+        "hip": "股関節・腰",
+        "shoulder": "肩",
+        "elbow": "肘",
+        "back": "背中",
+        "none": "なし"
+      },
+      "recoveryPeriod": {
+        "label": "最長の回復期間",
+        "under1week": "1週間未満",
+        "1-4weeks": "1〜4週間",
+        "1-3months": "1〜3ヶ月",
+        "over3months": "3ヶ月以上",
+        "none": "ケガなし"
+      },
+      "injuryRecurrence": {
+        "label": "同じ部位の繰り返しケガ",
+        "yes": "ある",
+        "no": "ない"
+      },
+      "imageSection": {
+        "title": "写真の提供（任意・すべてスキップ可）",
+        "handNail": "手の爪",
+        "footNail": "足の爪",
+        "sole": "足裏",
+        "uploadBtn": "写真を選択"
+      },
+      "consent": "このデータが研究目的のみに匿名で使用されることに同意します",
+      "consentRequired": "送信するには同意が必要です"
     }
   },
   "benefits": {
