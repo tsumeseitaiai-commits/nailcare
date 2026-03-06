@@ -15,7 +15,7 @@ interface Clinic {
 }
 
 interface Props {
-  bodyPart: 'nail' | 'heel' | null;
+  bodyPart: 'nail' | 'sole' | null;
 }
 
 const supabase = createClient(

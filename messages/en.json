@@ -720,7 +720,7 @@
     "label": "Select language"
   },
   "aiDiagnosis": {
-    "title": "AI Nail Diagnosis",
+    "title": "AI Diagnosis",
     "uploadTitle": "Upload Nail Photo",
     "chatTitle": "Consultation",
     "resultTitle": "Diagnosis Result",
@@ -750,8 +750,8 @@
       "dropHere": "Drop here",
       "uploadedLabel": "Uploaded:",
       "startButton": "Start Diagnosis",
-      "heelTitle": "Upload Heel Photo",
-      "heelDescription": "Select a photo of the heel you want to diagnose. Clear photos in good lighting work best."
+      "heelTitle": "Upload Foot Sole Photo",
+      "heelDescription": "Select a photo of the foot sole you want to diagnose. Clear photos in good lighting work best."
     },
     "chat": {
       "inputPlaceholder": "Type a message...",
@@ -1046,8 +1046,8 @@
       "subtitle": "Upload a photo and our AI will give you a detailed diagnosis",
       "nailTitle": "Diagnose Nails",
       "nailDesc": "AI analyzes nail shape, color, and condition\nAlso evaluates its relation to sports performance",
-      "heelTitle": "Diagnose Heel",
-      "heelDesc": "AI analyzes heel calluses and cracks\nSuggests self-care steps and treatment points"
+      "heelTitle": "Diagnose Foot Sole",
+      "heelDesc": "AI analyzes foot sole calluses and cracks\nSuggests self-care steps and treatment points"
     }
   },
   "benefits": {

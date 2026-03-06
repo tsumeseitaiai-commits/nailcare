@@ -14,9 +14,9 @@ export async function POST(req: NextRequest) {
 
     const q = quizAnswers as Record<string, unknown> | undefined;
 
-    // かかと診断の場合は専用プロンプトで処理
-    if (bodyPart === 'heel') {
-      return await handleHeelDiagnosis({ messages, image, quizAnswers: q, locale });
+    // 足裏診断の場合は専用プロンプトで処理
+    if (bodyPart === 'sole') {
+      return await handleSoleDiagnosis({ messages, image, quizAnswers: q, locale, caseId });
     }
 
     // Language instruction based on locale
@@ -345,26 +345,28 @@ async function saveToSupabase({
 }
 
 // ============================================================
-// かかと診断ハンドラー
+// 足裏診断ハンドラー
 // ============================================================
-async function handleHeelDiagnosis({
+async function handleSoleDiagnosis({
   messages,
   image,
   quizAnswers,
   locale,
+  caseId,
 }: {
   messages: { role: string; content: string }[];
   image: string;
   quizAnswers?: Record<string, unknown>;
   locale: string;
+  caseId?: string;
 }) {
   const q = quizAnswers;
   const langName = locale === 'ar' ? 'Arabic (العربية)' : locale === 'en' ? 'English' : 'Japanese (日本語)';
   const langInstruction = `IMPORTANT: All output text MUST be written in ${langName}.`;
 
-  const HEEL_PROMPT = `${langInstruction}
+  const SOLE_PROMPT = `${langInstruction}
 
-あなたはかかと・足裏ケアの専門AIです。以下の専門知識ベースとアンケート・チャット内容・写真をもとに診断してください。
+あなたは足裏ケアの専門AIです。以下の専門知識ベースとアンケート・チャット内容・写真をもとに診断してください。
 
 ${HEEL_KNOWLEDGE}
 
@@ -378,7 +380,7 @@ ${HEEL_KNOWLEDGE}
 ${JSON.stringify(messages)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[STEP 1] 写真からかかとの状態を評価（heel_score: 0-100）
+[STEP 1] 写真から足裏の状態を評価（sole_score: 0-100）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 以下を画像から評価：
 - 角質の厚み: 薄い=理想、厚い/ひび割れ=減点
@@ -388,7 +390,7 @@ ${JSON.stringify(messages)}
 - 潤い: ある=理想、乾燥/皮むけ=減点
 - タコ・魚の目・イボの疑いがある場合は必ず指摘
 
-→ 所見を heel_findings に列挙
+→ 所見を sole_findings に列挙
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [STEP 2] 生活習慣リスクスコア（context_score: 0-100）
@@ -400,18 +402,18 @@ ${JSON.stringify(messages)}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [STEP 3] 総合診断
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-health_score = heel_score × 0.7 + context_score × 0.3（整数）
+health_score = sole_score × 0.7 + context_score × 0.3（整数）
 
 self_care_steps: 専門知識ベースに基づいた具体的なセルフケア手順を4〜6ステップで。
 practitioner_points: 施術者が優先的に対応すべき点を2〜3つ。イボ疑いがある場合は医師紹介を必ず含める。
 
 以下のJSONのみ返してください（コードブロック・説明不要）:
 {
-  "heel_score": 0-100,
+  "sole_score": 0-100,
   "context_score": 0-100,
   "health_score": 0-100,
   "severity": "mild" | "moderate" | "severe",
-  "heel_findings": ["所見1", "所見2"],
+  "sole_findings": ["所見1", "所見2"],
   "detected_issues": ["問題1", "問題2"],
   "self_care_steps": ["Step 1: ...", "Step 2: ..."],
   "practitioner_points": ["ポイント1", "ポイント2"],
@@ -422,79 +424,90 @@ practitioner_points: 施術者が優先的に対応すべき点を2〜3つ。イ
   const model = genAI.getGenerativeModel({ model: MODEL_VERSION });
 
   const result = await model.generateContent([
-    { text: HEEL_PROMPT },
+    { text: SOLE_PROMPT },
     { inlineData: { mimeType: 'image/jpeg', data: image } },
   ]);
 
   const responseText = result.response.text();
   const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Invalid JSON from Gemini (heel)');
+  if (!jsonMatch) throw new Error('Invalid JSON from Gemini (sole)');
 
   const diagnosis = JSON.parse(jsonMatch[0]);
 
-  // Supabase保存
+  // Supabase保存: caseId がある場合は UPDATE、なければ INSERT
   try {
     const supabase = getSupabaseAdmin();
     const timestamp = Date.now();
-    const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const imagePath = `cases/${year}/${month}/${timestamp}-heel.jpg`;
 
-    const buffer = Buffer.from(image, 'base64');
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('nail-images')
-      .upload(imagePath, buffer, { contentType: 'image/jpeg', upsert: false });
-
-    if (uploadError) {
-      console.error('[Supabase][Heel] 画像アップロード失敗:', uploadError);
-    } else {
-      const { data: urlData } = supabase.storage.from('nail-images').getPublicUrl(imagePath);
-      const imageUrl = urlData.publicUrl;
-
-      const { data: savedCase, error: insertError } = await supabase
-        .from('nail_cases')
-        .insert({
-          image_url: imageUrl,
-          image_path: imagePath,
-          body_part: 'heel',
+    if (caseId) {
+      // save-quiz で既に作成済みのレコードを更新
+      const { error: updateError } = await supabase
+        .from('sole_cases')
+        .update({
           health_score: diagnosis.health_score,
-          detected_issues: diagnosis.detected_issues,
-          recommendations: diagnosis.recommendations,
+          sole_score: diagnosis.sole_score ?? null,
+          context_score: diagnosis.context_score ?? null,
+          sole_findings: diagnosis.sole_findings ?? [],
+          detected_issues: diagnosis.detected_issues ?? [],
+          recommendations: diagnosis.recommendations ?? [],
+          self_care_steps: diagnosis.self_care_steps ?? [],
+          practitioner_points: diagnosis.practitioner_points ?? [],
+          severity: diagnosis.severity ?? null,
           ai_diagnosis: diagnosis.analysis,
-          nail_findings: diagnosis.heel_findings ?? [],
-          nail_condition: {},
-          health_data: {
-            heelSeverity: q?.heelSeverity,
-            heelMoisture: q?.heelMoisture,
-            heelFootwear: q?.heelFootwear,
-            heelStanding: q?.heelStanding,
-          },
+          model_version: MODEL_VERSION,
+          messages_count: messages.length,
+        })
+        .eq('id', caseId);
+
+      if (updateError) {
+        console.error('[Supabase][Sole] sole_cases 更新失敗:', updateError);
+      } else {
+        await supabase.from('conversation_logs').insert({
+          session_id: `session-${timestamp}`,
+          sole_case_id: caseId,
+          messages,
+          extracted_health_data: { heelSeverity: q?.heelSeverity, heelMoisture: q?.heelMoisture },
+        });
+      }
+    } else {
+      // フォールバック: 新規 INSERT
+      const { data: savedCase, error: insertError } = await supabase
+        .from('sole_cases')
+        .insert({
+          health_score: diagnosis.health_score,
+          sole_score: diagnosis.sole_score ?? null,
+          context_score: diagnosis.context_score ?? null,
+          sole_findings: diagnosis.sole_findings ?? [],
+          detected_issues: diagnosis.detected_issues ?? [],
+          recommendations: diagnosis.recommendations ?? [],
+          self_care_steps: diagnosis.self_care_steps ?? [],
+          practitioner_points: diagnosis.practitioner_points ?? [],
+          severity: diagnosis.severity ?? null,
+          ai_diagnosis: diagnosis.analysis,
+          health_data: { heelSeverity: q?.heelSeverity, heelMoisture: q?.heelMoisture, heelFootwear: q?.heelFootwear, heelStanding: q?.heelStanding },
           model_version: MODEL_VERSION,
           user_consent: true,
           locale,
           messages_count: messages.length,
         })
-        .select()
+        .select('id')
         .single();
 
       if (insertError) {
-        console.error('[Supabase][Heel] nail_cases 保存失敗:', insertError);
+        console.error('[Supabase][Sole] sole_cases 保存失敗:', insertError);
       } else if (savedCase) {
         await supabase.from('conversation_logs').insert({
           session_id: `session-${timestamp}`,
-          nail_case_id: savedCase.id,
+          sole_case_id: savedCase.id,
           messages,
-          extracted_health_data: {
-            heelSeverity: q?.heelSeverity,
-            heelMoisture: q?.heelMoisture,
-          },
+          extracted_health_data: { heelSeverity: q?.heelSeverity, heelMoisture: q?.heelMoisture },
         });
       }
     }
   } catch (e) {
-    console.error('[Supabase][Heel] 保存エラー:', e);
+    console.error('[Supabase][Sole] 保存エラー:', e);
   }
 
-  // body_part フラグを付けて返す
-  return NextResponse.json({ ...diagnosis, body_part: 'heel' });
+  // body_part フラグを付けて返す（heel_findingsキーも互換性のため維持）
+  return NextResponse.json({ ...diagnosis, heel_findings: diagnosis.sole_findings, body_part: 'sole' });
 }

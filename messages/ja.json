@@ -720,7 +720,7 @@
     "label": "言語を選択"
   },
   "aiDiagnosis": {
-    "title": "AI爪診断",
+    "title": "AI診断",
     "uploadTitle": "爪の写真をアップロード",
     "chatTitle": "問診中",
     "resultTitle": "診断結果",
@@ -750,8 +750,8 @@
       "dropHere": "ここにドロップ",
       "uploadedLabel": "アップロード済み:",
       "startButton": "診断を開始",
-      "heelTitle": "かかとの写真をアップロード",
-      "heelDescription": "診断したいかかとの写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。"
+      "heelTitle": "足裏の写真をアップロード",
+      "heelDescription": "診断したい足裏の写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。"
     },
     "chat": {
       "inputPlaceholder": "メッセージを入力...",
@@ -1015,7 +1015,7 @@
         "progressLabel": "質問",
         "toChat": "チャットへ進む",
         "q1": {
-          "title": "かかとのひび割れ・硬さはどの程度ですか？",
+          "title": "足裏のひび割れ・硬さはどの程度ですか？",
           "mild": "気にならない",
           "moderate": "少し気になる",
           "severe": "ひどい"
@@ -1046,8 +1046,8 @@
       "subtitle": "写真をアップロードして、AIが詳しく診断します",
       "nailTitle": "爪を診断する",
       "nailDesc": "爪の形・色・状態をAIが分析\nスポーツパフォーマンスとの関係も診断",
-      "heelTitle": "かかとを診断する",
-      "heelDesc": "かかとの角質・ひび割れをAIが分析\nセルフケア手順と施術ポイントをご提案"
+      "heelTitle": "足裏を診断する",
+      "heelDesc": "足裏の角質・ひび割れをAIが分析\nセルフケア手順と施術ポイントをご提案"
     }
   },
   "benefits": {

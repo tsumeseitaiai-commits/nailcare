@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now();
     const year = new Date().getFullYear();
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    const suffix = bodyPart === 'heel' ? 'heel' : 'nail';
+    const suffix = bodyPart === 'sole' ? 'sole' : 'nail';
     const imagePath = `cases/${year}/${month}/${timestamp}-${suffix}.jpg`;
 
     // 画像アップロード
@@ -27,23 +27,31 @@ export async function POST(req: NextRequest) {
     const { data: urlData } = supabase.storage.from('nail-images').getPublicUrl(imagePath);
     const imageUrl = urlData.publicUrl;
 
-    // DBに保存
-    const insertData = bodyPart === 'heel'
-      ? {
-          image_url: imageUrl,
-          image_path: imagePath,
-          body_part: 'heel',
-          heel_severity: h?.heelSeverity ?? null,
-          heel_moisture: h?.heelMoisture ?? null,
-          heel_footwear: h?.heelFootwear ?? null,
-          heel_standing: h?.heelStanding ?? null,
-          nail_condition: {},
-          health_data: h ?? {},
-          model_version: 'quiz-only',
-          user_consent: true,
-          locale,
-        }
-      : {
+    // 足裏診断は sole_cases テーブルへ、爪診断は nail_cases テーブルへ
+    if (bodyPart === 'sole') {
+      const soleData = {
+        image_url: imageUrl,
+        image_path: imagePath,
+        heel_severity: h?.heelSeverity ?? null,
+        heel_moisture: h?.heelMoisture ?? null,
+        heel_footwear: h?.heelFootwear ?? null,
+        heel_standing: h?.heelStanding ?? null,
+        health_data: h ?? {},
+        model_version: 'quiz-only',
+        user_consent: true,
+        locale,
+      };
+      const { data: savedCase, error: insertError } = await supabase
+        .from('sole_cases')
+        .insert(soleData)
+        .select('id')
+        .single();
+      if (insertError) throw insertError;
+      console.log(`[save-quiz] 足裏保存成功: id=${savedCase.id}`);
+      return NextResponse.json({ id: savedCase.id });
+    }
+
+    const insertData = {
           image_url: imageUrl,
           image_path: imagePath,
           body_part: 'nail',

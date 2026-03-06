@@ -10,14 +10,36 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const { ids } = await req.json() as { ids: string[] };
+    const { ids, target = 'nail' } = await req.json() as { ids: string[]; target?: 'nail' | 'sole' };
     if (!Array.isArray(ids) || ids.length === 0) {
       return NextResponse.json({ error: 'ids が必要です' }, { status: 400 });
     }
 
     const supabase = getSupabaseAdmin();
 
-    // 削除対象の image_path を取得
+    if (target === 'sole') {
+      // sole_cases の削除
+      const { data: rows, error: fetchError } = await supabase
+        .from('sole_cases')
+        .select('id, image_path')
+        .in('id', ids);
+      if (fetchError) throw fetchError;
+
+      const paths = (rows ?? []).map((r) => r.image_path as string).filter(Boolean);
+      if (paths.length > 0) {
+        const { error: storageError } = await supabase.storage.from('nail-images').remove(paths);
+        if (storageError) console.warn('[delete][sole] storage error:', storageError.message);
+      }
+
+      await supabase.from('conversation_logs').delete().in('sole_case_id', ids);
+
+      const { error: deleteError } = await supabase.from('sole_cases').delete().in('id', ids);
+      if (deleteError) throw deleteError;
+
+      return NextResponse.json({ deleted: ids.length });
+    }
+
+    // nail_cases の削除（既存処理）
     const { data: rows, error: fetchError } = await supabase
       .from('nail_cases')
       .select('id, image_path')

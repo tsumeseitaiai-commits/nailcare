@@ -30,7 +30,7 @@ interface DiagnosisResult {
   self_care_steps?: string[];
   practitioner_points?: string[];
   analysis: string;
-  body_part?: 'nail' | 'heel';
+  body_part?: 'nail' | 'sole';
   severity?: 'mild' | 'moderate' | 'severe';
 }
 
@@ -212,7 +212,19 @@ export default function AIDiagnosisPage() {
     prelim: { badge: string; title: string; summaryLabel: string; ageSep: string; toeGrip: string; grip: string; balance: string; ankleSprain: string; chatTitle: string; chatDesc: string; chatBtn: string };
     chatBar: { specialistLabel: string; quizScore: string; viewResult: string; placeholder: string; initialMessage: string };
     scoreBreakdown: { nail: string; quiz: string; nailDiagnosis: string };
+    noAnswer: string;
+    simpQuiz: { q2Title: string; q3Title: string; q3Left: string; q3Right: string; q4Title: string; q5Title: string };
+    heel: {
+      progressLabel: string; toChat: string;
+      q1: { title: string; mild: string; moderate: string; severe: string };
+      q2: { title: string; daily: string; weekly: string; rarely: string };
+      q3: { title: string; heels: string; flats: string; sneakers: string; barefoot: string };
+      q4: { title: string; under2: string; '2to5': string; over5: string };
+    };
   };
+
+  // Select translations
+  const st = t.raw('select') as { title: string; subtitle: string; nailTitle: string; nailDesc: string; heelTitle: string; heelDesc: string };
 
   // Convert translation maps to option arrays
   const toOpts = (map: Record<string, string>) => Object.entries(map).map(([value, label]) => ({ value, label }));
@@ -225,7 +237,7 @@ export default function AIDiagnosisPage() {
   const ankleSprainLabel = (v: string) => toOpts(qt.ankleSprain).find(o => o.value === v)?.label ?? v;
   const genderLabel = (v: string) => toOpts(qt.gender).find(o => o.value === v)?.label ?? v;
 
-  const [bodyPart, setBodyPart] = useState<'nail' | 'heel' | null>(null);
+  const [bodyPart, setBodyPart] = useState<'nail' | 'sole' | null>(null);
   const [heelAnswers, setHeelAnswers] = useState<HeelAnswers>(INITIAL_HEEL_ANSWERS);
   const [heelStep, setHeelStep] = useState(1);
   const [practitionerMode, setPractitionerMode] = useState(false);
@@ -329,7 +341,7 @@ export default function AIDiagnosisPage() {
     isFinalDiagnosisCalled.current = false;
     isInitialFetchCalled.current = false;
     // 現時点のstateを引数として直接渡す（クロージャ問題を回避）
-    const currentAnswers = bodyPart === 'heel' ? heelAnswers : quizAnswers;
+    const currentAnswers = bodyPart === 'sole' ? heelAnswers : quizAnswers;
     // 定型質問完了時点で画像＋回答を保存
     saveQuizData(currentAnswers);
     fetchInitialFreeMessage(currentAnswers);
@@ -339,7 +351,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/save-quiz', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image, quizAnswers: bodyPart === 'nail' ? answers : undefined, heelAnswers: bodyPart === 'heel' ? answers : undefined, bodyPart, locale }),
+        body: JSON.stringify({ image, quizAnswers: bodyPart === 'nail' ? answers : undefined, heelAnswers: bodyPart === 'sole' ? answers : undefined, bodyPart, locale }),
       });
       const data = await res.json();
       if (data.id) setCaseId(data.id);
@@ -373,7 +385,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/chat-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart }),
+        body: JSON.stringify({ messages: updated, image, quizAnswers: bodyPart === 'sole' ? heelAnswers : quizAnswers, locale, bodyPart }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -395,7 +407,7 @@ export default function AIDiagnosisPage() {
     try {
       const res = await fetch('/api/final-diagnosis', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgs, image, quizAnswers: bodyPart === 'heel' ? heelAnswers : quizAnswers, locale, bodyPart, caseId }),
+        body: JSON.stringify({ messages: msgs, image, quizAnswers: bodyPart === 'sole' ? heelAnswers : quizAnswers, locale, bodyPart, caseId }),
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -454,8 +466,8 @@ export default function AIDiagnosisPage() {
             <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
               <div className="mb-6 text-center">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">STEP 1</p>
-                <h2 className="text-2xl font-bold text-foreground">どこを診断しますか？</h2>
-                <p className="mt-2 text-sm text-muted-foreground">写真をアップロードして、AIが詳しく診断します</p>
+                <h2 className="text-2xl font-bold text-foreground">{st.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{st.subtitle}</p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* 爪カード */}
@@ -465,19 +477,19 @@ export default function AIDiagnosisPage() {
                 >
                   <span className="text-5xl">💅</span>
                   <div>
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary">爪を診断する</p>
-                    <p className="mt-1 text-xs text-muted-foreground">爪の形・色・状態をAIが分析<br />スポーツパフォーマンスとの関係も診断</p>
+                    <p className="text-lg font-bold text-foreground group-hover:text-primary">{st.nailTitle}</p>
+                    <p className="mt-1 text-xs text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>{st.nailDesc}</p>
                   </div>
                 </button>
                 {/* かかとカード */}
                 <button
-                  onClick={() => { setBodyPart('heel'); setStep('upload'); }}
+                  onClick={() => { setBodyPart('sole'); setStep('upload'); }}
                   className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-border p-8 text-center transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                 >
                   <span className="text-5xl">🦶</span>
                   <div>
-                    <p className="text-lg font-bold text-foreground group-hover:text-primary">かかとを診断する</p>
-                    <p className="mt-1 text-xs text-muted-foreground">かかとの角質・ひび割れをAIが分析<br />セルフケア手順と施術ポイントをご提案</p>
+                    <p className="text-lg font-bold text-foreground group-hover:text-primary">{st.heelTitle}</p>
+                    <p className="mt-1 text-xs text-muted-foreground" style={{ whiteSpace: 'pre-line' }}>{st.heelDesc}</p>
                   </div>
                 </button>
               </div>
@@ -492,8 +504,8 @@ export default function AIDiagnosisPage() {
                   <Image src="/images/optimized/nailanaly.jpg" alt="AI Nail Diagnosis" fill className="object-cover" sizes="112px" priority />
                 </div>
               </div>
-              <h2 className="mb-2 text-xl font-bold text-foreground">{bodyPart === 'heel' ? 'かかとの写真をアップロード' : t('upload.title')}</h2>
-              <p className="mb-6 text-sm text-muted-foreground">{bodyPart === 'heel' ? '診断したいかかとの写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。' : t('upload.description')}</p>
+              <h2 className="mb-2 text-xl font-bold text-foreground">{bodyPart === 'sole' ? t('upload.heelTitle') : t('upload.title')}</h2>
+              <p className="mb-6 text-sm text-muted-foreground">{bodyPart === 'sole' ? t('upload.heelDescription') : t('upload.description')}</p>
               <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{t('upload.guideTitle')}</h3>
                 <ul className="space-y-1">
@@ -559,7 +571,7 @@ export default function AIDiagnosisPage() {
           )}
 
           {/* ===== かかとQuiz ===== */}
-          {step === 'quiz' && bodyPart === 'heel' && (() => {
+          {step === 'quiz' && bodyPart === 'sole' && (() => {
             const heelCanProceed = () => {
               if (heelStep === 1) return heelAnswers.heelSeverity !== '';
               if (heelStep === 2) return heelAnswers.heelMoisture !== '';
@@ -576,26 +588,27 @@ export default function AIDiagnosisPage() {
               else setStep('upload');
             };
 
+            const ht = qt.heel;
             const severityOpts = [
-              { value: 'mild', label: '気にならない' },
-              { value: 'moderate', label: '少し気になる' },
-              { value: 'severe', label: 'ひどい' },
+              { value: 'mild', label: ht.q1.mild },
+              { value: 'moderate', label: ht.q1.moderate },
+              { value: 'severe', label: ht.q1.severe },
             ];
             const moistureOpts = [
-              { value: 'daily', label: '毎日' },
-              { value: 'weekly', label: '週几回' },
-              { value: 'rarely', label: 'ほぼしない' },
+              { value: 'daily', label: ht.q2.daily },
+              { value: 'weekly', label: ht.q2.weekly },
+              { value: 'rarely', label: ht.q2.rarely },
             ];
             const footwearOpts = [
-              { value: 'heels', label: 'ヒール' },
-              { value: 'flats', label: 'フラット' },
-              { value: 'sneakers', label: 'スニーカー' },
-              { value: 'barefoot', label: '裸足が多い' },
+              { value: 'heels', label: ht.q3.heels },
+              { value: 'flats', label: ht.q3.flats },
+              { value: 'sneakers', label: ht.q3.sneakers },
+              { value: 'barefoot', label: ht.q3.barefoot },
             ];
             const standingOpts = [
-              { value: 'under2', label: '2時間未満' },
-              { value: '2to5', label: '2〜5時間' },
-              { value: 'over5', label: '5時間以上' },
+              { value: 'under2', label: ht.q4.under2 },
+              { value: '2to5', label: ht.q4['2to5'] },
+              { value: 'over5', label: ht.q4.over5 },
             ];
 
             return (
@@ -603,7 +616,7 @@ export default function AIDiagnosisPage() {
                 {/* 進捗バー */}
                 <div className="mb-6">
                   <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>質問 {heelStep} / {HEEL_TOTAL_STEPS}</span>
+                    <span>{ht.progressLabel} {heelStep} / {HEEL_TOTAL_STEPS}</span>
                     <span>{Math.round((heelStep / HEEL_TOTAL_STEPS) * 100)}%</span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -616,7 +629,7 @@ export default function AIDiagnosisPage() {
                 {heelStep === 1 && (
                   <div>
                     <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q1</p>
-                    <h2 className="mb-5 text-xl font-bold">かかとのひび割れ・硬さはどの程度ですか？</h2>
+                    <h2 className="mb-5 text-xl font-bold">{ht.q1.title}</h2>
                     <ChoiceButtons options={severityOpts} value={heelAnswers.heelSeverity}
                       onChange={v => setHeelAnswers(prev => ({ ...prev, heelSeverity: v }))} cols={3} />
                   </div>
@@ -626,7 +639,7 @@ export default function AIDiagnosisPage() {
                 {heelStep === 2 && (
                   <div>
                     <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q2</p>
-                    <h2 className="mb-5 text-xl font-bold">保湿ケアの頻度は？</h2>
+                    <h2 className="mb-5 text-xl font-bold">{ht.q2.title}</h2>
                     <ChoiceButtons options={moistureOpts} value={heelAnswers.heelMoisture}
                       onChange={v => setHeelAnswers(prev => ({ ...prev, heelMoisture: v }))} cols={3} />
                   </div>
@@ -636,7 +649,7 @@ export default function AIDiagnosisPage() {
                 {heelStep === 3 && (
                   <div>
                     <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q3</p>
-                    <h2 className="mb-5 text-xl font-bold">よく履く靴の種類は？</h2>
+                    <h2 className="mb-5 text-xl font-bold">{ht.q3.title}</h2>
                     <ChoiceButtons options={footwearOpts} value={heelAnswers.heelFootwear}
                       onChange={v => setHeelAnswers(prev => ({ ...prev, heelFootwear: v }))} cols={2} />
                   </div>
@@ -646,7 +659,7 @@ export default function AIDiagnosisPage() {
                 {heelStep === 4 && (
                   <div>
                     <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
-                    <h2 className="mb-5 text-xl font-bold">1日の立ち仕事の時間は？</h2>
+                    <h2 className="mb-5 text-xl font-bold">{ht.q4.title}</h2>
                     <ChoiceButtons options={standingOpts} value={heelAnswers.heelStanding}
                       onChange={v => setHeelAnswers(prev => ({ ...prev, heelStanding: v }))} cols={3} />
                   </div>
@@ -659,7 +672,7 @@ export default function AIDiagnosisPage() {
                   </button>
                   <button onClick={heelNext} disabled={!heelCanProceed()}
                     className="flex-1 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50">
-                    {heelStep < HEEL_TOTAL_STEPS ? qt.nextBtn : 'チャットへ進む'}
+                    {heelStep < HEEL_TOTAL_STEPS ? qt.nextBtn : ht.toChat}
                   </button>
                 </div>
               </div>
@@ -705,14 +718,14 @@ export default function AIDiagnosisPage() {
               {quizStep === 2 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q2</p>
-                  <h2 className="mb-5 text-xl font-bold">年齢を教えてください</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.simpQuiz.q2Title}</h2>
                   <div className="flex items-center gap-3">
                     <input type="number" min={5} max={100} value={quizAnswers.age} autoFocus
                       onChange={e => set('age', e.target.value === '' ? '' : Number(e.target.value))}
                       onKeyDown={e => e.key === 'Enter' && canProceed() && handleNext()}
                       placeholder="25"
                       className="w-32 rounded-lg border-2 border-border px-4 py-3 text-center text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                    <span className="text-base text-muted-foreground">歳</span>
+                    <span className="text-base text-muted-foreground">{qt.q2.ageUnit}</span>
                   </div>
                 </div>
               )}
@@ -721,9 +734,9 @@ export default function AIDiagnosisPage() {
               {quizStep === 3 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q3</p>
-                  <h2 className="mb-5 text-xl font-bold">足指で地面を掴める感覚はどのくらいですか？</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.simpQuiz.q3Title}</h2>
                   <SliderInput value={quizAnswers.toeGrip} onChange={v => set('toeGrip', v)}
-                    leftLabel="全く感じない" rightLabel="しっかり掴める" />
+                    leftLabel={qt.simpQuiz.q3Left} rightLabel={qt.simpQuiz.q3Right} />
                 </div>
               )}
 
@@ -731,12 +744,12 @@ export default function AIDiagnosisPage() {
               {quizStep === 4 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q4</p>
-                  <h2 className="mb-5 text-xl font-bold">足首の捻挫をしたことがありますか？</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.simpQuiz.q4Title}</h2>
                   <ChoiceButtons
                     options={[
-                      { value: 'none',  label: 'なし' },
-                      { value: 'once',  label: '1回' },
-                      { value: '2plus', label: '2回以上' },
+                      { value: 'none',  label: qt.ankleSprain.none },
+                      { value: 'once',  label: qt.ankleSprain.once },
+                      { value: '2plus', label: qt.ankleSprain['2plus'] },
                     ]}
                     value={quizAnswers.ankleSprain}
                     onChange={v => set('ankleSprain', v)}
@@ -749,9 +762,9 @@ export default function AIDiagnosisPage() {
               {quizStep === 5 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary">Q5</p>
-                  <h2 className="mb-5 text-xl font-bold">踏ん張り・グリップ力への自信はどのくらいですか？</h2>
+                  <h2 className="mb-5 text-xl font-bold">{qt.simpQuiz.q5Title}</h2>
                   <SliderInput value={quizAnswers.gripConfidence} onChange={v => set('gripConfidence', v)}
-                    leftLabel="全く自信がない" rightLabel="とても自信がある" />
+                    leftLabel={qt.q9.gripConfLeft} rightLabel={qt.q9.gripConfRight} />
                 </div>
               )}
 
@@ -801,10 +814,10 @@ export default function AIDiagnosisPage() {
                     <p className="mb-3 text-xs font-semibold text-muted-foreground">{qt.prelim.summaryLabel}</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-foreground">
                       <span>🏅 {sportLabel(quizAnswers.sport)}</span>
-                      <span>🎂 {quizAnswers.age}歳</span>
-                      <span>👣 足指グリップ {quizAnswers.toeGrip}/10</span>
-                      <span>💪 踏ん張り力 {quizAnswers.gripConfidence}/10</span>
-                      <span>🦶 捻挫歴 {ankleSprainLabel(quizAnswers.ankleSprain) || '未回答'}</span>
+                      <span>🎂 {quizAnswers.age}{qt.q2.ageUnit}</span>
+                      <span>{qt.prelim.toeGrip} {quizAnswers.toeGrip}/10</span>
+                      <span>{qt.prelim.grip} {quizAnswers.gripConfidence}/10</span>
+                      <span>{qt.prelim.ankleSprain} {ankleSprainLabel(quizAnswers.ankleSprain) || qt.noAnswer}</span>
                     </div>
                   </div>
                 </div>
@@ -951,7 +964,7 @@ export default function AIDiagnosisPage() {
                 </div>
 
                 {/* かかと所見 */}
-                {diagnosisResult.body_part === 'heel' && diagnosisResult.heel_findings && diagnosisResult.heel_findings.length > 0 && (
+                {diagnosisResult.body_part === 'sole' && diagnosisResult.heel_findings && diagnosisResult.heel_findings.length > 0 && (
                   <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
                     <h3 className="mb-4 flex items-center gap-2 text-base font-bold">
                       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-orange-100 text-orange-600">🦶</span>
@@ -964,7 +977,7 @@ export default function AIDiagnosisPage() {
                 )}
 
                 {/* セルフケア手順（かかと） */}
-                {diagnosisResult.body_part === 'heel' && diagnosisResult.self_care_steps && diagnosisResult.self_care_steps.length > 0 && (
+                {diagnosisResult.body_part === 'sole' && diagnosisResult.self_care_steps && diagnosisResult.self_care_steps.length > 0 && (
                   <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
                     <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-emerald-800">
                       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-200 text-emerald-700">🏠</span>

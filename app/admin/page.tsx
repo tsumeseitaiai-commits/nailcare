@@ -413,6 +413,265 @@ function ExportOverlay({ label }: { label: string }) {
 }
 
 // ────────────────────────────────────────────────
+// Sole Cases Tab
+// ────────────────────────────────────────────────
+interface SoleCase {
+  id: string;
+  created_at: string;
+  locale: string;
+  health_score: number;
+  sole_score: number | null;
+  context_score: number | null;
+  severity: string | null;
+  heel_severity: string | null;
+  heel_moisture: string | null;
+  heel_footwear: string | null;
+  heel_standing: string | null;
+  ai_diagnosis: string;
+  detected_issues: string[];
+  recommendations: string[];
+  sole_findings: string[];
+  self_care_steps: string[];
+  practitioner_points: string[];
+  image_url: string | null;
+  messages_count: number | null;
+}
+
+function SoleCasesTab({ password }: { password: string }) {
+  const [cases, setCases] = useState<SoleCase[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [selected, setSelected] = useState<SoleCase | null>(null);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const LIMIT = 20;
+
+  const fetchCases = useCallback(async (p: number) => {
+    setLoading(true); setError('');
+    try {
+      const res = await fetch(`/admin/api/sole-cases?page=${p}&limit=${LIMIT}`, { headers: { 'x-admin-password': password } });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setCases(json.data || []); setTotal(json.total || 0);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'データ取得失敗');
+    } finally { setLoading(false); }
+  }, [password]);
+
+  useEffect(() => { fetchCases(page); }, [page, fetchCases]);
+
+  const handleDelete = async (ids: string[]) => {
+    if (!ids.length || !confirm(`${ids.length}件を削除しますか？`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch('/admin/api/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+        body: JSON.stringify({ ids, target: 'sole' }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      setCheckedIds(new Set());
+      await fetchCases(page);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '削除失敗');
+    } finally { setDeleting(false); }
+  };
+
+  const SEVERITY_COLOR: Record<string, string> = {
+    mild: 'bg-emerald-100 text-emerald-700',
+    moderate: 'bg-amber-100 text-amber-700',
+    severe: 'bg-red-100 text-red-700',
+  };
+  const SEVERITY_LABEL: Record<string, string> = { mild: '軽度', moderate: '中度', severe: '重度' };
+
+  const totalPages = Math.ceil(total / LIMIT);
+  const toggleAll = () => setCheckedIds(checkedIds.size === cases.length ? new Set() : new Set(cases.map(c => c.id)));
+  const toggleCheck = (id: string) => setCheckedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  return (
+    <div className="mx-auto max-w-[1200px] px-4 py-6">
+      {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">⚠️ {error}</div>}
+
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-bold text-slate-700">足裏データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{total} 件</span></span>
+          {checkedIds.size > 0 && (
+            <button onClick={() => handleDelete(Array.from(checkedIds))} disabled={deleting}
+              className="flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-40">
+              🗑️ {checkedIds.size}件削除
+            </button>
+          )}
+        </div>
+        <a href={`/admin/api/sole-cases?format=csv`}
+          onClick={e => { e.preventDefault(); fetch('/admin/api/sole-cases?format=csv', { headers: { 'x-admin-password': password } }).then(r => r.blob()).then(b => { const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `sole_cases_${Date.now()}.csv`; a.click(); }); }}
+          className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+          📊 CSV
+        </a>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-32 text-slate-400 gap-3">
+          <svg className="h-6 w-6 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          読み込み中...
+        </div>
+      ) : cases.length === 0 ? (
+        <div className="py-32 text-center text-slate-400"><p className="text-4xl mb-2">🦶</p><p className="text-sm">足裏データがありません</p></div>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full text-sm min-w-[700px]">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50 text-left">
+                  <th className="px-3 py-3 w-10">
+                    <input type="checkbox" checked={checkedIds.size === cases.length && cases.length > 0} onChange={toggleAll} className="h-4 w-4 cursor-pointer accent-[#7c6b5e]" />
+                  </th>
+                  <th className="px-3 py-3 w-14 text-xs font-semibold uppercase tracking-wider text-slate-400">画像</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">総合</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">足裏</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">重症度</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">日時</th>
+                  <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">問診サマリー</th>
+                  <th className="px-3 py-3 w-20"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {cases.map(c => {
+                  const col = scoreColor(c.health_score);
+                  return (
+                    <tr key={c.id} className={`transition hover:bg-slate-50/80 ${checkedIds.has(c.id) ? 'bg-red-50/40' : ''}`}>
+                      <td className="px-3 py-2.5">
+                        <input type="checkbox" checked={checkedIds.has(c.id)} onChange={() => toggleCheck(c.id)} className="h-4 w-4 cursor-pointer accent-[#7c6b5e]" />
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {c.image_url
+                          // eslint-disable-next-line @next/next/no-img-element
+                          ? <img src={c.image_url} alt="sole" className="h-11 w-11 rounded-lg border object-cover shadow-sm" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          : <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-lg">🦶</div>
+                        }
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className={`inline-flex rounded-lg px-2 py-1 text-sm font-bold ring-1 ${col.bg} ${col.text} ${col.ring}`}>{c.health_score}</span>
+                      </td>
+                      <td className="px-3 py-2.5 text-xs font-semibold text-blue-600">{c.sole_score ?? '—'}</td>
+                      <td className="px-3 py-2.5">
+                        {c.severity ? (
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${SEVERITY_COLOR[c.severity] ?? 'bg-slate-100 text-slate-600'}`}>
+                            {SEVERITY_LABEL[c.severity] ?? c.severity}
+                          </span>
+                        ) : '—'}
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-slate-500 whitespace-nowrap">{fmtDate(c.created_at)}</td>
+                      <td className="px-3 py-2.5 text-xs text-slate-500 max-w-[180px]">
+                        <div className="flex flex-wrap gap-1">
+                          {[c.heel_severity, c.heel_moisture, c.heel_footwear].filter(Boolean).map((v, i) => (
+                            <span key={i} className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">{v}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex gap-1">
+                          <button onClick={() => setSelected(c)} className="rounded-lg bg-[#7c6b5e]/10 px-2.5 py-1.5 text-xs font-semibold text-[#7c6b5e] hover:bg-[#7c6b5e] hover:text-white transition">詳細</button>
+                          <button onClick={() => handleDelete([c.id])} disabled={deleting} className="rounded-lg bg-red-50 px-2 py-1.5 text-xs text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-40">🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40">← 前へ</button>
+              <span className="text-xs text-slate-500">{page} / {totalPages}</span>
+              <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40">次へ →</button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Detail Modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-10 backdrop-blur-sm"
+          onClick={e => e.target === e.currentTarget && setSelected(null)}>
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <div>
+                <p className="text-xs text-slate-400">{fmtDate(selected.created_at)}</p>
+                <p className="font-mono text-xs text-slate-500">{selected.id}</p>
+              </div>
+              <button onClick={() => setSelected(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="space-y-5 p-6">
+              <div className="flex items-start gap-4">
+                {selected.image_url
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={selected.image_url} alt="sole" className="h-28 w-28 shrink-0 rounded-xl border object-cover shadow-sm" />
+                  : <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-4xl">🦶</div>}
+                <div>
+                  <div className={`inline-flex items-baseline gap-1 rounded-xl px-4 py-2 ring-2 ${scoreColor(selected.health_score).bg} ${scoreColor(selected.health_score).ring}`}>
+                    <span className={`text-4xl font-bold ${scoreColor(selected.health_score).text}`}>{selected.health_score}</span>
+                    <span className={`text-sm ${scoreColor(selected.health_score).text}`}>/100</span>
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    {selected.sole_score != null && <span className="rounded-lg bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">🦶 足裏 {selected.sole_score}</span>}
+                    {selected.context_score != null && <span className="rounded-lg bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">📋 生活習慣 {selected.context_score}</span>}
+                    {selected.severity && <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${SEVERITY_COLOR[selected.severity] ?? ''}`}>{SEVERITY_LABEL[selected.severity] ?? selected.severity}</span>}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">📋 問診データ</h3>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-slate-50 p-4 text-xs">
+                  {[['ひび割れ・硬さ', selected.heel_severity], ['保湿ケア', selected.heel_moisture], ['靴タイプ', selected.heel_footwear], ['立ち仕事時間', selected.heel_standing]]
+                    .filter(([, v]) => v).map(([label, value], i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="w-24 shrink-0 font-semibold text-slate-500">{label}</span>
+                      <span className="text-slate-700">{value as string}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {selected.sole_findings?.length > 0 && (
+                <div>
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">🦶 足裏所見</h3>
+                  <ul className="space-y-1">{selected.sole_findings.map((f, i) => <li key={i} className="flex gap-2 text-sm"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />{f}</li>)}</ul>
+                </div>
+              )}
+              {selected.self_care_steps?.length > 0 && (
+                <div>
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">💆 セルフケア手順</h3>
+                  <ol className="space-y-1 list-decimal list-inside">{selected.self_care_steps.map((s, i) => <li key={i} className="text-sm text-slate-700">{s}</li>)}</ol>
+                </div>
+              )}
+              {selected.practitioner_points?.length > 0 && (
+                <div>
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">👩‍⚕️ 施術者ポイント</h3>
+                  <ul className="space-y-1">{selected.practitioner_points.map((p, i) => <li key={i} className="flex gap-2 text-sm"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-500" />{p}</li>)}</ul>
+                </div>
+              )}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">AI 分析</h3>
+                <p className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-700">{selected.ai_diagnosis}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
 // Textbook Tab
 // ────────────────────────────────────────────────
 interface Textbook {
@@ -579,7 +838,7 @@ function TextbookTab({ password }: { password: string }) {
 // Main
 // ────────────────────────────────────────────────
 export default function AdminPage() {
-  const [tab, setTab]                   = useState<'cases' | 'textbooks'>('cases');
+  const [tab, setTab]                   = useState<'cases' | 'sole' | 'textbooks'>('cases');
   const [password, setPassword]         = useState<string | null>(null);
   const [authed, setAuthed]             = useState(false);
   const [cases, setCases]               = useState<NailCase[]>([]);
@@ -790,10 +1049,10 @@ export default function AdminPage() {
       {/* Tabs */}
       <div className="border-b border-slate-200 bg-white px-4">
         <div className="mx-auto flex max-w-[1400px] gap-1">
-          {(['cases', 'textbooks'] as const).map(t => (
+          {(['cases', 'sole', 'textbooks'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition ${tab === t ? 'border-[#7c6b5e] text-[#7c6b5e]' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
-              {t === 'cases' ? '診断データ' : 'テキスト管理'}
+              {t === 'cases' ? '爪データ' : t === 'sole' ? '足裏データ' : 'テキスト管理'}
             </button>
           ))}
         </div>
@@ -812,6 +1071,7 @@ export default function AdminPage() {
         </div>
       )}
 
+      {tab === 'sole' && password && <SoleCasesTab password={password} />}
       {tab === 'textbooks' && password && <TextbookTab password={password} />}
 
       {/* Body: Filter + Table */}

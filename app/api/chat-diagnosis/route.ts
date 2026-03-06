@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       model: 'gemini-2.5-flash',
     });
 
-    const systemPrompt = bodyPart === 'heel'
+    const systemPrompt = bodyPart === 'sole'
       ? buildHeelSystemPrompt(quizAnswers, locale)
       : buildSystemPrompt(quizAnswers, locale);
 
