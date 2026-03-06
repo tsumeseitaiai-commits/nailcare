@@ -17,6 +17,9 @@ export async function POST(req: NextRequest) {
     const imagePath = `cases/${year}/${month}/${timestamp}-${suffix}.jpg`;
 
     // 画像アップロード
+    if (!image) {
+      return NextResponse.json({ error: 'No image provided' }, { status: 400 });
+    }
     const buffer = Buffer.from(image, 'base64');
     const { error: uploadError } = await supabase.storage
       .from('nail-images')

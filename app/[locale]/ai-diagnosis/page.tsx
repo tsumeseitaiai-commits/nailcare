@@ -548,6 +548,7 @@ export default function AIDiagnosisPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isFinalDiagnosisCalled = useRef(false);
   const isInitialFetchCalled = useRef(false);
+  const isStartFreeChatCalled = useRef(false);
   const [caseId, setCaseId] = useState<string | null>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
@@ -646,32 +647,39 @@ export default function AIDiagnosisPage() {
   // フリーチャット
   // ============================================================
   const handleStartFreeChat = () => {
+    if (isStartFreeChatCalled.current) return;
+    isStartFreeChatCalled.current = true;
     setShowPrelim(false); setStep('freeChat'); setMessages([]);
     isFinalDiagnosisCalled.current = false;
     isInitialFetchCalled.current = false;
     // 現時点のstateを引数として直接渡す（クロージャ問題を回避）
     const currentAnswers = bodyPart === 'sole' ? heelAnswers : quizAnswers;
+    console.log('[handleStartFreeChat] called, bodyPart:', bodyPart, 'image:', !!image);
     // 定型質問完了時点で画像＋回答を保存
     saveQuizData(currentAnswers);
     fetchInitialFreeMessage(currentAnswers);
   };
 
   const saveQuizData = async (answers: typeof quizAnswers | typeof heelAnswers) => {
+    console.log('[saveQuizData] start, bodyPart:', bodyPart, 'image:', !!image);
     try {
       const res = await fetch('/api/save-quiz', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image, quizAnswers: bodyPart === 'nail' ? answers : undefined, heelAnswers: bodyPart === 'sole' ? answers : undefined, bodyPart, locale }),
       });
       const data = await res.json();
+      console.log('[saveQuizData] result:', res.status, data);
+      if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
       if (data.id) setCaseId(data.id);
     } catch (e) {
-      console.error('[save-quiz]', e); // 保存失敗しても診断フローは止めない
+      console.error('[save-quiz] error:', e); // 保存失敗しても診断フローは止めない
     }
   };
 
   const fetchInitialFreeMessage = async (answers: typeof quizAnswers | typeof heelAnswers) => {
     if (isInitialFetchCalled.current) return;
     isInitialFetchCalled.current = true;
+    console.log('[fetchInitialFreeMessage] start, bodyPart:', bodyPart);
     setIsLoading(true);
     try {
       const res = await fetch('/api/chat-diagnosis', {
@@ -679,9 +687,11 @@ export default function AIDiagnosisPage() {
         body: JSON.stringify({ messages: [{ role: 'user', content: qt.chatBar.initialMessage }], image, quizAnswers: answers, isInitial: true, locale, bodyPart }),
       });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      console.log('[fetchInitialFreeMessage] response:', res.status, data?.response?.slice(0, 50));
+      if (!res.ok || data.error) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
       setMessages([{ role: 'assistant', content: data.response, timestamp: new Date().toISOString() }]);
-    } catch {
+    } catch (e) {
+      console.error('[fetchInitialFreeMessage] error:', e);
       setMessages([{ role: 'assistant', content: t('chat.error'), timestamp: new Date().toISOString() }]);
     } finally { setIsLoading(false); }
   };
@@ -729,6 +739,8 @@ export default function AIDiagnosisPage() {
 
   const handleReset = () => {
     isFinalDiagnosisCalled.current = false;
+    isInitialFetchCalled.current = false;
+    isStartFreeChatCalled.current = false;
     setStep('select'); setBodyPart(null);
     setQuizStep(1); setQuizAnswers(INITIAL_ANSWERS);
     setHeelStep(1); setHeelAnswers(INITIAL_HEEL_ANSWERS);
