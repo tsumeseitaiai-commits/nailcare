@@ -148,27 +148,34 @@ export async function POST(req: NextRequest) {
       ? buildHeelSystemPrompt(quizAnswers, locale)
       : buildSystemPrompt(quizAnswers, locale);
 
-    // Build conversation history
+    // Build conversation history for Gemini
+    // priorMessages = lastMessage以外の全メッセージ
     const priorMessages = messages.slice(0, -1) as { role: string; content: string }[];
-    const firstUserIdx = priorMessages.findIndex((m) => m.role === 'user');
 
     let chatHistory: { role: string; parts: { text: string }[] }[];
 
-    if (firstUserIdx >= 0) {
-      chatHistory = priorMessages.slice(firstUserIdx).map((msg) => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }],
-      }));
-    } else if (priorMessages.length > 0) {
-      chatHistory = [
-        { role: 'user', parts: [{ text: 'start' }] },
-        ...priorMessages.map((msg) => ({
+    if (priorMessages.length === 0) {
+      // 初回メッセージ（履歴なし）
+      chatHistory = [];
+    } else {
+      // Geminiはhistoryの最初がuserである必要があるため、
+      // assistantから始まる場合はダミーのuser→modelペアで包む
+      const startsWithAssistant = priorMessages[0].role === 'assistant';
+
+      if (startsWithAssistant) {
+        chatHistory = [
+          { role: 'user', parts: [{ text: '診断を始めてください' }] },
+          ...priorMessages.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }],
+          })),
+        ];
+      } else {
+        chatHistory = priorMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'model',
           parts: [{ text: msg.content }],
-        })),
-      ];
-    } else {
-      chatHistory = [];
+        }));
+      }
     }
 
     const chat = model.startChat({
