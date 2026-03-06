@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter, Link } from '@/i18n/routing';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -20,7 +20,7 @@ export default function LoginPage() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError('メールアドレスまたはパスワードが違います'); setLoading(false); return; }
-    router.push('/ja/members/textbook');
+    router.push('/members/textbook');
   };
 
   return (
@@ -49,7 +49,7 @@ export default function LoginPage() {
               </button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              アカウントをお持ちでない方は <a href="/ja/register" className="font-semibold text-primary hover:underline">会員登録</a>
+              アカウントをお持ちでない方は <Link href="/register" className="font-semibold text-primary hover:underline">会員登録</Link>
             </p>
           </div>
         </div>

@@ -711,7 +711,10 @@
     "aiDiagnosis": "AI Diagnosis",
     "aboutNail": "Nail Care",
     "nailSeitai": "Nail Seitai",
-    "contactUs": "Contact"
+    "contactUs": "Contact",
+    "register": "Register",
+    "login": "Login",
+    "textbook": "Textbook"
   },
   "languageSwitcher": {
     "label": "Select language"
@@ -746,7 +749,9 @@
       "consentRequired": "Consent required to proceed",
       "dropHere": "Drop here",
       "uploadedLabel": "Uploaded:",
-      "startButton": "Start Diagnosis"
+      "startButton": "Start Diagnosis",
+      "heelTitle": "Upload Heel Photo",
+      "heelDescription": "Select a photo of the heel you want to diagnose. Clear photos in good lighting work best."
     },
     "chat": {
       "inputPlaceholder": "Type a message...",
@@ -996,7 +1001,53 @@
         "nail": "💅 Nail Score",
         "quiz": "📋 Interview Score",
         "nailDiagnosis": "Nail Diagnosis from Image"
+      },
+      "noAnswer": "Not answered",
+      "simpQuiz": {
+        "q2Title": "How old are you?",
+        "q3Title": "How well can you grip the ground with your toes?",
+        "q3Left": "Can't feel it at all",
+        "q3Right": "Strong grip",
+        "q4Title": "Have you ever sprained your ankle?",
+        "q5Title": "How confident are you in your grip and push-off strength?"
+      },
+      "heel": {
+        "progressLabel": "Question",
+        "toChat": "Go to Chat",
+        "q1": {
+          "title": "How severe is the cracking and hardness of your heel?",
+          "mild": "Not bothersome",
+          "moderate": "Slightly bothersome",
+          "severe": "Severe"
+        },
+        "q2": {
+          "title": "How often do you moisturize your heels?",
+          "daily": "Daily",
+          "weekly": "A few times a week",
+          "rarely": "Rarely"
+        },
+        "q3": {
+          "title": "What type of footwear do you usually wear?",
+          "heels": "Heels",
+          "flats": "Flats",
+          "sneakers": "Sneakers",
+          "barefoot": "Often barefoot"
+        },
+        "q4": {
+          "title": "How many hours do you stand per day?",
+          "under2": "Less than 2 hours",
+          "2to5": "2–5 hours",
+          "over5": "More than 5 hours"
+        }
       }
+    },
+    "select": {
+      "title": "Which area do you want to diagnose?",
+      "subtitle": "Upload a photo and our AI will give you a detailed diagnosis",
+      "nailTitle": "Diagnose Nails",
+      "nailDesc": "AI analyzes nail shape, color, and condition\nAlso evaluates its relation to sports performance",
+      "heelTitle": "Diagnose Heel",
+      "heelDesc": "AI analyzes heel calluses and cracks\nSuggests self-care steps and treatment points"
     }
   },
   "benefits": {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+import { useRouter, Link } from '@/i18n/routing';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -23,7 +23,7 @@ export default function RegisterPage() {
       options: { data: { display_name: form.display_name, role: form.role, phone: form.phone } },
     });
     if (error) { setError(error.message); setLoading(false); return; }
-    router.push('/ja/members/textbook');
+    router.push('/members/textbook');
   };
 
   return (
@@ -82,7 +82,7 @@ export default function RegisterPage() {
               </button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              すでにアカウントをお持ちの方は <a href="/ja/login" className="font-semibold text-primary hover:underline">ログイン</a>
+              すでにアカウントをお持ちの方は <Link href="/login" className="font-semibold text-primary hover:underline">ログイン</Link>
             </p>
           </div>
         </div>

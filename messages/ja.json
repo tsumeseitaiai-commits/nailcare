@@ -711,7 +711,10 @@
     "aiDiagnosis": "AI診断",
     "aboutNail": "爪ケアとは",
     "nailSeitai": "爪整体とは",
-    "contactUs": "お問い合わせ"
+    "contactUs": "お問い合わせ",
+    "register": "会員登録",
+    "login": "ログイン",
+    "textbook": "テキスト閲覧"
   },
   "languageSwitcher": {
     "label": "言語を選択"
@@ -746,7 +749,9 @@
       "consentRequired": "続行するには同意が必要です",
       "dropHere": "ここにドロップ",
       "uploadedLabel": "アップロード済み:",
-      "startButton": "診断を開始"
+      "startButton": "診断を開始",
+      "heelTitle": "かかとの写真をアップロード",
+      "heelDescription": "診断したいかかとの写真を選択してください。明るい場所で撮影した鮮明な画像が最適です。"
     },
     "chat": {
       "inputPlaceholder": "メッセージを入力...",
@@ -996,7 +1001,53 @@
         "nail": "💅 爪スコア",
         "quiz": "📋 問診スコア",
         "nailDiagnosis": "画像からの爪診断"
+      },
+      "noAnswer": "未回答",
+      "simpQuiz": {
+        "q2Title": "年齢を教えてください",
+        "q3Title": "足指で地面を掴める感覚はどのくらいですか？",
+        "q3Left": "全く感じない",
+        "q3Right": "しっかり掴める",
+        "q4Title": "足首の捻挫をしたことがありますか？",
+        "q5Title": "踏ん張り・グリップ力への自信はどのくらいですか？"
+      },
+      "heel": {
+        "progressLabel": "質問",
+        "toChat": "チャットへ進む",
+        "q1": {
+          "title": "かかとのひび割れ・硬さはどの程度ですか？",
+          "mild": "気にならない",
+          "moderate": "少し気になる",
+          "severe": "ひどい"
+        },
+        "q2": {
+          "title": "保湿ケアの頻度は？",
+          "daily": "毎日",
+          "weekly": "週几回",
+          "rarely": "ほぼしない"
+        },
+        "q3": {
+          "title": "よく履く靴の種類は？",
+          "heels": "ヒール",
+          "flats": "フラット",
+          "sneakers": "スニーカー",
+          "barefoot": "裸足が多い"
+        },
+        "q4": {
+          "title": "1日の立ち仕事の時間は？",
+          "under2": "2時間未満",
+          "2to5": "2〜5時間",
+          "over5": "5時間以上"
+        }
       }
+    },
+    "select": {
+      "title": "どこを診断しますか？",
+      "subtitle": "写真をアップロードして、AIが詳しく診断します",
+      "nailTitle": "爪を診断する",
+      "nailDesc": "爪の形・色・状態をAIが分析\nスポーツパフォーマンスとの関係も診断",
+      "heelTitle": "かかとを診断する",
+      "heelDesc": "かかとの角質・ひび割れをAIが分析\nセルフケア手順と施術ポイントをご提案"
     }
   },
   "benefits": {

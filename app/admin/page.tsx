@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // ────────────────────────────────────────────────
 // Types
@@ -413,9 +413,173 @@ function ExportOverlay({ label }: { label: string }) {
 }
 
 // ────────────────────────────────────────────────
+// Textbook Tab
+// ────────────────────────────────────────────────
+interface Textbook {
+  id: string;
+  title: string;
+  level: string;
+  order_num: number;
+  file_path: string;
+  created_at: string;
+}
+
+const LEVEL_OPTIONS = [
+  { value: 'beginner', label: '初級編' },
+  { value: 'high', label: '上級編' },
+  { value: 'professional', label: 'プロ編' },
+  { value: 'student', label: '受講者向け' },
+];
+
+function TextbookTab({ password }: { password: string }) {
+  const [books, setBooks] = useState<Textbook[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [title, setTitle] = useState('');
+  const [level, setLevel] = useState('beginner');
+  const [orderNum, setOrderNum] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const fetchBooks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/admin/api/textbooks', { headers: { 'x-admin-password': password } });
+      const json = await res.json();
+      setBooks(json.data || []);
+    } catch {
+      setError('取得に失敗しました');
+    } finally { setLoading(false); }
+  }, [password]);
+
+  useEffect(() => { fetchBooks(); }, [fetchBooks]);
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const file = fileRef.current?.files?.[0];
+    if (!file || !title.trim()) return;
+    setUploading(true); setError('');
+    try {
+      const fd = new FormData();
+      fd.append('title', title.trim());
+      fd.append('level', level);
+      fd.append('order_num', orderNum || '0');
+      fd.append('file', file);
+      const res = await fetch('/admin/api/textbooks', { method: 'POST', headers: { 'x-admin-password': password }, body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      setTitle(''); setOrderNum(''); setLevel('beginner');
+      if (fileRef.current) fileRef.current.value = '';
+      await fetchBooks();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'アップロードに失敗しました');
+    } finally { setUploading(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('削除しますか？')) return;
+    try {
+      const res = await fetch('/admin/api/textbooks', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'x-admin-password': password }, body: JSON.stringify({ id }) });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      await fetchBooks();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '削除に失敗しました');
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-[1000px] px-4 py-6">
+      {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">⚠️ {error}</div>}
+
+      {/* Add form */}
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-sm font-bold text-slate-700">📚 教科書を追加</h2>
+        <form onSubmit={handleAdd} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="lg:col-span-1">
+            <label className="mb-1 block text-xs font-semibold text-slate-500">タイトル</label>
+            <input type="text" required value={title} onChange={e => setTitle(e.target.value)}
+              placeholder="例：基礎テキスト" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#7c6b5e] focus:outline-none" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-500">レベル</label>
+            <select value={level} onChange={e => setLevel(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#7c6b5e] focus:outline-none">
+              {LEVEL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-500">順序番号</label>
+            <input type="number" min="0" value={orderNum} onChange={e => setOrderNum(e.target.value)}
+              placeholder="0" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#7c6b5e] focus:outline-none" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-500">PDFファイル</label>
+            <input ref={fileRef} type="file" accept=".pdf" required
+              className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 file:mr-2 file:rounded file:border-0 file:bg-slate-100 file:px-2 file:py-1 file:text-xs" />
+          </div>
+          <div className="sm:col-span-2 lg:col-span-4 flex justify-end">
+            <button type="submit" disabled={uploading}
+              className="rounded-xl bg-[#7c6b5e] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#6a5a4e] disabled:opacity-50">
+              {uploading ? 'アップロード中...' : 'アップロード'}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="border-b border-slate-100 px-5 py-3 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-slate-700">教科書一覧 <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{books.length} 件</span></h2>
+          {loading && <span className="text-xs text-slate-400">読み込み中...</span>}
+        </div>
+        {books.length === 0 && !loading ? (
+          <div className="py-16 text-center text-slate-400"><p className="text-3xl mb-2">📚</p><p className="text-sm">教科書がありません</p></div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50 text-left">
+                  <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">タイトル</th>
+                  <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">レベル</th>
+                  <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">順序</th>
+                  <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">ファイルパス</th>
+                  <th className="px-4 py-2.5 w-16"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {books.map(b => (
+                  <tr key={b.id} className="hover:bg-slate-50/80">
+                    <td className="px-4 py-3 font-medium text-slate-700">{b.title}</td>
+                    <td className="px-4 py-3 text-xs">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
+                        {LEVEL_OPTIONS.find(o => o.value === b.level)?.label ?? b.level}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-500">{b.order_num}</td>
+                    <td className="px-4 py-3 text-xs text-slate-400 font-mono max-w-[200px] truncate">{b.file_path}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => handleDelete(b.id)}
+                        className="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500 hover:text-white transition">
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
 // Main
 // ────────────────────────────────────────────────
 export default function AdminPage() {
+  const [tab, setTab]                   = useState<'cases' | 'textbooks'>('cases');
   const [password, setPassword]         = useState<string | null>(null);
   const [authed, setAuthed]             = useState(false);
   const [cases, setCases]               = useState<NailCase[]>([]);
@@ -623,8 +787,20 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {/* Tabs */}
+      <div className="border-b border-slate-200 bg-white px-4">
+        <div className="mx-auto flex max-w-[1400px] gap-1">
+          {(['cases', 'textbooks'] as const).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition ${tab === t ? 'border-[#7c6b5e] text-[#7c6b5e]' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+              {t === 'cases' ? '診断データ' : 'テキスト管理'}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Stats */}
-      {avgScore !== null && (
+      {tab === 'cases' && avgScore !== null && (
         <div className="border-b border-slate-200 bg-white px-4 py-2">
           <div className="mx-auto flex max-w-[1400px] items-center gap-4 text-xs text-slate-500">
             <span>表示 <b className="text-slate-800">{filtered.length}</b> 件</span>
@@ -636,8 +812,10 @@ export default function AdminPage() {
         </div>
       )}
 
+      {tab === 'textbooks' && password && <TextbookTab password={password} />}
+
       {/* Body: Filter + Table */}
-      <div className="mx-auto flex max-w-[1400px] gap-5 px-4 py-6">
+      {tab === 'cases' && <div className="mx-auto flex max-w-[1400px] gap-5 px-4 py-6">
 
         {/* Filter Panel */}
         <FilterPanel f={filters} set={setF} reset={resetF} cases={cases} />
@@ -755,7 +933,7 @@ export default function AdminPage() {
             </>
           )}
         </div>
-      </div>
+      </div>}
 
       {selected && <DetailModal item={selected} onClose={() => setSelected(null)} />}
     </div>

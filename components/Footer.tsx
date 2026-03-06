@@ -75,6 +75,30 @@ export default function Footer() {
                   {t("contactUs")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/register"
+                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {t("register")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/login"
+                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {t("login")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/members/textbook"
+                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {t("textbook")}
+                </Link>
+              </li>
             </ul>
           </div>
 
