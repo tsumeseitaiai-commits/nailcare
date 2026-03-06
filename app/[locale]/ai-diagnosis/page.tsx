@@ -224,52 +224,6 @@ function ChoiceButtons({ options, value, onChange, cols = 1 }: {
 }
 
 // ============================================================
-// カメラガイドコンポーネント
-// ============================================================
-type GuidePartType = 'right_hand' | 'left_hand' | 'both_feet' | 'right_sole' | 'left_sole';
-
-const GUIDE_TEXTS: Record<GuidePartType, string> = {
-  right_hand: '右手の甲（爪が見える向き）をシルエットに合わせてください',
-  left_hand:  '左手の甲（爪が見える向き）をシルエットに合わせてください',
-  both_feet:  '両足の爪が見えるようにシルエットに合わせてください',
-  right_sole: '右足裏全体をシルエットに合わせ、真上から撮影してください',
-  left_sole:  '左足裏全体をシルエットに合わせ、真上から撮影してください',
-};
-
-const HAND_PATH = 'M 160,680 C 120,680 100,650 100,620 L 100,480 C 100,450 110,430 120,410 L 120,360 C 120,340 132,328 144,328 C 156,328 168,340 168,360 L 168,330 C 168,308 180,295 192,295 C 204,295 216,308 216,330 L 216,310 C 216,286 228,272 242,272 C 256,272 268,286 268,310 L 268,330 C 268,308 280,295 294,295 C 308,295 318,310 318,332 L 318,460 L 320,500 C 330,520 340,550 330,600 L 320,640 C 310,665 290,680 260,680 Z';
-const FOOT_PATH = 'M 80,640 C 60,640 50,620 50,590 L 50,300 C 50,260 70,230 90,210 L 90,160 C 90,140 100,128 112,128 C 124,128 132,140 132,160 L 134,150 C 134,130 145,118 158,118 C 170,118 180,130 180,150 L 182,140 C 182,118 194,105 208,105 C 222,105 232,118 232,140 L 234,145 C 234,123 246,110 260,110 C 274,110 284,124 284,146 L 286,170 C 290,150 305,138 322,142 C 338,148 346,166 342,188 L 320,290 C 340,300 350,340 350,400 L 350,590 C 350,620 340,640 320,640 Z';
-const SOLE_PATH = 'M 200,80 C 240,80 280,120 295,190 C 310,260 305,340 295,400 C 285,450 280,490 285,530 C 290,570 295,610 280,640 C 265,665 240,675 200,675 C 160,675 135,665 120,640 C 105,610 110,570 115,530 C 120,490 115,450 105,400 C 95,340 90,260 105,190 C 120,120 160,80 200,80 Z';
-
-function CameraGuide({ part }: { part: GuidePartType }) {
-  const isBothFeet = part === 'both_feet';
-  const vbW = isBothFeet ? 800 : 400;
-  const maskId = `sg-${part}`;
-
-  const Shapes = () => {
-    if (part === 'right_hand') return <path d={HAND_PATH} />;
-    if (part === 'left_hand')  return <path d={HAND_PATH} transform="translate(400,0) scale(-1,1)" />;
-    if (part === 'both_feet')  return (<><path d={FOOT_PATH} /><path d={FOOT_PATH} transform="translate(800,0) scale(-1,1)" /></>);
-    if (part === 'right_sole') return <path d={SOLE_PATH} />;
-    return <path d={SOLE_PATH} transform="translate(400,0) scale(-1,1)" />;
-  };
-
-  return (
-    <svg width="100%" height="100%"
-      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-      viewBox={`0 0 ${vbW} 700`} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <mask id={maskId}>
-          <rect width={vbW} height="700" fill="white" />
-          <g fill="black"><Shapes /></g>
-        </mask>
-      </defs>
-      <rect width={vbW} height="700" fill="rgba(0,0,0,0.5)" mask={`url(#${maskId})`} />
-      <g fill="none" stroke="rgba(99,102,241,0.9)" strokeWidth="3"><Shapes /></g>
-    </svg>
-  );
-}
-
-// ============================================================
 // メインコンポーネント
 // ============================================================
 export default function AIDiagnosisPage() {
@@ -404,12 +358,6 @@ export default function AIDiagnosisPage() {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [cameraSupported, setCameraSupported] = useState(false);
-  const [capturedImages, setCapturedImages] = useState<{ part: 'right_hand' | 'left_hand' | 'both_feet'; dataUrl: string; b64: string }[]>([]);
-  const [currentShootPart, setCurrentShootPart] = useState<'right_hand' | 'left_hand' | 'both_feet' | null>(null);
-  const [soleCapturedImages, setSoleCapturedImages] = useState<{ part: 'right_sole' | 'left_sole'; dataUrl: string; b64: string }[]>([]);
-  const [currentSolePart, setCurrentSolePart] = useState<'right_sole' | 'left_sole' | null>(null);
-  const [researchCameraPart, setResearchCameraPart] = useState<GuidePartType | null>(null);
-  const [researchCameraSlot, setResearchCameraSlot] = useState<'hand_nail' | 'foot_nail' | 'sole' | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -498,84 +446,17 @@ export default function AIDiagnosisPage() {
     setCameraActive(false);
   };
 
-  const getCanvasDataUrl = () => {
+  const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return null;
+    if (!video || !canvas) return;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d')?.drawImage(video, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.9);
-  };
-
-  const NAIL_ORDER: Array<'right_hand' | 'left_hand' | 'both_feet'> = ['right_hand', 'left_hand', 'both_feet'];
-  const SOLE_ORDER: Array<'right_sole' | 'left_sole'> = ['right_sole', 'left_sole'];
-
-  const captureNailPhoto = () => {
-    const dataUrl = getCanvasDataUrl();
-    if (!dataUrl || !currentShootPart) return;
-    const b64 = dataUrl.split(',')[1];
-    const updated = [...capturedImages.filter(c => c.part !== currentShootPart), { part: currentShootPart, dataUrl, b64 }];
-    setCapturedImages(updated);
-    if (currentShootPart === 'right_hand') { setImage(b64); setImagePreview(dataUrl); }
-    const nextIdx = NAIL_ORDER.indexOf(currentShootPart) + 1;
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    setImage(dataUrl.split(',')[1]);
+    setImagePreview(dataUrl);
     stopCamera();
-    if (nextIdx < NAIL_ORDER.length) { setCurrentShootPart(NAIL_ORDER[nextIdx]); setTimeout(() => startCamera(), 300); }
-    else { setCurrentShootPart(null); }
-  };
-
-  const skipNailPart = () => {
-    if (!currentShootPart) return;
-    const nextIdx = NAIL_ORDER.indexOf(currentShootPart) + 1;
-    stopCamera();
-    if (nextIdx < NAIL_ORDER.length) { setCurrentShootPart(NAIL_ORDER[nextIdx]); setTimeout(() => startCamera(), 300); }
-    else { setCurrentShootPart(null); }
-  };
-
-  const captureSolePhoto = () => {
-    const dataUrl = getCanvasDataUrl();
-    if (!dataUrl || !currentSolePart) return;
-    const b64 = dataUrl.split(',')[1];
-    const updated = [...soleCapturedImages.filter(c => c.part !== currentSolePart), { part: currentSolePart, dataUrl, b64 }];
-    setSoleCapturedImages(updated);
-    if (currentSolePart === 'right_sole') { setImage(b64); setImagePreview(dataUrl); }
-    const nextIdx = SOLE_ORDER.indexOf(currentSolePart) + 1;
-    stopCamera();
-    if (nextIdx < SOLE_ORDER.length) { setCurrentSolePart(SOLE_ORDER[nextIdx]); setTimeout(() => startCamera(), 300); }
-    else { setCurrentSolePart(null); }
-  };
-
-  const skipSolePart = () => {
-    if (!currentSolePart) return;
-    const nextIdx = SOLE_ORDER.indexOf(currentSolePart) + 1;
-    stopCamera();
-    if (nextIdx < SOLE_ORDER.length) { setCurrentSolePart(SOLE_ORDER[nextIdx]); setTimeout(() => startCamera(), 300); }
-    else { setCurrentSolePart(null); }
-  };
-
-  const captureResearchPhoto = () => {
-    const dataUrl = getCanvasDataUrl();
-    if (!dataUrl || !researchCameraSlot) return;
-    const b64 = dataUrl.split(',')[1];
-    setResearchAnswers(prev => ({
-      ...prev,
-      images: [...prev.images.filter(i => i.type !== researchCameraSlot), { type: researchCameraSlot, dataUrl, b64 }],
-    }));
-    stopCamera();
-    setResearchCameraPart(null);
-    setResearchCameraSlot(null);
-  };
-
-  const handleStartNailCamera = () => {
-    const next = NAIL_ORDER.find(p => !capturedImages.some(c => c.part === p)) ?? 'right_hand';
-    setCurrentShootPart(next);
-    startCamera();
-  };
-
-  const handleStartSoleCamera = () => {
-    const next = SOLE_ORDER.find(p => !soleCapturedImages.some(c => c.part === p)) ?? 'right_sole';
-    setCurrentSolePart(next);
-    startCamera();
   };
 
   // ============================================================
@@ -672,9 +553,6 @@ export default function AIDiagnosisPage() {
     setImage(null); setImagePreview(null); setMessages([]);
     setDiagnosisResult(null); setUserInput(''); setUserConsent(false);
     setPractitionerMode(false); setCaseId(null);
-    setCapturedImages([]); setCurrentShootPart(null);
-    setSoleCapturedImages([]); setCurrentSolePart(null);
-    setResearchCameraPart(null); setResearchCameraSlot(null);
     setCameraActive(false);
     cameraStream?.getTracks().forEach(t => t.stop()); setCameraStream(null);
   };
@@ -760,196 +638,100 @@ export default function AIDiagnosisPage() {
           )}
 
           {/* ===== Upload ===== */}
-          {step === 'upload' && (() => {
-            const activePart = currentShootPart ?? currentSolePart;
-            const partIdx = bodyPart === 'nail'
-              ? (currentShootPart ? NAIL_ORDER.indexOf(currentShootPart) + 1 : 0)
-              : (currentSolePart ? SOLE_ORDER.indexOf(currentSolePart) + 1 : 0);
-            const partTotal = bodyPart === 'nail' ? 3 : 2;
-            const partTitles: Record<GuidePartType, string> = {
-              right_hand: '右手を撮影', left_hand: '左手を撮影', both_feet: '両足を撮影',
-              right_sole: '右足裏を撮影', left_sole: '左足裏を撮影',
-            };
-            return (
-              <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
-                {cameraActive ? (
-                  <div className="relative bg-black" style={{ minHeight: '400px' }}>
-                    {/* Header */}
-                    <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
-                      <button onClick={() => { stopCamera(); setCurrentShootPart(null); setCurrentSolePart(null); }}
-                        className="text-xs font-semibold text-white/80 hover:text-white">← 戻る</button>
-                      <span className="text-sm font-bold text-white">
-                        {activePart ? `${partTitles[activePart]} (${partIdx}/${partTotal})` : ''}
-                      </span>
-                      <button onClick={stopCamera}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white text-xs font-bold">✕</button>
-                    </div>
-                    {/* Video */}
-                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
-                    {/* SVG guide overlay */}
-                    {activePart && <CameraGuide part={activePart} />}
-                    {/* Guide text */}
-                    {activePart && (
-                      <div className="pointer-events-none absolute bottom-28 left-0 right-0 z-10 flex justify-center px-4">
-                        <p className="rounded-lg bg-black/40 px-3 py-1.5 text-center text-xs font-semibold text-white">{GUIDE_TEXTS[activePart]}</p>
-                      </div>
-                    )}
-                    {/* Buttons */}
-                    <div className="absolute bottom-4 left-0 right-0 z-20 flex flex-col items-center gap-2">
-                      <button
-                        onClick={bodyPart === 'nail' ? captureNailPhoto : captureSolePhoto}
-                        className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-2xl shadow-lg transition-transform active:scale-95">
-                        📸
-                      </button>
-                      <button
-                        onClick={bodyPart === 'nail' ? skipNailPart : skipSolePart}
-                        className="text-xs text-white/70 hover:text-white">
-                        スキップ（省略する）
-                      </button>
+          {step === 'upload' && (
+            <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+              {cameraActive ? (
+                <div className="relative bg-black" style={{ minHeight: '320px' }}>
+                  <button onClick={stopCamera}
+                    className="absolute top-3 right-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white text-sm font-bold">✕</button>
+                  <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
+                  <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center">
+                    <button onClick={capturePhoto}
+                      className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-2xl shadow-lg transition-transform active:scale-95">
+                      📸
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-8">
+                  <div className="mb-6 flex justify-center">
+                    <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-primary/20 shadow-md">
+                      <Image src="/images/optimized/nailanaly.jpg" alt="AI Nail Diagnosis" fill className="object-cover" sizes="112px" priority />
                     </div>
                   </div>
-                ) : (
-                  <div className="p-8">
-                    <div className="mb-6 flex justify-center">
-                      <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-primary/20 shadow-md">
-                        <Image src="/images/optimized/nailanaly.jpg" alt="AI Nail Diagnosis" fill className="object-cover" sizes="112px" priority />
-                      </div>
-                    </div>
-                    <h2 className="mb-2 text-xl font-bold text-foreground">{bodyPart === 'sole' ? t('upload.heelTitle') : t('upload.title')}</h2>
-                    <p className="mb-6 text-sm text-muted-foreground">{bodyPart === 'sole' ? t('upload.heelDescription') : t('upload.description')}</p>
-                    <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{t('upload.guideTitle')}</h3>
-                      <ul className="space-y-1">
-                        {guideItems.map((g, i) => (
-                          <li key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />{g}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    {/* Drag-drop / file select */}
-                    <div
-                      onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all ${
-                        isDragging ? 'scale-[1.01] border-primary bg-primary/5' : 'border-border hover:border-primary/40'
-                      }`}
-                    >
-                      <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl transition-colors ${
-                        isDragging ? 'bg-primary text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'
-                      }`}>
-                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <span className="text-base font-semibold text-foreground">{isDragging ? t('upload.dropHere') : t('upload.dragDrop')}</span>
-                      <span className="mt-1 text-sm text-muted-foreground">{t('upload.fileTypes')}</span>
-                      <input ref={fileInputRef} type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }} className="hidden" />
-                    </div>
-                    {/* Camera button */}
-                    {cameraSupported && (
-                      <button
-                        onClick={bodyPart === 'nail' ? handleStartNailCamera : handleStartSoleCamera}
-                        className="mt-3 w-full rounded-xl border-2 border-dashed border-border py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40"
-                      >
-                        📷 カメラで撮影
-                      </button>
-                    )}
-                    {/* Camera thumbnails — nail */}
-                    {bodyPart === 'nail' && capturedImages.length > 0 && (
-                      <div className="mt-5">
-                        <p className="mb-2 text-xs font-semibold text-muted-foreground">撮影済み</p>
-                        <div className="flex gap-3">
-                          {(['right_hand', 'left_hand', 'both_feet'] as const).map(part => {
-                            const img = capturedImages.find(c => c.part === part);
-                            const labels = { right_hand: '右手', left_hand: '左手', both_feet: '両足' };
-                            return (
-                              <div key={part} className="flex-1 text-center">
-                                <p className="mb-1 text-[10px] text-muted-foreground">{labels[part]}</p>
-                                {img ? (
-                                  <div>
-                                    <img src={img.dataUrl} alt={part} className="h-20 w-full rounded-lg border border-border object-cover" />
-                                    <button onClick={() => { setCurrentShootPart(part); startCamera(); }}
-                                      className="mt-1 text-[10px] text-primary hover:underline">撮り直し</button>
-                                  </div>
-                                ) : (
-                                  <div className="flex h-20 w-full items-center justify-center rounded-lg border-2 border-dashed border-border">
-                                    <span className="text-[10px] text-muted-foreground">未撮影</span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    {/* Camera thumbnails — sole */}
-                    {bodyPart === 'sole' && soleCapturedImages.length > 0 && (
-                      <div className="mt-5">
-                        <p className="mb-2 text-xs font-semibold text-muted-foreground">撮影済み</p>
-                        <div className="flex gap-3">
-                          {(['right_sole', 'left_sole'] as const).map(part => {
-                            const img = soleCapturedImages.find(c => c.part === part);
-                            const labels = { right_sole: '右足裏', left_sole: '左足裏' };
-                            return (
-                              <div key={part} className="flex-1 text-center">
-                                <p className="mb-1 text-[10px] text-muted-foreground">{labels[part]}</p>
-                                {img ? (
-                                  <div>
-                                    <img src={img.dataUrl} alt={part} className="h-20 w-full rounded-lg border border-border object-cover" />
-                                    <button onClick={() => { setCurrentSolePart(part); startCamera(); }}
-                                      className="mt-1 text-[10px] text-primary hover:underline">撮り直し</button>
-                                  </div>
-                                ) : (
-                                  <div className="flex h-20 w-full items-center justify-center rounded-lg border-2 border-dashed border-border">
-                                    <span className="text-[10px] text-muted-foreground">未撮影</span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    {/* File selection single preview (no camera thumbnails) */}
-                    {imagePreview && capturedImages.length === 0 && soleCapturedImages.length === 0 && (
-                      <div className="mt-6 text-center">
-                        <p className="mb-2 text-sm text-muted-foreground">{t('upload.uploadedLabel')}</p>
-                        <div className="relative mx-auto h-48 w-48 overflow-hidden rounded-lg border border-border">
-                          <Image src={imagePreview} alt="Uploaded nail" fill className="object-cover" />
-                        </div>
-                      </div>
-                    )}
-                    {imagePreview && (
-                      <div className="mt-5 rounded-xl border border-border bg-muted/50 p-4">
-                        <label className="flex cursor-pointer items-start gap-3">
-                          <input type="checkbox" checked={userConsent} onChange={e => setUserConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-primary" />
-                          <span className="text-xs leading-relaxed text-muted-foreground">{t('upload.consent')}</span>
-                        </label>
-                      </div>
-                    )}
-                    {imagePreview && (
-                      <button
-                        onClick={() => { if (!image || !userConsent) return; setStep('quiz'); setQuizStep(1); setHeelStep(1); }}
-                        disabled={!userConsent}
-                        className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {qt.startBtn.replace('{total}', String(TOTAL_STEPS))}
-                      </button>
-                    )}
-                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                      <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <h2 className="mb-2 text-xl font-bold text-foreground">{bodyPart === 'sole' ? t('upload.heelTitle') : t('upload.title')}</h2>
+                  <p className="mb-6 text-sm text-muted-foreground">{bodyPart === 'sole' ? t('upload.heelDescription') : t('upload.description')}</p>
+                  <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{t('upload.guideTitle')}</h3>
+                    <ul className="space-y-1">
+                      {guideItems.map((g, i) => (
+                        <li key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />{g}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div
+                    onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all ${
+                      isDragging ? 'scale-[1.01] border-primary bg-primary/5' : 'border-border hover:border-primary/40'
+                    }`}
+                  >
+                    <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl transition-colors ${
+                      isDragging ? 'bg-primary text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'
+                    }`}>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <p className="text-xs text-amber-800">{t('upload.disclaimer')}</p>
                     </div>
+                    <span className="text-base font-semibold text-foreground">{isDragging ? t('upload.dropHere') : t('upload.dragDrop')}</span>
+                    <span className="mt-1 text-sm text-muted-foreground">{t('upload.fileTypes')}</span>
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }} className="hidden" />
                   </div>
-                )}
-              </div>
-            );
-          })()}
+                  {cameraSupported && (
+                    <button onClick={startCamera}
+                      className="mt-3 w-full rounded-xl border-2 border-dashed border-border py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40">
+                      📷 カメラで撮影
+                    </button>
+                  )}
+                  {imagePreview && (
+                    <div className="mt-6 text-center">
+                      <p className="mb-2 text-sm text-muted-foreground">{t('upload.uploadedLabel')}</p>
+                      <div className="relative mx-auto h-48 w-48 overflow-hidden rounded-lg border border-border">
+                        <Image src={imagePreview} alt="Uploaded nail" fill className="object-cover" />
+                      </div>
+                    </div>
+                  )}
+                  {imagePreview && (
+                    <div className="mt-5 rounded-xl border border-border bg-muted/50 p-4">
+                      <label className="flex cursor-pointer items-start gap-3">
+                        <input type="checkbox" checked={userConsent} onChange={e => setUserConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-primary" />
+                        <span className="text-xs leading-relaxed text-muted-foreground">{t('upload.consent')}</span>
+                      </label>
+                    </div>
+                  )}
+                  {imagePreview && (
+                    <button
+                      onClick={() => { if (!image || !userConsent) return; setStep('quiz'); setQuizStep(1); setHeelStep(1); }}
+                      disabled={!userConsent}
+                      className="mt-4 w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {qt.startBtn.replace('{total}', String(TOTAL_STEPS))}
+                    </button>
+                  )}
+                  <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-xs text-amber-800">{t('upload.disclaimer')}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ===== かかとQuiz ===== */}
           {step === 'quiz' && bodyPart === 'sole' && (() => {
@@ -1796,25 +1578,6 @@ export default function AIDiagnosisPage() {
                 {/* Step 8: 写真提供 + 同意 + 送信 */}
                 {researchStep === 8 && (
                   <div className="space-y-6">
-                    {/* Research camera UI */}
-                    {cameraActive && researchCameraPart && (
-                      <div className="relative bg-black rounded-xl overflow-hidden" style={{ minHeight: '360px' }}>
-                        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
-                          <span className="text-sm font-bold text-white">{researchCameraPart && GUIDE_TEXTS[researchCameraPart].slice(0, 12)}…</span>
-                          <button onClick={() => { stopCamera(); setResearchCameraPart(null); setResearchCameraSlot(null); }}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white text-xs font-bold">✕</button>
-                        </div>
-                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', display: 'block' }} />
-                        <CameraGuide part={researchCameraPart} />
-                        <div className="pointer-events-none absolute bottom-20 left-0 right-0 z-10 flex justify-center px-4">
-                          <p className="rounded-lg bg-black/40 px-3 py-1.5 text-center text-xs font-semibold text-white">{GUIDE_TEXTS[researchCameraPart]}</p>
-                        </div>
-                        <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center">
-                          <button onClick={captureResearchPhoto}
-                            className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-xl shadow-lg transition-transform active:scale-95">📸</button>
-                        </div>
-                      </div>
-                    )}
                     <h2 className="text-xl font-bold">{rt.step8Title}</h2>
                     <p className="text-xs text-muted-foreground">{rt.imageSection.title}</p>
                     <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
@@ -1831,12 +1594,6 @@ export default function AIDiagnosisPage() {
                       {(['hand_nail', 'foot_nail', 'sole'] as const).map(type => {
                         const existing = researchAnswers.images.find(i => i.type === type);
                         const label = type === 'hand_nail' ? rt.imageSection.handNail : type === 'foot_nail' ? rt.imageSection.footNail : rt.imageSection.sole;
-                        // camera guide parts per slot
-                        const slotGuides: Record<typeof type, GuidePartType[]> = {
-                          hand_nail: ['right_hand', 'left_hand'],
-                          foot_nail: ['both_feet'],
-                          sole: ['right_sole', 'left_sole'],
-                        };
                         return (
                           <div key={type} className="text-center">
                             <label className="mb-2 block text-xs font-semibold text-muted-foreground">{label}</label>
@@ -1847,24 +1604,12 @@ export default function AIDiagnosisPage() {
                                   className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">✕</button>
                               </div>
                             ) : (
-                              <div className="space-y-1">
-                                {/* Camera button(s) */}
-                                {cameraSupported && slotGuides[type].map(guidePart => {
-                                  const partLabel = { right_hand: '右手', left_hand: '左手', both_feet: '両足', right_sole: '右足裏', left_sole: '左足裏' }[guidePart];
-                                  return (
-                                    <button key={guidePart} onClick={() => { setResearchCameraPart(guidePart); setResearchCameraSlot(type); startCamera(); }}
-                                      className="flex w-full items-center justify-center gap-1 rounded-lg border border-border py-1.5 text-[10px] font-semibold hover:border-emerald-400 transition-colors">
-                                      📷 {partLabel}
-                                    </button>
-                                  );
-                                })}
-                                {/* File select */}
-                                <label className="flex cursor-pointer items-center justify-center gap-1 rounded-lg border border-dashed border-border py-1.5 text-[10px] text-muted-foreground hover:border-emerald-400 transition-colors">
-                                  🖼 ファイル
-                                  <input type="file" accept="image/*" className="hidden"
-                                    onChange={e => { const f = e.target.files?.[0]; if (f) handleResearchImageUpload(type, f); }} />
-                                </label>
-                              </div>
+                              <label className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border hover:border-emerald-400 transition-colors">
+                                <span className="text-2xl">📷</span>
+                                <span className="mt-1 text-[10px] text-muted-foreground">{rt.imageSection.uploadBtn}</span>
+                                <input type="file" accept="image/*" className="hidden"
+                                  onChange={e => { const f = e.target.files?.[0]; if (f) handleResearchImageUpload(type, f); }} />
+                              </label>
                             )}
                           </div>
                         );
