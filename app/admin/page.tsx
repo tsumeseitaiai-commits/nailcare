@@ -413,6 +413,110 @@ function ExportOverlay({ label }: { label: string }) {
 }
 
 // ────────────────────────────────────────────────
+// Sole Filter Panel
+// ────────────────────────────────────────────────
+interface SoleFilters {
+  severity: string;
+  heel_severity: string;
+  heel_moisture: string;
+  heel_footwear: string;
+  heel_standing: string;
+  health_score_min: string;
+  health_score_max: string;
+  sole_score_min: string;
+  sole_score_max: string;
+}
+
+const EMPTY_SOLE: SoleFilters = {
+  severity: '', heel_severity: '', heel_moisture: '', heel_footwear: '', heel_standing: '',
+  health_score_min: '', health_score_max: '', sole_score_min: '', sole_score_max: '',
+};
+
+function SoleFilterPanel({ f, set, reset, cases }: {
+  f: SoleFilters; set: (p: Partial<SoleFilters>) => void; reset: () => void; cases: SoleCase[];
+}) {
+  const heelSeverities = uniq(cases.map(c => c.heel_severity));
+  const heelMoistures  = uniq(cases.map(c => c.heel_moisture));
+  const heelFootwears  = uniq(cases.map(c => c.heel_footwear));
+  const heelStandings  = uniq(cases.map(c => c.heel_standing));
+
+  const active = Object.values(f).filter(v => v !== '').length;
+
+  const Sel = ({ label, field, opts }: { label: string; field: keyof SoleFilters; opts: string[] }) => (
+    <label className="block">
+      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</span>
+      <select value={f[field]} onChange={e => set({ [field]: e.target.value })}
+        className={`w-full rounded-lg border px-2 py-1.5 text-xs focus:outline-none focus:border-[#7c6b5e] ${f[field] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5 font-semibold text-[#7c6b5e]' : 'border-slate-200 bg-white text-slate-700'}`}>
+        <option value="">すべて</option>
+        {opts.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </label>
+  );
+
+  const Rng = ({ label, kMin, kMax, lo, hi }: { label: string; kMin: keyof SoleFilters; kMax: keyof SoleFilters; lo: number; hi: number }) => {
+    const isActive = f[kMin] || f[kMax];
+    return (
+      <div>
+        <span className={`mb-1 block text-[10px] font-semibold uppercase tracking-wider ${isActive ? 'text-[#7c6b5e]' : 'text-slate-400'}`}>{label}</span>
+        <div className="flex items-center gap-1">
+          <input type="number" min={lo} max={hi} placeholder={String(lo)} value={f[kMin]}
+            onChange={e => set({ [kMin]: e.target.value })}
+            className={`w-full rounded-lg border px-2 py-1.5 text-xs text-center focus:outline-none focus:border-[#7c6b5e] ${f[kMin] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5' : 'border-slate-200'}`} />
+          <span className="shrink-0 text-[10px] text-slate-400">〜</span>
+          <input type="number" min={lo} max={hi} placeholder={String(hi)} value={f[kMax]}
+            onChange={e => set({ [kMax]: e.target.value })}
+            className={`w-full rounded-lg border px-2 py-1.5 text-xs text-center focus:outline-none focus:border-[#7c6b5e] ${f[kMax] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5' : 'border-slate-200'}`} />
+        </div>
+      </div>
+    );
+  };
+
+  const Section = ({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) => (
+    <div className="space-y-3">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-[#7c6b5e]">{emoji} {title}</p>
+      {children}
+    </div>
+  );
+
+  return (
+    <div className="w-60 shrink-0">
+      <div className="sticky top-[61px] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-700">🔍 絞り込み</span>
+            {active > 0 && <span className="rounded-full bg-[#7c6b5e] px-2 py-0.5 text-[10px] font-bold text-white">{active}</span>}
+          </div>
+          {active > 0 && <button onClick={reset} className="text-xs text-slate-400 hover:text-red-500 transition font-semibold">全リセット</button>}
+        </div>
+        <div className="overflow-y-auto p-4 space-y-5" style={{ maxHeight: 'calc(100vh - 130px)' }}>
+          <Section emoji="📊" title="スコア">
+            <Rng label="総合スコア" kMin="health_score_min" kMax="health_score_max" lo={0} hi={100} />
+            <Rng label="足裏スコア" kMin="sole_score_min" kMax="sole_score_max" lo={0} hi={100} />
+          </Section>
+          <div className="border-t border-slate-100" />
+          <Section emoji="🦶" title="足裏の状態">
+            <label className="block">
+              <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">重症度</span>
+              <select value={f.severity} onChange={e => set({ severity: e.target.value })}
+                className={`w-full rounded-lg border px-2 py-1.5 text-xs focus:outline-none focus:border-[#7c6b5e] ${f.severity ? 'border-[#7c6b5e] bg-[#7c6b5e]/5 font-semibold text-[#7c6b5e]' : 'border-slate-200 bg-white text-slate-700'}`}>
+                <option value="">すべて</option>
+                <option value="mild">軽度</option>
+                <option value="moderate">中度</option>
+                <option value="severe">重度</option>
+              </select>
+            </label>
+            <Sel label="ひび割れ・硬さ" field="heel_severity" opts={heelSeverities} />
+            <Sel label="保湿ケア" field="heel_moisture" opts={heelMoistures} />
+            <Sel label="靴タイプ" field="heel_footwear" opts={heelFootwears} />
+            <Sel label="立ち仕事時間" field="heel_standing" opts={heelStandings} />
+          </Section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
 // Sole Cases Tab
 // ────────────────────────────────────────────────
 interface SoleCase {
@@ -446,6 +550,9 @@ function SoleCasesTab({ password }: { password: string }) {
   const [selected, setSelected] = useState<SoleCase | null>(null);
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [soleFilters, setSoleFiltersRaw] = useState<SoleFilters>(EMPTY_SOLE);
+  const setSoleF = (p: Partial<SoleFilters>) => setSoleFiltersRaw(prev => ({ ...prev, ...p }));
+  const resetSoleF = () => setSoleFiltersRaw(EMPTY_SOLE);
   const LIMIT = 20;
 
   const fetchCases = useCallback(async (p: number) => {
@@ -487,17 +594,32 @@ function SoleCasesTab({ password }: { password: string }) {
   };
   const SEVERITY_LABEL: Record<string, string> = { mild: '軽度', moderate: '中度', severe: '重度' };
 
+  const filteredCases = cases.filter(c => {
+    if (soleFilters.severity && c.severity !== soleFilters.severity) return false;
+    if (soleFilters.heel_severity && c.heel_severity !== soleFilters.heel_severity) return false;
+    if (soleFilters.heel_moisture && c.heel_moisture !== soleFilters.heel_moisture) return false;
+    if (soleFilters.heel_footwear && c.heel_footwear !== soleFilters.heel_footwear) return false;
+    if (soleFilters.heel_standing && c.heel_standing !== soleFilters.heel_standing) return false;
+    if (soleFilters.health_score_min && c.health_score < Number(soleFilters.health_score_min)) return false;
+    if (soleFilters.health_score_max && c.health_score > Number(soleFilters.health_score_max)) return false;
+    if (soleFilters.sole_score_min && (c.sole_score ?? 0) < Number(soleFilters.sole_score_min)) return false;
+    if (soleFilters.sole_score_max && c.sole_score != null && c.sole_score > Number(soleFilters.sole_score_max)) return false;
+    return true;
+  });
+
   const totalPages = Math.ceil(total / LIMIT);
-  const toggleAll = () => setCheckedIds(checkedIds.size === cases.length ? new Set() : new Set(cases.map(c => c.id)));
+  const toggleAll = () => setCheckedIds(checkedIds.size === filteredCases.length ? new Set() : new Set(filteredCases.map(c => c.id)));
   const toggleCheck = (id: string) => setCheckedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-6">
+    <div className="mx-auto flex max-w-[1400px] gap-5 px-4 py-6">
+      <SoleFilterPanel f={soleFilters} set={setSoleF} reset={resetSoleF} cases={cases} />
+      <div className="flex-1 min-w-0">
       {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">⚠️ {error}</div>}
 
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-slate-700">足裏データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{total} 件</span></span>
+          <span className="text-sm font-bold text-slate-700">足裏データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{filteredCases.length}/{total} 件</span></span>
           {checkedIds.size > 0 && (
             <button onClick={() => handleDelete(Array.from(checkedIds))} disabled={deleting}
               className="flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-40">
@@ -520,7 +642,7 @@ function SoleCasesTab({ password }: { password: string }) {
           </svg>
           読み込み中...
         </div>
-      ) : cases.length === 0 ? (
+      ) : filteredCases.length === 0 ? (
         <div className="py-32 text-center text-slate-400"><p className="text-4xl mb-2">🦶</p><p className="text-sm">足裏データがありません</p></div>
       ) : (
         <>
@@ -529,7 +651,7 @@ function SoleCasesTab({ password }: { password: string }) {
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50 text-left">
                   <th className="px-3 py-3 w-10">
-                    <input type="checkbox" checked={checkedIds.size === cases.length && cases.length > 0} onChange={toggleAll} className="h-4 w-4 cursor-pointer accent-[#7c6b5e]" />
+                    <input type="checkbox" checked={checkedIds.size === filteredCases.length && filteredCases.length > 0} onChange={toggleAll} className="h-4 w-4 cursor-pointer accent-[#7c6b5e]" />
                   </th>
                   <th className="px-3 py-3 w-14 text-xs font-semibold uppercase tracking-wider text-slate-400">画像</th>
                   <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">総合</th>
@@ -541,7 +663,7 @@ function SoleCasesTab({ password }: { password: string }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {cases.map(c => {
+                {filteredCases.map(c => {
                   const col = scoreColor(c.health_score);
                   return (
                     <tr key={c.id} className={`transition hover:bg-slate-50/80 ${checkedIds.has(c.id) ? 'bg-red-50/40' : ''}`}>
@@ -596,6 +718,7 @@ function SoleCasesTab({ password }: { password: string }) {
           )}
         </>
       )}
+      </div>
 
       {/* Detail Modal */}
       {selected && (
@@ -672,6 +795,142 @@ function SoleCasesTab({ password }: { password: string }) {
 }
 
 // ────────────────────────────────────────────────
+// Research Filter Panel
+// ────────────────────────────────────────────────
+interface ResearchFilters {
+  sport: string;
+  gender: string;
+  country: string;
+  age_min: string;
+  age_max: string;
+  dominant_foot: string;
+  hallux_valgus: string;
+  major_injury_site: string;
+  injury_recurrence: string;
+  weekly_sessions: string;
+  fatigue_min: string;
+  fatigue_max: string;
+  toe_grip_min: string;
+  toe_grip_max: string;
+  stress_min: string;
+  stress_max: string;
+  sleep_hours_min: string;
+  sleep_hours_max: string;
+  training_intensity_min: string;
+  training_intensity_max: string;
+  nail_cut_frequency: string;
+  deep_nail_habit: string;
+}
+
+const EMPTY_RESEARCH: ResearchFilters = {
+  sport: '', gender: '', country: '', age_min: '', age_max: '', dominant_foot: '',
+  hallux_valgus: '', major_injury_site: '', injury_recurrence: '', weekly_sessions: '',
+  fatigue_min: '', fatigue_max: '', toe_grip_min: '', toe_grip_max: '',
+  stress_min: '', stress_max: '', sleep_hours_min: '', sleep_hours_max: '',
+  training_intensity_min: '', training_intensity_max: '',
+  nail_cut_frequency: '', deep_nail_habit: '',
+};
+
+function ResearchFilterPanel({ f, set, reset, cases }: {
+  f: ResearchFilters; set: (p: Partial<ResearchFilters>) => void; reset: () => void; cases: ResearchCase[];
+}) {
+  const sports     = uniq(cases.map(c => c.sport));
+  const genders    = uniq(cases.map(c => c.gender));
+  const countries  = uniq(cases.map(c => c.country));
+  const domFeet    = uniq(cases.map(c => c.dominant_foot));
+  const halluxes   = uniq(cases.map(c => c.hallux_valgus));
+  const injSites   = uniq(cases.map(c => c.major_injury_site));
+  const injRecurs  = uniq(cases.map(c => c.injury_recurrence));
+  const weeklySess = uniq(cases.map(c => c.weekly_sessions));
+  const nailFreqs  = uniq(cases.map(c => c.nail_cut_frequency));
+  const deepNails  = uniq(cases.map(c => c.deep_nail_habit));
+
+  const active = Object.values(f).filter(v => v !== '').length;
+
+  const Sel = ({ label, field, opts }: { label: string; field: keyof ResearchFilters; opts: string[] }) => (
+    <label className="block">
+      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</span>
+      <select value={f[field]} onChange={e => set({ [field]: e.target.value })}
+        className={`w-full rounded-lg border px-2 py-1.5 text-xs focus:outline-none focus:border-[#7c6b5e] ${f[field] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5 font-semibold text-[#7c6b5e]' : 'border-slate-200 bg-white text-slate-700'}`}>
+        <option value="">すべて</option>
+        {opts.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </label>
+  );
+
+  const Rng = ({ label, kMin, kMax, lo, hi }: { label: string; kMin: keyof ResearchFilters; kMax: keyof ResearchFilters; lo: number; hi: number }) => {
+    const isActive = f[kMin] || f[kMax];
+    return (
+      <div>
+        <span className={`mb-1 block text-[10px] font-semibold uppercase tracking-wider ${isActive ? 'text-[#7c6b5e]' : 'text-slate-400'}`}>{label}</span>
+        <div className="flex items-center gap-1">
+          <input type="number" min={lo} max={hi} placeholder={String(lo)} value={f[kMin]}
+            onChange={e => set({ [kMin]: e.target.value })}
+            className={`w-full rounded-lg border px-2 py-1.5 text-xs text-center focus:outline-none focus:border-[#7c6b5e] ${f[kMin] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5' : 'border-slate-200'}`} />
+          <span className="shrink-0 text-[10px] text-slate-400">〜</span>
+          <input type="number" min={lo} max={hi} placeholder={String(hi)} value={f[kMax]}
+            onChange={e => set({ [kMax]: e.target.value })}
+            className={`w-full rounded-lg border px-2 py-1.5 text-xs text-center focus:outline-none focus:border-[#7c6b5e] ${f[kMax] ? 'border-[#7c6b5e] bg-[#7c6b5e]/5' : 'border-slate-200'}`} />
+        </div>
+      </div>
+    );
+  };
+
+  const Section = ({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) => (
+    <div className="space-y-3">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-[#7c6b5e]">{emoji} {title}</p>
+      {children}
+    </div>
+  );
+
+  return (
+    <div className="w-60 shrink-0">
+      <div className="sticky top-[61px] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-700">🔍 絞り込み</span>
+            {active > 0 && <span className="rounded-full bg-[#7c6b5e] px-2 py-0.5 text-[10px] font-bold text-white">{active}</span>}
+          </div>
+          {active > 0 && <button onClick={reset} className="text-xs text-slate-400 hover:text-red-500 transition font-semibold">全リセット</button>}
+        </div>
+        <div className="overflow-y-auto p-4 space-y-5" style={{ maxHeight: 'calc(100vh - 130px)' }}>
+          <Section emoji="👤" title="属性">
+            <Sel label="競技" field="sport" opts={sports} />
+            <Sel label="性別" field="gender" opts={genders} />
+            <Sel label="国" field="country" opts={countries} />
+            <Rng label="年齢" kMin="age_min" kMax="age_max" lo={5} hi={80} />
+            <Sel label="利き足" field="dominant_foot" opts={domFeet} />
+          </Section>
+          <div className="border-t border-slate-100" />
+          <Section emoji="🏋️" title="トレーニング">
+            <Sel label="週練習回数" field="weekly_sessions" opts={weeklySess} />
+            <Rng label="トレーニング強度 (1-10)" kMin="training_intensity_min" kMax="training_intensity_max" lo={1} hi={10} />
+          </Section>
+          <div className="border-t border-slate-100" />
+          <Section emoji="💤" title="コンディション">
+            <Rng label="疲労度 (1-10)" kMin="fatigue_min" kMax="fatigue_max" lo={1} hi={10} />
+            <Rng label="睡眠時間" kMin="sleep_hours_min" kMax="sleep_hours_max" lo={0} hi={12} />
+            <Rng label="ストレス (1-10)" kMin="stress_min" kMax="stress_max" lo={1} hi={10} />
+          </Section>
+          <div className="border-t border-slate-100" />
+          <Section emoji="🦶" title="足・爪の状態">
+            <Sel label="外反母趾" field="hallux_valgus" opts={halluxes} />
+            <Rng label="足指感覚 (1-10)" kMin="toe_grip_min" kMax="toe_grip_max" lo={1} hi={10} />
+            <Sel label="爪切り頻度" field="nail_cut_frequency" opts={nailFreqs} />
+            <Sel label="深爪の習慣" field="deep_nail_habit" opts={deepNails} />
+          </Section>
+          <div className="border-t border-slate-100" />
+          <Section emoji="⚡" title="ケガ歴">
+            <Sel label="主なケガ部位" field="major_injury_site" opts={injSites} />
+            <Sel label="繰り返しケガ" field="injury_recurrence" opts={injRecurs} />
+          </Section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────
 // Research Cases Tab
 // ────────────────────────────────────────────────
 interface ResearchImage {
@@ -725,6 +984,9 @@ function ResearchTab({ password }: { password: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<ResearchCase | null>(null);
+  const [researchFilters, setResearchFiltersRaw] = useState<ResearchFilters>(EMPTY_RESEARCH);
+  const setResearchF = (p: Partial<ResearchFilters>) => setResearchFiltersRaw(prev => ({ ...prev, ...p }));
+  const resetResearchF = () => setResearchFiltersRaw(EMPTY_RESEARCH);
   const LIMIT = 20;
 
   const fetchCases = useCallback(async (p: number) => {
@@ -754,21 +1016,50 @@ function ResearchTab({ password }: { password: string }) {
       });
   };
 
-  // Summary stats
-  const avgFatigue = cases.length ? (cases.reduce((s, c) => s + (c.fatigue_level ?? 0), 0) / cases.filter(c => c.fatigue_level != null).length || 0).toFixed(1) : null;
-  const avgToeGrip = cases.length ? (cases.reduce((s, c) => s + (c.toe_grip_sense ?? 0), 0) / cases.filter(c => c.toe_grip_sense != null).length || 0).toFixed(1) : null;
-  const topSports = Object.entries(cases.reduce((acc, c) => { if (c.sport) acc[c.sport] = (acc[c.sport] || 0) + 1; return acc; }, {} as Record<string, number>))
+  // filteredCases (client-side)
+  const filteredCases = cases.filter(c => {
+    if (researchFilters.sport && c.sport !== researchFilters.sport) return false;
+    if (researchFilters.gender && c.gender !== researchFilters.gender) return false;
+    if (researchFilters.country && c.country !== researchFilters.country) return false;
+    if (researchFilters.age_min && (c.age ?? 0) < Number(researchFilters.age_min)) return false;
+    if (researchFilters.age_max && (c.age ?? 999) > Number(researchFilters.age_max)) return false;
+    if (researchFilters.dominant_foot && c.dominant_foot !== researchFilters.dominant_foot) return false;
+    if (researchFilters.hallux_valgus && c.hallux_valgus !== researchFilters.hallux_valgus) return false;
+    if (researchFilters.major_injury_site && c.major_injury_site !== researchFilters.major_injury_site) return false;
+    if (researchFilters.injury_recurrence && c.injury_recurrence !== researchFilters.injury_recurrence) return false;
+    if (researchFilters.weekly_sessions && c.weekly_sessions !== researchFilters.weekly_sessions) return false;
+    if (researchFilters.fatigue_min && (c.fatigue_level ?? 0) < Number(researchFilters.fatigue_min)) return false;
+    if (researchFilters.fatigue_max && c.fatigue_level != null && c.fatigue_level > Number(researchFilters.fatigue_max)) return false;
+    if (researchFilters.toe_grip_min && (c.toe_grip_sense ?? 0) < Number(researchFilters.toe_grip_min)) return false;
+    if (researchFilters.toe_grip_max && c.toe_grip_sense != null && c.toe_grip_sense > Number(researchFilters.toe_grip_max)) return false;
+    if (researchFilters.stress_min && (c.stress_level ?? 0) < Number(researchFilters.stress_min)) return false;
+    if (researchFilters.stress_max && c.stress_level != null && c.stress_level > Number(researchFilters.stress_max)) return false;
+    if (researchFilters.sleep_hours_min && (c.sleep_hours ?? 0) < Number(researchFilters.sleep_hours_min)) return false;
+    if (researchFilters.sleep_hours_max && c.sleep_hours != null && c.sleep_hours > Number(researchFilters.sleep_hours_max)) return false;
+    if (researchFilters.training_intensity_min && (c.training_intensity ?? 0) < Number(researchFilters.training_intensity_min)) return false;
+    if (researchFilters.training_intensity_max && c.training_intensity != null && c.training_intensity > Number(researchFilters.training_intensity_max)) return false;
+    if (researchFilters.nail_cut_frequency && c.nail_cut_frequency !== researchFilters.nail_cut_frequency) return false;
+    if (researchFilters.deep_nail_habit && c.deep_nail_habit !== researchFilters.deep_nail_habit) return false;
+    return true;
+  });
+
+  // Summary stats (filteredCases対象)
+  const avgFatigue = filteredCases.length ? (filteredCases.reduce((s, c) => s + (c.fatigue_level ?? 0), 0) / filteredCases.filter(c => c.fatigue_level != null).length || 0).toFixed(1) : null;
+  const avgToeGrip = filteredCases.length ? (filteredCases.reduce((s, c) => s + (c.toe_grip_sense ?? 0), 0) / filteredCases.filter(c => c.toe_grip_sense != null).length || 0).toFixed(1) : null;
+  const topSports = Object.entries(filteredCases.reduce((acc, c) => { if (c.sport) acc[c.sport] = (acc[c.sport] || 0) + 1; return acc; }, {} as Record<string, number>))
     .sort((a, b) => b[1] - a[1]).slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-6">
+    <div className="mx-auto flex max-w-[1400px] gap-5 px-4 py-6">
+      <ResearchFilterPanel f={researchFilters} set={setResearchF} reset={resetResearchF} cases={cases} />
+      <div className="flex-1 min-w-0">
       {error && <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">⚠️ {error}</div>}
 
       {/* Summary Cards */}
-      {cases.length > 0 && (
+      {filteredCases.length > 0 && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-center">
-            <p className="text-2xl font-bold text-[#7c6b5e]">{total}</p>
+            <p className="text-2xl font-bold text-[#7c6b5e]">{filteredCases.length}</p>
             <p className="text-xs text-slate-500 mt-1">総件数</p>
           </div>
           {avgFatigue && (
@@ -795,7 +1086,7 @@ function ResearchTab({ password }: { password: string }) {
       )}
 
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm font-bold text-slate-700">研究データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{total} 件</span></span>
+        <span className="text-sm font-bold text-slate-700">研究データ <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{filteredCases.length}/{total} 件</span></span>
         <button onClick={handleExportCsv}
           className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">
           📊 CSV
@@ -810,7 +1101,7 @@ function ResearchTab({ password }: { password: string }) {
           </svg>
           読み込み中...
         </div>
-      ) : cases.length === 0 ? (
+      ) : filteredCases.length === 0 ? (
         <div className="py-32 text-center text-slate-400"><p className="text-4xl mb-2">🔬</p><p className="text-sm">研究データがありません</p></div>
       ) : (
         <>
@@ -831,7 +1122,7 @@ function ResearchTab({ password }: { password: string }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {cases.map(c => (
+                {filteredCases.map(c => (
                   <tr key={c.id} className="transition hover:bg-slate-50/80 cursor-pointer" onClick={() => setSelected(c)}>
                     <td className="px-3 py-2.5 text-xs text-slate-500 whitespace-nowrap">{fmtDate(c.created_at)}</td>
                     <td className="px-3 py-2.5 text-xs font-semibold text-slate-700">{c.sport || '—'}</td>
@@ -867,6 +1158,7 @@ function ResearchTab({ password }: { password: string }) {
           )}
         </>
       )}
+      </div>
 
       {/* Detail Modal */}
       {selected && (
