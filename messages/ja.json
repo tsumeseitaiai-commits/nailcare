@@ -819,7 +819,8 @@
         "title": "体格と利き足を教えてください",
         "heightLabel": "身長",
         "weightLabel": "体重",
-        "dominantFootLabel": "利き足"
+        "dominantFootLabel": "利き足",
+        "shoeSizeLabel": "足のサイズ（cm）"
       },
       "q4": {
         "title": "競技歴と練習頻度を教えてください",
@@ -877,6 +878,11 @@
       "dominantFoot": {
         "right": "右足",
         "left": "左足",
+        "both": "両方"
+      },
+      "dominantHand": {
+        "right": "右手",
+        "left": "左手",
         "both": "両方"
       },
       "practiceFreq": {
@@ -1073,6 +1079,7 @@
       "doneDesc": "データは研究目的のみに匿名で使用されます。今後の爪整体研究にお役立てします。",
       "doneBack": "トップへ戻る",
       "country": "国・地域",
+      "footSize": "足のサイズ（cm）",
       "position": "ポジション / 種目",
       "dominantHand": "利き手",
       "dominantFoot": "利き足",

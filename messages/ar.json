@@ -819,7 +819,8 @@
         "title": "ما هو طولك ووزنك وقدمك المفضلة؟",
         "heightLabel": "الطول",
         "weightLabel": "الوزن",
-        "dominantFootLabel": "القدم المفضلة"
+        "dominantFootLabel": "القدم المفضلة",
+        "shoeSizeLabel": "مقاس القدم (سم)"
       },
       "q4": {
         "title": "كم سنة مارست الرياضة وكم مرة تتدرب في الأسبوع؟",
@@ -873,6 +874,11 @@
         "male": "ذكر",
         "female": "أنثى",
         "other": "آخر"
+      },
+      "dominantHand": {
+        "right": "اليد اليمنى",
+        "left": "اليد اليسرى",
+        "both": "كلتاهما"
       },
       "dominantFoot": {
         "right": "القدم اليمنى",

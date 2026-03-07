@@ -52,6 +52,7 @@ interface ResearchAnswers {
   gender: string;
   height: number | '';
   weight: number | '';
+  shoe_size: number | '';
   country: string;
   sport: string;
   position: string;
@@ -132,7 +133,7 @@ const HEEL_TOTAL_STEPS = 4;
 const RESEARCH_TOTAL_STEPS = 8;
 
 const INITIAL_RESEARCH: ResearchAnswers = {
-  age: '', gender: '', height: '', weight: '', country: '', sport: '',
+  age: '', gender: '', height: '', weight: '', shoe_size: '', country: '', sport: '',
   position: '', dominant_hand: '', dominant_foot: '', sports_history: '',
   weekly_sessions: '', session_duration: '', monthly_matches: '', training_intensity: 5,
   weekly_rest_days: '',
@@ -424,7 +425,7 @@ export default function AIDiagnosisPage() {
     finishBtn: string;
     q1: { title: string; placeholder: string };
     q2: { title: string; ageLabel: string; ageUnit: string; genderLabel: string };
-    q3: { title: string; heightLabel: string; weightLabel: string; dominantFootLabel: string };
+    q3: { title: string; heightLabel: string; weightLabel: string; dominantFootLabel: string; shoeSizeLabel: string };
     q4: { title: string; historyLabel: string; historyUnit: string; freqLabel: string };
     q5: { title: string; sub: string; colorChange: string; brittle: string; pain: string; growthChange: string };
     q6: { title: string; archLabel: string; callusLabel: string };
@@ -433,6 +434,7 @@ export default function AIDiagnosisPage() {
     q9: { title: string; toeGripLabel: string; toeGripLeft: string; toeGripRight: string; gripConfLabel: string; gripConfLeft: string; gripConfRight: string; balanceLabel: string; balanceLeft: string; balanceRight: string };
     q10: { title: string; finalLabel: string; ankleSprainLabel: string; painAreasLabel: string };
     gender: Record<string, string>;
+    dominantHand: Record<string, string>;
     dominantFoot: Record<string, string>;
     practiceFreq: Record<string, string>;
     archType: Record<string, string>;
@@ -1606,6 +1608,12 @@ export default function AIDiagnosisPage() {
                       </div>
                     </div>
                     <div>
+                      <label className="mb-1 block text-xs font-semibold text-muted-foreground">{qt.q3.shoeSizeLabel}</label>
+                      <input type="number" min={15} max={35} step={0.5} value={researchAnswers.shoe_size}
+                        onChange={e => setR('shoe_size', e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-32 rounded-lg border border-border px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none" />
+                    </div>
+                    <div>
                       <label className="mb-1 block text-xs font-semibold text-muted-foreground">{rt.country}</label>
                       <input type="text" value={researchAnswers.country} onChange={e => setR('country', e.target.value)}
                         placeholder="Japan"
@@ -1633,7 +1641,7 @@ export default function AIDiagnosisPage() {
                     </div>
                     <div>
                       <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.dominantHand}</label>
-                      <ChoiceButtons options={toOpts(qt.dominantFoot)} value={researchAnswers.dominant_hand} onChange={v => setR('dominant_hand', v)} cols={3} />
+                      <ChoiceButtons options={toOpts(qt.dominantHand)} value={researchAnswers.dominant_hand} onChange={v => setR('dominant_hand', v)} cols={3} />
                     </div>
                     <div>
                       <label className="mb-2 block text-xs font-semibold text-muted-foreground">{rt.dominantFoot}</label>

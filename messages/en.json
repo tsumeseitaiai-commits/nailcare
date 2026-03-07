@@ -819,7 +819,8 @@
         "title": "What is your body size and dominant foot?",
         "heightLabel": "Height",
         "weightLabel": "Weight",
-        "dominantFootLabel": "Dominant Foot"
+        "dominantFootLabel": "Dominant Foot",
+        "shoeSizeLabel": "Foot Size (cm)"
       },
       "q4": {
         "title": "How long have you played and how often do you train?",
@@ -873,6 +874,11 @@
         "male": "Male",
         "female": "Female",
         "other": "Other"
+      },
+      "dominantHand": {
+        "right": "Right hand",
+        "left": "Left hand",
+        "both": "Both"
       },
       "dominantFoot": {
         "right": "Right foot",
