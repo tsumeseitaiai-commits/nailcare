@@ -5,17 +5,29 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { createClient } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 
 export default function Header() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   // Close mobile menu on route change
@@ -78,6 +90,23 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
 
+          {/* マイページ / ログイン — desktop */}
+          {user ? (
+            <Link
+              href="/my-diagnoses"
+              className="hidden items-center justify-center rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
+            >
+              マイページ
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden items-center justify-center rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
+            >
+              ログイン
+            </Link>
+          )}
+
           {/* CTA Button — desktop */}
           <Link
             href="/ai-diagnosis"
@@ -128,6 +157,23 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {user ? (
+              <Link
+                href="/my-diagnoses"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                マイページ
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                ログイン
+              </Link>
+            )}
             <Link
               href="/ai-diagnosis"
               onClick={() => setMenuOpen(false)}

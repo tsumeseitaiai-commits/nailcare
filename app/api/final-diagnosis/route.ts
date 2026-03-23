@@ -12,11 +12,18 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, image, quizAnswers, locale = 'ja', bodyPart = 'nail', caseId } = await req.json();
 
+    // ログインユーザーのIDを取得
+    const cookieHeader = req.headers.get('cookie');
+    const { createSupabaseServerClientFromCookies } = await import('@/lib/supabaseServer');
+    const supabaseAuth = createSupabaseServerClientFromCookies(cookieHeader);
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    const userId: string | null = user?.id ?? null;
+
     const q = quizAnswers as Record<string, unknown> | undefined;
 
     // 足裏診断の場合は専用プロンプトで処理
     if (bodyPart === 'sole') {
-      return await handleSoleDiagnosis({ messages, image, quizAnswers: q, locale, caseId });
+      return await handleSoleDiagnosis({ messages, image, quizAnswers: q, locale, caseId, userId });
     }
 
     // Language instruction based on locale
@@ -129,7 +136,7 @@ Return ONLY the following JSON (no explanation, no code blocks):
 
     // --- Supabase保存（caseIdがあればUPDATE、なければINSERT）---
     console.log('[API] Supabase保存を開始します...');
-    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale, caseId });
+    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale, caseId, userId });
     console.log('[API] Supabase保存が完了しました');
 
     return NextResponse.json(diagnosis);
@@ -153,6 +160,7 @@ async function saveToSupabase({
   quizAnswers,
   locale,
   caseId,
+  userId,
 }: {
   image: string;
   messages: { role: string; content: string }[];
@@ -168,6 +176,7 @@ async function saveToSupabase({
   quizAnswers?: Record<string, unknown>;
   locale: string;
   caseId?: string;
+  userId?: string | null;
 }) {
   const q = quizAnswers;
   console.log('[Supabase] saveToSupabase 開始');
@@ -186,6 +195,7 @@ async function saveToSupabase({
         recommendations: diagnosis.recommendations,
         model_version:   MODEL_VERSION,
         messages_count:  messages.length,
+        ...(userId ? { user_id: userId } : {}),
       };
       const { error: updateError } = await getSupabaseAdmin()
         .from('nail_cases')
@@ -353,12 +363,14 @@ async function handleSoleDiagnosis({
   quizAnswers,
   locale,
   caseId,
+  userId,
 }: {
   messages: { role: string; content: string }[];
   image: string;
   quizAnswers?: Record<string, unknown>;
   locale: string;
   caseId?: string;
+  userId?: string | null;
 }) {
   const q = quizAnswers;
   const langName = locale === 'ar' ? 'Arabic (العربية)' : locale === 'en' ? 'English' : 'Japanese (日本語)';
@@ -456,6 +468,7 @@ practitioner_points: 施術者が優先的に対応すべき点を2〜3つ。イ
           ai_diagnosis: diagnosis.analysis,
           model_version: MODEL_VERSION,
           messages_count: messages.length,
+          ...(userId ? { user_id: userId } : {}),
         })
         .eq('id', caseId);
 

@@ -9,6 +9,13 @@ export async function POST(req: NextRequest) {
     const q = quizAnswers as Record<string, unknown> | undefined;
     const h = heelAnswers as Record<string, unknown> | undefined;
 
+    // ログインユーザーのIDを取得（未ログインは null）
+    const cookieHeader = req.headers.get('cookie');
+    const { createSupabaseServerClientFromCookies } = await import('@/lib/supabaseServer');
+    const supabaseAuth = createSupabaseServerClientFromCookies(cookieHeader);
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    const userId: string | null = user?.id ?? null;
+
     const supabase = getSupabaseAdmin();
     const timestamp = Date.now();
     const year = new Date().getFullYear();
@@ -43,6 +50,7 @@ export async function POST(req: NextRequest) {
         model_version: 'quiz-only',
         user_consent: true,
         locale,
+        user_id: userId,
       };
       const { data: savedCase, error: insertError } = await supabase
         .from('sole_cases')
@@ -87,6 +95,7 @@ export async function POST(req: NextRequest) {
           model_version: 'quiz-only',
           user_consent: true,
           locale,
+          user_id: userId,
         };
 
     const { data: savedCase, error: insertError } = await supabase
