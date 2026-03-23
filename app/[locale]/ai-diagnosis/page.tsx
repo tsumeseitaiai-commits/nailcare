@@ -1423,6 +1423,42 @@ export default function AIDiagnosisPage() {
                 {/* 登録店舗サジェスト */}
                 <ClinicSuggest bodyPart={bodyPart as 'nail' | 'sole' | null} />
 
+                {/* 経過観察・履歴保存バナー */}
+                {!userRole && (
+                  <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+                    <div className="mb-4 flex items-start gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl">📈</div>
+                      <div>
+                        <h3 className="text-base font-bold text-foreground">爪の健康は「経過観察」が大切です</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          爪の状態は日々の生活習慣やケアによってゆっくり変化します。1回の診断だけでなく、<strong>定期的に記録を重ねることで変化のパターンを把握</strong>し、より適切なケアにつなげられます。
+                        </p>
+                      </div>
+                    </div>
+                    <ul className="mb-5 space-y-2">
+                      {[
+                        '診断結果が自動で保存され、いつでも振り返れる',
+                        'スコアの推移をグラフで確認できる（近日公開）',
+                        '改善・悪化のタイミングを見逃さない',
+                      ].map((text, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                          <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-primary/20 text-center text-[10px] font-bold leading-4 text-primary">✓</span>
+                          {text}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex gap-3">
+                      <a href="/ja/login" className="flex-1 rounded-xl bg-primary py-2.5 text-center text-sm font-bold text-white hover:bg-primary/90">
+                        Googleで無料ログイン
+                      </a>
+                      <a href="/ja/register" className="flex-1 rounded-xl border border-primary py-2.5 text-center text-sm font-bold text-primary hover:bg-primary/5">
+                        メールで登録
+                      </a>
+                    </div>
+                    <p className="mt-2 text-center text-[11px] text-muted-foreground">登録・ログインは無料です。クレジットカード不要。</p>
+                  </div>
+                )}
+
                 {/* 会員登録バナー */}
                 {!userRole && (
                   <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-6 text-center">
