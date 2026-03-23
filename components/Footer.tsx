@@ -122,12 +122,12 @@ export default function Footer() {
             &copy; 2026 {t("copyright")}
           </p>
           <div className="flex gap-6">
-            <span className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-primary">
+            <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-primary">
               {t("privacy")}
-            </span>
-            <span className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-primary">
+            </Link>
+            <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-primary">
               {t("terms")}
-            </span>
+            </Link>
           </div>
         </div>
       </div>
