@@ -1,144 +1,309 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-export default function PrivacyPage() {
+type Locale = 'ja' | 'en' | 'ar';
+
+const content: Record<Locale, {
+  title: string;
+  updated: string;
+  dir: 'ltr' | 'rtl';
+  sections: { heading: string; body: React.ReactNode }[];
+}> = {
+  ja: {
+    title: 'プライバシーポリシー',
+    updated: '最終更新日：2025年1月',
+    dir: 'ltr',
+    sections: [
+      {
+        heading: '1. 事業者情報',
+        body: <p>本サービス「爪整体 AI診断」（以下「本サービス」）は、HaLVision（以下「当社」）が運営します。</p>,
+      },
+      {
+        heading: '2. 取得する情報',
+        body: (
+          <>
+            <p className="mb-2">本サービスでは、以下の情報を取得する場合があります。</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>メールアドレスおよびパスワード（アカウント登録時）</li>
+              <li>アップロードされた爪・足裏の画像</li>
+              <li>診断に関するアンケート回答（年齢、性別、競技種目、身体の状態等）</li>
+              <li>AI診断の結果データ</li>
+              <li>アクセスログ（IPアドレス、ブラウザ情報等）</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '3. 情報の利用目的',
+        body: (
+          <>
+            <p className="mb-2">取得した情報は、以下の目的で利用します。</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>AI診断サービスの提供および診断精度の向上</li>
+              <li>ユーザーアカウントの管理および認証</li>
+              <li>診断履歴の保存・閲覧機能の提供</li>
+              <li>サービスの改善・研究開発（匿名化した統計データとして利用する場合があります）</li>
+              <li>不正アクセスの検知・防止</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '4. 第三者への提供',
+        body: (
+          <>
+            <p>当社は、以下の場合を除き、取得した個人情報を第三者に提供しません。</p>
+            <ul className="ml-4 mt-2 space-y-1 list-disc text-muted-foreground">
+              <li>ユーザー本人の同意がある場合</li>
+              <li>法令に基づく場合</li>
+              <li>人の生命・身体・財産の保護のために必要な場合</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '5. 外部サービスの利用',
+        body: (
+          <>
+            <p className="mb-2">本サービスは以下の外部サービスを利用しており、各サービスのプライバシーポリシーが適用されます。</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>Google LLC（Google Gemini AI）</li>
+              <li>Supabase Inc.（データベース・ストレージ）</li>
+              <li>Vercel Inc.（ホスティング）</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '6. データの保管・削除',
+        body: <p>取得したデータはSupabaseのサーバー（AWS）に暗号化して保管します。アカウント削除のご要望は下記お問い合わせ先までご連絡ください。ご要望から30日以内に対応いたします。</p>,
+      },
+      {
+        heading: '7. Cookieの使用',
+        body: <p>本サービスはログイン状態の維持のためにCookieを使用します。ブラウザの設定でCookieを無効にすることができますが、一部機能が利用できなくなる場合があります。</p>,
+      },
+      {
+        heading: '8. 未成年者の利用',
+        body: <p>16歳未満の方がご利用になる場合は、保護者の同意を得た上でご利用ください。</p>,
+      },
+      {
+        heading: '9. プライバシーポリシーの変更',
+        body: <p>本ポリシーは予告なく変更する場合があります。重要な変更がある場合はサービス上でお知らせします。</p>,
+      },
+      {
+        heading: '10. お問い合わせ',
+        body: <p>個人情報の開示・訂正・削除等のご要望、またはプライバシーに関するお問い合わせは、サイト内のお問い合わせフォームよりご連絡ください。</p>,
+      },
+    ],
+  },
+
+  en: {
+    title: 'Privacy Policy',
+    updated: 'Last updated: January 2025',
+    dir: 'ltr',
+    sections: [
+      {
+        heading: '1. About Us',
+        body: <p>This service &quot;Nail Seitai AI Diagnosis&quot; (hereinafter &quot;the Service&quot;) is operated by HaLVision (hereinafter &quot;we&quot; or &quot;us&quot;).</p>,
+      },
+      {
+        heading: '2. Information We Collect',
+        body: (
+          <>
+            <p className="mb-2">We may collect the following information when you use the Service.</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>Email address and password (at account registration)</li>
+              <li>Uploaded images of nails and foot soles</li>
+              <li>Survey answers related to diagnosis (age, gender, sport, physical condition, etc.)</li>
+              <li>AI diagnosis result data</li>
+              <li>Access logs (IP address, browser information, etc.)</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '3. How We Use Your Information',
+        body: (
+          <>
+            <p className="mb-2">Collected information is used for the following purposes.</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>Providing and improving the accuracy of the AI diagnosis service</li>
+              <li>Managing and authenticating user accounts</li>
+              <li>Providing diagnosis history storage and browsing features</li>
+              <li>Service improvement and research (may be used as anonymized statistical data)</li>
+              <li>Detecting and preventing unauthorized access</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '4. Sharing with Third Parties',
+        body: (
+          <>
+            <p>We will not provide collected personal information to third parties except in the following cases.</p>
+            <ul className="ml-4 mt-2 space-y-1 list-disc text-muted-foreground">
+              <li>When the user has given their consent</li>
+              <li>When required by law</li>
+              <li>When necessary to protect the life, body, or property of a person</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '5. Third-Party Services',
+        body: (
+          <>
+            <p className="mb-2">The Service uses the following third-party services, each subject to their own privacy policies.</p>
+            <ul className="ml-4 space-y-1 list-disc text-muted-foreground">
+              <li>Google LLC (Google Gemini AI)</li>
+              <li>Supabase Inc. (database &amp; storage)</li>
+              <li>Vercel Inc. (hosting)</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '6. Data Storage & Deletion',
+        body: <p>Collected data is stored encrypted on Supabase servers (AWS). To request account deletion, please contact us via the inquiry form. We will process your request within 30 days.</p>,
+      },
+      {
+        heading: '7. Cookies',
+        body: <p>The Service uses cookies to maintain your login state. You can disable cookies in your browser settings, but some features may become unavailable.</p>,
+      },
+      {
+        heading: '8. Minors',
+        body: <p>If you are under 16 years of age, please obtain parental consent before using the Service.</p>,
+      },
+      {
+        heading: '9. Changes to This Policy',
+        body: <p>This policy may be updated without prior notice. We will notify you of significant changes through the Service.</p>,
+      },
+      {
+        heading: '10. Contact',
+        body: <p>For requests regarding disclosure, correction, or deletion of personal information, or for privacy-related inquiries, please use the contact form on the site.</p>,
+      },
+    ],
+  },
+
+  ar: {
+    title: 'سياسة الخصوصية',
+    updated: 'آخر تحديث: يناير 2025',
+    dir: 'rtl',
+    sections: [
+      {
+        heading: '1. معلومات عنا',
+        body: <p>تشغّل HaLVision (المشار إليها فيما يلي بـ «نحن») خدمة «Nail Seitai AI Diagnosis» (المشار إليها فيما يلي بـ «الخدمة»).</p>,
+      },
+      {
+        heading: '2. المعلومات التي نجمعها',
+        body: (
+          <>
+            <p className="mb-2">قد نجمع المعلومات التالية عند استخدامك للخدمة.</p>
+            <ul className="mr-4 space-y-1 list-disc text-muted-foreground">
+              <li>عنوان البريد الإلكتروني وكلمة المرور (عند تسجيل الحساب)</li>
+              <li>الصور المرفوعة للأظافر وباطن القدم</li>
+              <li>إجابات الاستبيان المتعلقة بالتشخيص (العمر، الجنس، الرياضة، الحالة البدنية، إلخ)</li>
+              <li>بيانات نتائج التشخيص بالذكاء الاصطناعي</li>
+              <li>سجلات الوصول (عنوان IP، معلومات المتصفح، إلخ)</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '3. كيفية استخدام معلوماتك',
+        body: (
+          <>
+            <p className="mb-2">تُستخدم المعلومات المجمّعة للأغراض التالية.</p>
+            <ul className="mr-4 space-y-1 list-disc text-muted-foreground">
+              <li>تقديم خدمة التشخيص بالذكاء الاصطناعي وتحسين دقتها</li>
+              <li>إدارة حسابات المستخدمين والمصادقة عليها</li>
+              <li>توفير ميزات حفظ سجل التشخيص وعرضه</li>
+              <li>تحسين الخدمة والبحث والتطوير (قد تُستخدم كبيانات إحصائية مجهولة الهوية)</li>
+              <li>اكتشاف الوصول غير المصرح به ومنعه</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '4. المشاركة مع أطراف ثالثة',
+        body: (
+          <>
+            <p>لن نقدّم المعلومات الشخصية المجمّعة لأطراف ثالثة إلا في الحالات التالية.</p>
+            <ul className="mr-4 mt-2 space-y-1 list-disc text-muted-foreground">
+              <li>عند موافقة المستخدم</li>
+              <li>عند الاقتضاء القانوني</li>
+              <li>عند الضرورة لحماية حياة شخص أو جسده أو ممتلكاته</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '5. الخدمات الخارجية',
+        body: (
+          <>
+            <p className="mb-2">تستخدم الخدمة الخدمات الخارجية التالية، وتخضع كل منها لسياسة الخصوصية الخاصة بها.</p>
+            <ul className="mr-4 space-y-1 list-disc text-muted-foreground">
+              <li>Google LLC (Google Gemini AI)</li>
+              <li>Supabase Inc. (قاعدة البيانات والتخزين)</li>
+              <li>Vercel Inc. (الاستضافة)</li>
+            </ul>
+          </>
+        ),
+      },
+      {
+        heading: '6. تخزين البيانات وحذفها',
+        body: <p>تُخزَّن البيانات المجمّعة مشفَّرة على خوادم Supabase (AWS). لطلب حذف الحساب، يُرجى التواصل معنا عبر نموذج الاستفسار. سنعالج طلبك في غضون 30 يومًا.</p>,
+      },
+      {
+        heading: '7. ملفات تعريف الارتباط (Cookies)',
+        body: <p>تستخدم الخدمة ملفات تعريف الارتباط للحفاظ على حالة تسجيل الدخول. يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، لكن قد تصبح بعض الميزات غير متاحة.</p>,
+      },
+      {
+        heading: '8. القاصرون',
+        body: <p>إذا كنت دون السادسة عشرة من العمر، يُرجى الحصول على موافقة وليّ الأمر قبل استخدام الخدمة.</p>,
+      },
+      {
+        heading: '9. التغييرات على هذه السياسة',
+        body: <p>قد يتم تحديث هذه السياسة دون إشعار مسبق. سنُعلمك بالتغييرات الجوهرية من خلال الخدمة.</p>,
+      },
+      {
+        heading: '10. التواصل معنا',
+        body: <p>للاستفسار عن الإفصاح أو تصحيح أو حذف المعلومات الشخصية، أو لأي استفسارات تتعلق بالخصوصية، يُرجى استخدام نموذج التواصل على الموقع.</p>,
+      },
+    ],
+  },
+};
+
+export default async function PrivacyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const lang = (locale === 'en' || locale === 'ar') ? locale : 'ja';
+  const c = content[lang];
+
   return (
     <div className="flex min-h-screen flex-col bg-muted">
       <Header />
       <main className="flex-1 py-12">
         <div className="mx-auto max-w-3xl px-4">
-          <div className="rounded-xl border border-border bg-white p-8 shadow-sm">
-            <h1 className="mb-2 text-2xl font-bold text-foreground">プライバシーポリシー</h1>
-            <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年3月23日</p>
+          <div className="rounded-xl border border-border bg-white p-8 shadow-sm" dir={c.dir}>
+            <h1 className="mb-2 text-3xl font-bold text-foreground">{c.title}</h1>
+            <p className="mb-8 text-sm text-muted-foreground">{c.updated}</p>
 
-            <Section title="1. はじめに">
-              <p>
-                爪整体AI（以下「本サービス」）は、ユーザーのプライバシーを尊重し、個人情報の適切な保護に努めます。
-                本ポリシーは、本サービスが収集する情報の種類、利用目的、管理方法について説明するものです。
-              </p>
-            </Section>
-
-            <Section title="2. 収集する情報">
-              <Subsection title="2-1. アカウント情報">
-                <p>Googleアカウントまたはメール・パスワードでログインいただく場合、以下の情報を取得します。</p>
-                <ul>
-                  <li>メールアドレス</li>
-                  <li>表示名（Googleログインの場合）</li>
-                  <li>ログイン日時</li>
-                </ul>
-              </Subsection>
-              <Subsection title="2-2. 診断データ">
-                <p>AI診断を利用した場合、以下のデータを収集・保存します。</p>
-                <ul>
-                  <li>アップロードされた画像（爪・足裏）</li>
-                  <li>問診アンケートの回答（年齢・競技・身体状態など）</li>
-                  <li>AI診断結果（スコア・所見・推奨事項）</li>
-                  <li>チャット問診のメッセージログ</li>
-                </ul>
-                <p className="mt-2">
-                  ログインしていない場合、診断データは匿名で保存され、ユーザーアカウントとは紐付けられません。
-                </p>
-              </Subsection>
-              <Subsection title="2-3. 自動収集情報">
-                <p>本サービスへのアクセスに際し、以下の情報が自動的に収集される場合があります。</p>
-                <ul>
-                  <li>IPアドレス</li>
-                  <li>ブラウザの種類・バージョン</li>
-                  <li>アクセス日時</li>
-                  <li>参照元URL</li>
-                </ul>
-              </Subsection>
-            </Section>
-
-            <Section title="3. 情報の利用目的">
-              <p>収集した情報は以下の目的のみに利用します。</p>
-              <ul>
-                <li>AI診断サービスの提供・改善</li>
-                <li>診断履歴の管理・表示</li>
-                <li>サービスの品質向上・研究開発（匿名化処理後）</li>
-                <li>お問い合わせへの対応</li>
-                <li>不正利用の防止</li>
-              </ul>
-              <p className="mt-2">
-                収集した個人情報を、ユーザーの同意なく第三者に販売・提供することはありません。
-              </p>
-            </Section>
-
-            <Section title="4. 画像データの取り扱い">
-              <p>
-                アップロードされた画像はAI診断の実行に使用され、診断結果とともにデータベースに保存されます。
-                保存された画像は、サービス改善・AI学習の目的で利用される場合がありますが、その際は個人を特定できない形で処理します。
-              </p>
-              <p className="mt-2">
-                アカウント削除を希望する場合、保存されたデータの削除をお問い合わせフォームよりご依頼いただけます。
-              </p>
-            </Section>
-
-            <Section title="5. 第三者サービスの利用">
-              <p>本サービスは以下の第三者サービスを利用しており、それぞれのプライバシーポリシーが適用されます。</p>
-              <ul>
-                <li><strong>Supabase</strong>（データベース・認証）— <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">supabase.com/privacy</a></li>
-                <li><strong>Google Gemini API</strong>（AI診断）— <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">policies.google.com/privacy</a></li>
-                <li><strong>Vercel</strong>（ホスティング）— <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline">vercel.com/legal/privacy-policy</a></li>
-              </ul>
-            </Section>
-
-            <Section title="6. Cookie の使用">
-              <p>
-                本サービスはセッション管理のためにCookieを使用します。
-                ブラウザの設定によりCookieを無効にすることも可能ですが、その場合ログイン状態の維持などの機能が正常に動作しない場合があります。
-              </p>
-            </Section>
-
-            <Section title="7. セキュリティ">
-              <p>
-                個人情報の保護のため、SSL/TLS暗号化通信を採用し、データへのアクセスは認証されたシステムのみに限定しています。
-                ただし、インターネット上のいかなる通信・保存方法も100%安全であるとは保証できません。
-              </p>
-            </Section>
-
-            <Section title="8. 未成年者の利用">
-              <p>
-                本サービスは13歳未満の方の利用を想定していません。
-                13歳未満のお子様が個人情報を提供していることが判明した場合、速やかに削除いたします。
-              </p>
-            </Section>
-
-            <Section title="9. ポリシーの変更">
-              <p>
-                本ポリシーは予告なく変更される場合があります。
-                重要な変更がある場合は、本ページにて更新日を明示します。
-                変更後も継続して本サービスをご利用いただいた場合、変更後のポリシーに同意したものとみなします。
-              </p>
-            </Section>
-
-            <Section title="10. お問い合わせ">
-              <p>
-                個人情報の取り扱いに関するご質問・削除依頼は、<a href="/ja/contact" className="text-primary underline">お問い合わせフォーム</a>よりご連絡ください。
-              </p>
-            </Section>
+            <div className="space-y-8 text-sm leading-relaxed text-foreground">
+              {c.sections.map((s) => (
+                <section key={s.heading}>
+                  <h2 className="mb-3 text-lg font-bold">{s.heading}</h2>
+                  <div className="text-muted-foreground">{s.body}</div>
+                </section>
+              ))}
+            </div>
           </div>
         </div>
       </main>
       <Footer />
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="mb-8">
-      <h2 className="mb-3 text-base font-bold text-foreground border-b border-border pb-2">{title}</h2>
-      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">{children}</div>
-    </section>
-  );
-}
-
-function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-3">
-      <h3 className="mb-1 text-sm font-semibold text-foreground">{title}</h3>
-      <div className="space-y-1 text-sm leading-relaxed text-muted-foreground [&_ul]:mt-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1">{children}</div>
     </div>
   );
 }
