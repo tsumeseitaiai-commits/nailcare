@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SportsGallery from '@/components/SportsGallery';
 
 type PainPointItem = { icon: string; text: string };
 type FeatureItem = { title: string; desc: string; icon: string };
@@ -85,6 +86,9 @@ export default async function SportsPage() {
             </div>
           </div>
         </section>
+
+        {/* ===== Sports Gallery ===== */}
+        <SportsGallery />
 
         {/* ===== Features ===== */}
         <section id="features" className="bg-muted py-20 sm:py-28">
