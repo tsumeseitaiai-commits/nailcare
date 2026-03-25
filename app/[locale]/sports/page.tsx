@@ -234,7 +234,7 @@ export default async function SportsPage() {
                 </p>
                 <p className="mt-3 text-lg font-bold">{pricingPaid.desc}</p>
                 <Link
-                  href="/ai-diagnosis"
+                  href="/pricing"
                   className="mt-8 flex w-full items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-700 transition-all hover:bg-white/90"
                 >
                   {pricingPaid.cta}
