@@ -8,6 +8,7 @@ import HeroCanvas from "@/components/HeroCanvas";
 export default function HomePage() {
   const t = useTranslations("home");
   const tMedia = useTranslations("media");
+  const tNew = useTranslations("newServices");
   const conditionItems = t.raw("conditions.items") as {
     name: string; eng: string; severity: string; desc: string; action: string; color: string;
   }[];
@@ -88,15 +89,6 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                {/* Stats */}
-                <div className="mt-14 grid grid-cols-3 gap-6 border-t border-white/20 pt-8">
-                  {(["accuracy", "images", "support"] as const).map((key) => (
-                    <div key={key}>
-                      <p className="text-2xl font-bold text-white">{t(`hero.stats.${key}.value`)}</p>
-                      <p className="mt-0.5 text-xs text-white/60">{t(`hero.stats.${key}.label`)}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Hero image */}
@@ -570,6 +562,88 @@ export default function HomePage() {
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
               >
                 {tMedia("title")} →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== NEW: New Services Section ===== */}
+        <section className="bg-gradient-to-br from-slate-50 via-white to-primary/5 py-20 sm:py-28">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                {tNew("badge")}
+              </span>
+              <h2 className="mt-4 text-3xl font-bold text-foreground sm:text-4xl">
+                {tNew("title")}
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                {tNew("subtitle")}
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-6 lg:grid-cols-2">
+              {/* Sports Plan Card */}
+              <Link
+                href="/sports"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <div className="absolute top-0 end-0 h-32 w-32 rounded-bl-3xl bg-gradient-to-bl from-blue-500/10 to-transparent" />
+                <div className="relative">
+                  <div className="flex items-start justify-between">
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 border border-blue-100">
+                      {tNew("sports.badge")}
+                    </span>
+                    <span className="text-sm font-bold text-blue-600">{tNew("sports.price")}</span>
+                  </div>
+                  <div className="mt-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-2xl">
+                    🏆
+                  </div>
+                  <h3 className="mt-4 text-xl font-bold text-foreground group-hover:text-blue-600 transition-colors">
+                    {tNew("sports.title")}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {tNew("sports.desc")}
+                  </p>
+                  <div className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-blue-600">
+                    {tNew("sports.cta")}
+                    <svg className="h-4 w-4 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Kids Growth Card */}
+              <Link
+                href="/kids"
+                className="group relative overflow-hidden rounded-2xl border border-border bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <div className="absolute top-0 end-0 h-32 w-32 rounded-bl-3xl bg-gradient-to-bl from-emerald-500/10 to-transparent" />
+                <div className="relative">
+                  <div className="flex items-start justify-between">
+                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
+                      {tNew("kids.badge")}
+                    </span>
+                    <span className="text-sm font-bold text-emerald-600">{tNew("kids.price")}</span>
+                  </div>
+                  <div className="mt-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-2xl">
+                    👶
+                  </div>
+                  <h3 className="mt-4 text-xl font-bold text-foreground group-hover:text-emerald-600 transition-colors">
+                    {tNew("kids.title")}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {tNew("kids.desc")}
+                  </p>
+                  <div className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600">
+                    {tNew("kids.cta")}
+                    <svg className="h-4 w-4 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </div>
               </Link>
             </div>
           </div>

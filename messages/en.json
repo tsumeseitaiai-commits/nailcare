@@ -12,7 +12,9 @@
     "brandTagline": "AI Diagnosis",
     "aiDiagnosis": "AI Diagnosis",
     "contact": "Contact",
-    "footCare": "Foot Care"
+    "footCare": "Foot Care",
+    "sports": "Sports",
+    "kids": "Kids"
   },
   "home": {
     "hero": {
@@ -1652,6 +1654,157 @@
           "Evidence-Based Care: All treatments are tracked with objective data, providing measurable outcomes and personalized care plans."
         ]
       }
+    }
+  },
+  "sports": {
+    "nav": "Sports",
+    "metadata": {
+      "title": "Sports Plan | Performance-Changing Nail Seitai AI",
+      "description": "AI diagnosis of feet and nails to quantify output loss and injury risk. Match schedule management and auto rehab planning to maximize athletic performance."
+    },
+    "hero": {
+      "badge": "NEW SERVICE — Sports Plan",
+      "title": "Performance-Changing Nail Seitai AI",
+      "subtitle": "Your discomfort might not be your muscles — it could be your 'force outlet'",
+      "cta": "Start Free Diagnosis",
+      "secondary": "Learn More"
+    },
+    "painPoints": {
+      "title": "Do any of these sound familiar?",
+      "items": [
+        { "icon": "🦵", "text": "Can't plant your feet firmly" },
+        { "icon": "⚡", "text": "Slow to change direction" },
+        { "icon": "🩹", "text": "Recurring injuries" },
+        { "icon": "💨", "text": "Feeling of power draining away" }
+      ]
+    },
+    "features": {
+      "badge": "What You Can Do",
+      "title": "What this app does for you",
+      "items": [
+        { "title": "AI Diagnosis", "desc": "AI diagnosis of feet, toes, and nails", "icon": "🔬" },
+        { "title": "Output Loss %", "desc": "Quantify your 'output loss percentage'", "icon": "📊" },
+        { "title": "Injury Risk", "desc": "Visualize injury risk as a score", "icon": "⚠️" },
+        { "title": "Programs", "desc": "Auto-generate sport-specific improvement programs", "icon": "🏆" }
+      ]
+    },
+    "schedule": {
+      "badge": "NEW",
+      "title": "Match Schedule Management",
+      "desc": "Design your conditioning backwards from match day. Auto-suggest optimal nail and foot condition. Auto-generate pre-match routines.",
+      "cta": "Know exactly what to do and when"
+    },
+    "rehab": {
+      "badge": "NEW",
+      "title": "Injury Rehab Schedule",
+      "desc": "AI manages recovery stages for muscle strains, sprains, and more. Auto-suggests 'what to do right now'. Visualizes return-to-play timeline.",
+      "cta": "Recover safely, return faster"
+    },
+    "premium": {
+      "badge": "Premium",
+      "title": "Even More (Paid Features)",
+      "items": [
+        "Daily check-ins & feedback",
+        "Performance change graphs",
+        "AI coaching (unlimited consultations)"
+      ]
+    },
+    "benefits": {
+      "title": "Benefits",
+      "items": [
+        { "icon": "🛡️", "title": "Injury Prevention", "desc": "Identify risk in advance and prevent injuries before they happen" },
+        { "icon": "📈", "title": "Performance Boost", "desc": "Improve force transmission efficiency and break records" },
+        { "icon": "🎯", "title": "Peak Timing", "desc": "Reach peak condition exactly on match day" },
+        { "icon": "💪", "title": "Confident Rehab", "desc": "Visualize recovery stages and eliminate anxiety about returning" }
+      ]
+    },
+    "pricing": {
+      "badge": "Pricing",
+      "title": "Simple Pricing",
+      "free": { "label": "Free", "desc": "1 AI Diagnosis", "cta": "Try for Free" },
+      "paid": { "label": "¥980–2,980/mo", "desc": "Paid plan with full features", "cta": "View Plans" }
+    },
+    "team": {
+      "badge": "Team Plan",
+      "title": "Team Plans Available",
+      "desc": "For clubs, school teams, and professional teams",
+      "items": [
+        "Manage all athletes' status at once",
+        "Auto-notify high injury risk athletes",
+        "Sync with match schedules"
+      ]
+    },
+    "tagline": "Align before you train. Peak on match day.",
+    "taglineDesc": "This is what changes results.",
+    "ctaFinal": "Start Free Diagnosis"
+  },
+  "kids": {
+    "nav": "Kids",
+    "metadata": {
+      "title": "Kids Growth Tracker | AI App to See Growth Through Hands & Feet",
+      "description": "Record changes in your child's hands, feet, and nails from birth. AI visualizes growth milestones and development."
+    },
+    "hero": {
+      "badge": "NEW SERVICE — Kids Growth Tracker",
+      "title": "See Growth Through Hands & Feet",
+      "subtitle": "From the moment of birth, record changes in your child's hands, feet, and nails — and let AI make 'growth' visible.",
+      "cta": "Start Free Trial",
+      "secondary": "Learn More"
+    },
+    "features": {
+      "badge": "Features",
+      "title": "What you can do",
+      "items": [
+        { "title": "Auto Growth Records", "desc": "Just take photos of hands and feet to automatically track growth", "icon": "📸" },
+        { "title": "AI Scoring", "desc": "AI scores finger movement and grip strength", "icon": "🤖" },
+        { "title": "Milestone Detection", "desc": "Auto-detects 'first steps', 'firm grip', and more", "icon": "✨" },
+        { "title": "Growth Movie", "desc": "Auto-creates a year's worth of growth into a birthday movie", "icon": "🎬" }
+      ]
+    },
+    "difference": {
+      "badge": "What Makes Us Different",
+      "title": "More than just photo storage",
+      "desc": "Understand how your child's body is developing. Track strength, balance, and grip data over time.",
+      "points": [
+        { "label": "Regular photo apps", "value": "Just saves photos", "positive": false },
+        { "label": "This app", "value": "Analyzes and records as growth data", "positive": true }
+      ]
+    },
+    "target": {
+      "title": "Perfect for parents who...",
+      "items": [
+        { "icon": "📷", "text": "Want to properly document growth" },
+        { "icon": "🔍", "text": "Are concerned about development" },
+        { "icon": "🏃", "text": "Wonder about their child's future athletic ability" }
+      ]
+    },
+    "pricing": {
+      "badge": "Pricing",
+      "title": "Affordable Plans",
+      "free": { "label": "Free", "desc": "Basic recording features", "cta": "Start Free" },
+      "paid": { "label": "¥500–1,500/mo", "desc": "AI analysis, videos & growth predictions", "cta": "View Plans" }
+    },
+    "tagline": "Your child's growth is fleeting.",
+    "taglineDesc": "Start capturing every moment together.",
+    "ctaFinal": "Start Free Trial"
+  },
+  "newServices": {
+    "badge": "NEW SERVICES",
+    "title": "Introducing Two New Services",
+    "subtitle": "Applying our nail seitai AI technology to two exciting new areas",
+    "sports": {
+      "badge": "Sports Plan",
+      "title": "Performance-Changing Nail Seitai AI",
+      "desc": "Output loss quantification, injury risk visualization, match schedule management, auto rehab planning",
+      "cta": "Learn More",
+      "price": "¥980–2,980/mo"
+    },
+    "kids": {
+      "badge": "Kids Growth Tracker",
+      "title": "See Growth Through Hands & Feet",
+      "desc": "AI records, analyzes, and visualizes changes in hands, feet, and nails from birth",
+      "cta": "Learn More",
+      "price": "¥500–1,500/mo"
     }
   },
   "loading": {

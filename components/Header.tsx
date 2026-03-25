@@ -44,6 +44,11 @@ export default function Header() {
     { href: "/contact" as const, label: t("contact") },
   ];
 
+  const newServiceLinks = [
+    { href: "/sports" as const, label: t("sports"), badge: "NEW" },
+    { href: "/kids" as const, label: t("kids"), badge: "NEW" },
+  ];
+
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -83,6 +88,18 @@ export default function Header() {
               className="rounded-lg px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               {link.label}
+            </Link>
+          ))}
+          {newServiceLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="relative rounded-lg px-3.5 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+            >
+              {link.label}
+              <span className="absolute -top-0.5 -end-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-white leading-none">
+                N
+              </span>
             </Link>
           ))}
         </nav>
@@ -155,6 +172,19 @@ export default function Header() {
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 {link.label}
+              </Link>
+            ))}
+            {newServiceLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+              >
+                {link.label}
+                <span className="inline-flex items-center rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-white">
+                  NEW
+                </span>
               </Link>
             ))}
             {user ? (
