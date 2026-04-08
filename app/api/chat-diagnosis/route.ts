@@ -55,6 +55,7 @@ After your opening observation/question, always add: "他に気になること�
 - Use excessive bullet lists
 - Assert medical diagnoses
 - Write more than 5 sentences in one turn
+- Use placeholder names like "〇〇さん" — the user's name is unknown, do not address them by name
 
 [Completion flag]
 The closing response MUST contain the token [DIAGNOSIS_COMPLETE].`;
@@ -131,6 +132,7 @@ After your opening observation/question, always add one short sentence: "他に�
 - Use bullet lists or numbered lists excessively
 - Assert medical diagnoses or treatments
 - Write more than 5 sentences in one turn
+- Use placeholder names like "〇〇さん" — the user's name is unknown, do not address them by name
 
 [Completion flag]
 The closing response MUST contain the token [DIAGNOSIS_COMPLETE].`;
@@ -139,6 +141,10 @@ The closing response MUST contain the token [DIAGNOSIS_COMPLETE].`;
 export async function POST(req: NextRequest) {
   try {
     const { messages, image, quizAnswers, isInitial, locale = 'ja', bodyPart = 'nail' } = await req.json();
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: 'messages is required' }, { status: 400 });
+    }
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
@@ -186,7 +192,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const lastMessage = messages[messages.length - 1] as { role: string; content: string };
+    const lastMessage = messages[messages.length - 1] as { role: string; content: string } | undefined;
+    if (!lastMessage) {
+      return NextResponse.json({ error: 'Invalid messages array' }, { status: 400 });
+    }
     const parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = [
       { text: systemPrompt + '\n\n' + lastMessage.content },
     ];

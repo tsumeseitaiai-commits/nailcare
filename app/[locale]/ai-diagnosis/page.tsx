@@ -709,7 +709,8 @@ export default function AIDiagnosisPage() {
         body: JSON.stringify({ messages: updated, image, quizAnswers: bodyPart === 'sole' ? heelAnswers : quizAnswers, locale, bodyPart }),
       });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      if (!res.ok || data.error) throw new Error(data?.error || data?.details || `HTTP ${res.status}`);
+      if (!data.response) throw new Error('Empty response from AI');
       const aiMsg: Message = { role: 'assistant', content: data.response, timestamp: new Date().toISOString() };
       const final = [...updated, aiMsg];
       setMessages(final);
