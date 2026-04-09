@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
           ankle_sprain:        q?.ankleSprain ?? null,
           current_pain_areas:  q?.currentPainAreas ?? [],
           nail_condition: {},
+          ai_diagnosis: {},
           health_data: q ?? {},
           model_version: 'quiz-only',
           user_consent: true,
