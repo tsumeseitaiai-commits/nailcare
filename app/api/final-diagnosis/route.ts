@@ -8,13 +8,22 @@ import { HEEL_KNOWLEDGE } from '@/lib/heelKnowledge';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const MODEL_VERSION = 'gemini-2.5-flash';
 
-// GeminiのJSON出力に含まれる生の改行文字を修正してパース
+const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+
+const JSON_GENERATION_CONFIG = {
+  responseMimeType: 'application/json' as const,
+  temperature: 0.2,
+};
+
+// JSON.parse失敗時は壊れたレスポンス先頭をログに出しつつ改行修正して再試行（応急処置）
 function parseGeminiJson(text: string) {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('JSON形式の応答を取得できませんでした');
   try {
     return JSON.parse(jsonMatch[0]);
-  } catch {
+  } catch (firstErr) {
+    console.error('[parseGeminiJson] JSON.parse失敗。レスポンス先頭200字:', jsonMatch[0].slice(0, 200));
+    console.error('[parseGeminiJson] エラー:', (firstErr as Error).message);
     // 文字列内の生の改行・タブを\\nに置換して再試行
     let fixed = '';
     let inString = false;
@@ -31,16 +40,15 @@ function parseGeminiJson(text: string) {
     return JSON.parse(fixed);
   }
 }
-const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
 
 async function generateWithFallback(contents: Parameters<ReturnType<typeof genAI.getGenerativeModel>['generateContent']>[0]) {
   try {
-    return await genAI.getGenerativeModel({ model: MODEL_VERSION }).generateContent(contents);
+    return await genAI.getGenerativeModel({ model: MODEL_VERSION, generationConfig: JSON_GENERATION_CONFIG }).generateContent(contents);
   } catch (err) {
     const e = err as { message?: string };
     if (e?.message?.includes('503') || e?.message?.includes('Service Unavailable')) {
       console.warn(`[Gemini] ${MODEL_VERSION} 503 → フォールバック: ${FALLBACK_MODEL}`);
-      return await genAI.getGenerativeModel({ model: FALLBACK_MODEL }).generateContent(contents);
+      return await genAI.getGenerativeModel({ model: FALLBACK_MODEL, generationConfig: JSON_GENERATION_CONFIG }).generateContent(contents);
     }
     throw err;
   }
