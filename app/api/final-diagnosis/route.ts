@@ -7,6 +7,30 @@ import { HEEL_KNOWLEDGE } from '@/lib/heelKnowledge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const MODEL_VERSION = 'gemini-2.5-flash';
+
+// GeminiのJSON出力に含まれる生の改行文字を修正してパース
+function parseGeminiJson(text: string) {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('JSON形式の応答を取得できませんでした');
+  try {
+    return JSON.parse(jsonMatch[0]);
+  } catch {
+    // 文字列内の生の改行・タブを\\nに置換して再試行
+    let fixed = '';
+    let inString = false;
+    let escaped = false;
+    for (const ch of jsonMatch[0]) {
+      if (escaped) { fixed += ch; escaped = false; continue; }
+      if (ch === '\\' && inString) { fixed += ch; escaped = true; continue; }
+      if (ch === '"') { inString = !inString; fixed += ch; continue; }
+      if (inString && ch === '\n') { fixed += '\\n'; continue; }
+      if (inString && ch === '\r') { fixed += '\\r'; continue; }
+      if (inString && ch === '\t') { fixed += '\\t'; continue; }
+      fixed += ch;
+    }
+    return JSON.parse(fixed);
+  }
+}
 const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
 
 async function generateWithFallback(contents: Parameters<ReturnType<typeof genAI.getGenerativeModel>['generateContent']>[0]) {
@@ -138,18 +162,17 @@ Return ONLY the following JSON (no explanation, no code blocks):
     ]);
 
     const responseText = result.response.text();
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    const diagnosis = parseGeminiJson(responseText);
 
-    if (!jsonMatch) {
-      throw new Error('JSON形式の応答を取得できませんでした');
-    }
-
-    const diagnosis = JSON.parse(jsonMatch[0]);
-
-    // --- Supabase保存（caseIdがあればUPDATE、なければINSERT）---
+    // --- Supabase保存（失敗しても診断結果は返す）---
     console.log('[API] Supabase保存を開始します...');
-    await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale, caseId, userId });
-    console.log('[API] Supabase保存が完了しました');
+    try {
+      await saveToSupabase({ image, messages, diagnosis, quizAnswers, locale, caseId, userId });
+      console.log('[API] Supabase保存が完了しました');
+    } catch (saveError) {
+      const se = saveError as { message?: string };
+      console.error('[API] Supabase保存失敗（診断結果は返します）:', se?.message);
+    }
 
     return NextResponse.json(diagnosis);
   } catch (error) {
@@ -450,10 +473,7 @@ practitioner_points: 施術者が優先的に対応すべき点を2〜3つ。イ
   ]);
 
   const responseText = result.response.text();
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Invalid JSON from Gemini (sole)');
-
-  const diagnosis = JSON.parse(jsonMatch[0]);
+  const diagnosis = parseGeminiJson(responseText);
 
   // Supabase保存: caseId がある場合は UPDATE、なければ INSERT
   try {
