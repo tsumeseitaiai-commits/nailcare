@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { HEEL_KNOWLEDGE } from '@/lib/heelKnowledge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const PRIMARY_MODEL = 'gemini-2.5-flash';
+const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
 
 function getLangInstruction(locale: string): string {
   if (locale === 'ar') return 'IMPORTANT: You must respond in Arabic (العربية) only.';
@@ -146,10 +148,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'messages is required' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-    });
-
     const systemPrompt = bodyPart === 'sole'
       ? buildHeelSystemPrompt(quizAnswers, locale)
       : buildSystemPrompt(quizAnswers, locale);
@@ -184,14 +182,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const chat = model.startChat({
-      history: chatHistory,
-      generationConfig: {
-        maxOutputTokens: 2000,
-        temperature: 0.7,
-      },
-    });
-
     const lastMessage = messages[messages.length - 1] as { role: string; content: string } | undefined;
     if (!lastMessage) {
       return NextResponse.json({ error: 'Invalid messages array' }, { status: 400 });
@@ -211,7 +201,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const result = await chat.sendMessage(parts);
+    // 503の場合はフォールバックモデルで再試行
+    const sendWithFallback = async (modelName: string) => {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const chat = model.startChat({
+        history: chatHistory,
+        generationConfig: { maxOutputTokens: 2000, temperature: 0.7 },
+      });
+      return await chat.sendMessage(parts);
+    };
+
+    let result;
+    try {
+      result = await sendWithFallback(PRIMARY_MODEL);
+    } catch (err) {
+      const e = err as { message?: string };
+      if (e?.message?.includes('503') || e?.message?.includes('Service Unavailable')) {
+        console.warn(`[Gemini] ${PRIMARY_MODEL} 503 → フォールバック: ${FALLBACK_MODEL}`);
+        result = await sendWithFallback(FALLBACK_MODEL);
+      } else {
+        throw err;
+      }
+    }
 
     if (!result || !result.response) {
       throw new Error('No response from AI');
